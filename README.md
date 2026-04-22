@@ -8,7 +8,7 @@
 ![bpmn--js](https://img.shields.io/badge/bpmn--js-17-1a1a1a)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 
-A single-page, vanilla-JS reader for browsing BPMN process landscapes. Inspired by SAP Signavio's Process Collaboration Hub — structured like a data catalog, read-only, and designed for non-modellers to navigate collections of documented business processes.
+A single-page, vanilla-JS reader for browsing BPMN process landscapes. Structured like a data catalog, read-only, and designed for non-modellers to navigate collections of documented business processes.
 
 No build step. No framework. Load over an HTTP server and go.
 
