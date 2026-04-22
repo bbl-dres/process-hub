@@ -393,18 +393,10 @@ body.sidebar-resizing .header-logo { transition: none !important; }
   width: 100%;
   animation: fadeIn 200ms ease;
 }
-/* Cap prose-heavy views at --content-max-width so 4K monitors don't
-   stretch KPIs, Metadaten cards, or the chat placeholder all the way
-   across. Route-specific body classes opt in. The Tabelle / Diagramm
-   views deliberately go full-width (they're canvases). */
-body.route-home .content-wrapper,
-body.route-workflows .content-wrapper,
-body.route-chat .content-wrapper,
-body.route-search .content-wrapper,
-body.route-collection-metadata .content-wrapper,
-body.route-process-metadata .content-wrapper {
-  max-width: var(--content-max-width);
-}
+/* Individual prose elements (descriptions, long text inside Metadaten
+   props-table values) get their own --prose-max-width cap so lines stay
+   readable on wide displays — but the layout frame goes full-width,
+   giving tables and card grids the horizontal room they want. */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
