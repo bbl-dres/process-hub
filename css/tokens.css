@@ -102,9 +102,22 @@
   --transition-hover: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
 
   /* Layout */
-  --sidebar-width: 260px;
+  --sidebar-width: 300px;
   --header-height: 56px;
   --content-max-width: 960px;
   --content-padding: 32px;
   --prose-max-width: 720px;
+
+  /* Data-table column widths — shared across every .data-table in the app
+     so the same concept (Nr. / Status / Bereich / …) is the same width
+     everywhere. Mix fixed pixels (predictable content) with a single
+     percentage for the primary text column so it scales with the viewport
+     instead of eating 100% of remaining space. */
+  --col-id:         160px;    /* "TQ.21.00.00.15", "2.3b" */
+  --col-count:      120px;    /* Small numeric counts (Bereiche, Prozesse, …) */
+  --col-status:     160px;    /* Status badges ("Freigegeben", "In Prüfung") */
+  --col-date:       140px;    /* ISO dates (YYYY-MM-DD) */
+  --col-area:       220px;    /* Bereich badge column */
+  --col-person:     220px;    /* Owner / Expert name + org */
+  --col-primary:    35%;      /* Primary name/title column (responsive) */
 }

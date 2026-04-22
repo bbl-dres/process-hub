@@ -123,7 +123,7 @@ function showFatalError(err) {
     <div style="max-width: 480px; text-align: center; padding: 32px;">
       <h2 style="margin-bottom: 12px; color: var(--color-text-primary);">Daten konnten nicht geladen werden</h2>
       <p style="color: var(--color-text-secondary); margin-bottom: 8px;">${escapeHtml(err.message)}</p>
-      <p style="color: var(--color-text-secondary); font-size: var(--text-small);">
+      <p class="text-sub">
         Die Seite muss über einen HTTP-Server geöffnet werden
         (z.&nbsp;B. <code>python -m http.server</code>).
         <code>file://</code> blockiert <code>fetch</code>.
@@ -593,16 +593,16 @@ function renderHome() {
         `).join('')}
       </div>
 
-      <div class="section-label">Prozess-Sammlungen</div>
-      <div class="list-panel">
+      <section class="content-section">
+        <div class="section-label">Prozess-Sammlungen</div>
         <div class="data-table-wrap">
           <table class="data-table">
             <colgroup>
-              <col>
-              <col style="width: 200px;">
-              <col style="width: 110px;">
-              <col style="width: 140px;">
-              <col style="width: 140px;">
+              <col style="width: var(--col-primary);">
+              <col style="width: var(--col-count);">
+              <col style="width: var(--col-count);">
+              <col style="width: var(--col-count);">
+              <col style="width: var(--col-date);">
             </colgroup>
             <thead>
               <tr>
@@ -618,10 +618,12 @@ function renderHome() {
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <div class="section-label" style="margin-top: var(--space-6);">Letzte Aktivitäten</div>
-      ${renderRecentActivityTable()}
+      <section class="content-section">
+        <div class="section-label">Letzte Aktivitäten</div>
+        ${renderRecentActivityTable()}
+      </section>
     </div>
   `;
 }
@@ -636,45 +638,43 @@ function renderRecentActivityTable() {
     });
   });
   if (all.length === 0) {
-    return `<p style="color: var(--color-text-secondary);">Keine Aktivitäten erfasst.</p>`;
+    return `<p class="text-secondary">Keine Aktivitäten erfasst.</p>`;
   }
   all.sort((x, y) => (y.g.updatedAt || '').localeCompare(x.g.updatedAt || ''));
   const top = all.slice(0, 5);
   return `
-    <div class="list-panel">
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <colgroup>
-            <col style="width: 140px;">
-            <col>
-            <col style="width: 220px;">
-            <col style="width: 140px;">
-            <col style="width: 130px;">
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col">Nr.</th>
-              <th scope="col">Prozess</th>
-              <th scope="col">Sammlung</th>
-              <th scope="col">Status</th>
-              <th scope="col">Aktualisiert</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${top.map(({ c, a, g }) => {
-              const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(g.id)}`;
-              return `
-                <tr class="clickable-row" data-href="${escapeAttr(href)}">
-                  <td style="font-variant-numeric: tabular-nums;">${escapeHtml(g.id)}</td>
-                  <td>${escapeHtml(g.name)}</td>
-                  <td>${escapeHtml(c.name)}</td>
-                  <td>${renderStatusBadge(g.status)}</td>
-                  <td>${escapeHtml(g.updatedAt)}</td>
-                </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <colgroup>
+          <col style="width: var(--col-id);">
+          <col style="width: var(--col-primary);">
+          <col style="width: var(--col-area);">
+          <col style="width: var(--col-status);">
+          <col style="width: var(--col-date);">
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Nr.</th>
+            <th scope="col">Prozess</th>
+            <th scope="col">Sammlung</th>
+            <th scope="col">Status</th>
+            <th scope="col">Aktualisiert</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${top.map(({ c, a, g }) => {
+            const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(g.id)}`;
+            return `
+              <tr class="clickable-row" data-href="${escapeAttr(href)}">
+                <td class="tabular-nums">${escapeHtml(g.id)}</td>
+                <td>${escapeHtml(g.name)}</td>
+                <td>${escapeHtml(c.name)}</td>
+                <td>${renderStatusBadge(g.status)}</td>
+                <td>${escapeHtml(g.updatedAt)}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
     </div>
   `;
 }
@@ -687,12 +687,12 @@ function renderCollectionRow(c) {
     <tr class="clickable-row" data-href="${escapeAttr(href)}">
       <td>
         <div style="font-weight:500;">${escapeHtml(c.name)}</div>
-        ${c.subtitle ? `<div style="font-size: var(--text-small); color: var(--color-text-secondary);">${escapeHtml(c.subtitle)}</div>` : ''}
+        ${c.subtitle ? `<div class="text-sub">${escapeHtml(c.subtitle)}</div>` : ''}
       </td>
-      <td style="font-variant-numeric: tabular-nums;">${c.landscape.areas.length}</td>
-      <td style="font-variant-numeric: tabular-nums;">${count}</td>
-      <td style="font-variant-numeric: tabular-nums;">${bpmn}</td>
-      <td style="color: var(--color-text-secondary); font-size: var(--text-small);">${escapeHtml(c.updatedAt || '—')}</td>
+      <td class="tabular-nums">${c.landscape.areas.length}</td>
+      <td class="tabular-nums">${count}</td>
+      <td class="tabular-nums">${bpmn}</td>
+      <td class="text-sub">${escapeHtml(c.updatedAt || '—')}</td>
     </tr>
   `;
 }
@@ -766,14 +766,14 @@ function renderCollectionMetadataView(c) {
     ? (c.ownerUrl
         ? `<a href="${escapeAttr(c.ownerUrl)}" target="_blank" rel="noopener">${escapeHtml(c.owner)}</a>`
         : escapeHtml(c.owner))
-    : '<span style="color: var(--color-text-placeholder);">—</span>';
+    : '<span class="text-placeholder">—</span>';
 
   return `
     <section class="content-section">
       <div class="section-label">Beschreibung</div>
       ${c.description
         ? `<p style="margin:0; max-width: var(--prose-max-width); line-height:1.6;">${escapeHtml(c.description)}</p>`
-        : `<p style="margin:0; color: var(--color-text-placeholder);">Keine Beschreibung hinterlegt.</p>`}
+        : `<p class="text-placeholder" style="margin:0;">Keine Beschreibung hinterlegt.</p>`}
     </section>
 
     <section class="content-section">
@@ -949,11 +949,11 @@ function renderProcessTable(c, rows) {
     <div class="data-table-wrap">
       <table class="data-table">
         <colgroup>
-          <col style="width: 170px;">
-          <col>
-          <col style="width: 260px;">
-          <col style="width: 260px;">
-          <col style="width: 180px;">
+          <col style="width: var(--col-id);">
+          <col style="width: var(--col-primary);">
+          <col style="width: var(--col-area);">
+          <col style="width: var(--col-person);">
+          <col style="width: var(--col-status);">
         </colgroup>
         <thead>
           <tr>
@@ -978,7 +978,7 @@ function renderProcessRow(c, a, g) {
   const filterActive = state.filters[c.id]?.phases.has(a.id);
   return `
     <tr class="clickable-row" data-href="${escapeAttr(href)}">
-      <td style="font-variant-numeric: tabular-nums;">${escapeHtml(g.id)}</td>
+      <td class="tabular-nums">${escapeHtml(g.id)}</td>
       <td>${escapeHtml(g.name)}</td>
       <td>
         <button type="button" class="badge badge-domain badge-filterable"
@@ -986,13 +986,13 @@ function renderProcessRow(c, a, g) {
                 ${filterActive ? 'aria-pressed="true"' : ''}
                 title="Nach Bereich filtern">${escapeHtml(a.name)}</button>
       </td>
-      <td>${owner ? escapeHtml(owner.name) : '<span style="color: var(--color-text-placeholder);">—</span>'}</td>
+      <td>${owner ? escapeHtml(owner.name) : '<span class="text-placeholder">—</span>'}</td>
       <td>${renderStatusBadge(g.status)}</td>
     </tr>`;
 }
 
 function renderStatusBadge(status) {
-  if (!status) return '<span style="color: var(--color-text-placeholder);">—</span>';
+  if (!status) return '<span class="text-placeholder">—</span>';
   const s = STATUS_LABELS[status];
   if (!s) return escapeHtml(status);
   return `<span class="badge ${s.badge}">${escapeHtml(s.label)}</span>`;
@@ -1018,7 +1018,10 @@ function renderGroupingDropdown(collId) {
 
 function groupRows(rows, grouping, c) {
   if (grouping === 'none') {
-    return [{ label: null, rows }];
+    // Still emit a single group so the header-with-count renders — matches
+    // the data-catalog pattern of always showing "<label> (N)" above the
+    // table, even when there's no real grouping.
+    return [{ label: 'Prozesse', rows }];
   }
 
   const keyFn = {
@@ -1481,8 +1484,8 @@ function renderProcessDiagramPane(group) {
 }
 
 function renderProcessMetadataPane(c, area, group) {
-  const dash = '<span style="color: var(--color-text-placeholder);">—</span>';
-  const emptyPara = msg => `<p style="margin:0; color: var(--color-text-placeholder);">${escapeHtml(msg)}</p>`;
+  const dash = '<span class="text-placeholder">—</span>';
+  const emptyPara = msg => `<p class="text-placeholder" style="margin:0;">${escapeHtml(msg)}</p>`;
 
   const responsibleList = (group.responsible || []).map(renderPersonInline).join('<br>') || dash;
   const tagsHtml = (group.tags || []).length
@@ -1589,7 +1592,7 @@ function renderProcessMetadataPane(c, area, group) {
 }
 
 function renderLinkedProcesses(c, ids) {
-  if (!ids || ids.length === 0) return '<span style="color: var(--color-text-placeholder);">—</span>';
+  if (!ids || ids.length === 0) return '<span class="text-placeholder">—</span>';
   return ids.map(pid => {
     const hit = findGroupInCollection(c, pid);
     if (hit) {
@@ -1614,10 +1617,10 @@ function renderProcessStepsPane() {
 }
 
 function renderPersonInline(id) {
-  if (!id) return '<span style="color: var(--color-text-placeholder);">—</span>';
+  if (!id) return '<span class="text-placeholder">—</span>';
   const p = resolvePerson(id);
   if (!p) return escapeHtml(id);
-  return `<div>${escapeHtml(p.name)}</div>${p.org ? `<div style="font-size: var(--text-small); color: var(--color-text-secondary);">${escapeHtml(p.org)}</div>` : ''}`;
+  return `<div>${escapeHtml(p.name)}</div>${p.org ? `<div class="text-sub">${escapeHtml(p.org)}</div>` : ''}`;
 }
 
 async function loadProcessSteps(group) {
@@ -1710,10 +1713,10 @@ function renderStepsTable(steps) {
     <div class="data-table-wrap">
       <table class="data-table">
         <colgroup>
-          <col style="width: 56px;">
-          <col>
-          <col style="width: 180px;">
-          <col style="width: 220px;">
+          <col style="width: 60px;">
+          <col style="width: var(--col-primary);">
+          <col style="width: var(--col-area);">
+          <col style="width: var(--col-person);">
         </colgroup>
         <thead>
           <tr>
@@ -1727,9 +1730,9 @@ function renderStepsTable(steps) {
           ${steps.map((s, i) => `
             <tr>
               <td style="font-variant-numeric: tabular-nums; color: var(--color-text-secondary);">${i + 1}</td>
-              <td>${s.name ? escapeHtml(s.name) : '<span style="color: var(--color-text-placeholder);">(ohne Namen)</span>'}</td>
+              <td>${s.name ? escapeHtml(s.name) : '<span class="text-placeholder">(ohne Namen)</span>'}</td>
               <td>${escapeHtml(s.typeLabel)}</td>
-              <td>${s.lane ? escapeHtml(s.lane) : '<span style="color: var(--color-text-placeholder);">—</span>'}</td>
+              <td>${s.lane ? escapeHtml(s.lane) : '<span class="text-placeholder">—</span>'}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -1861,10 +1864,10 @@ function renderWorkflowsView() {
       <div class="data-table-wrap">
         <table class="data-table">
           <colgroup>
+            <col style="width: var(--col-primary);">
+            <col style="width: var(--col-count);">
+            <col style="width: var(--col-count);">
             <col>
-            <col style="width: 110px;">
-            <col style="width: 140px;">
-            <col style="width: 420px;">
           </colgroup>
           <thead>
             <tr>
@@ -1885,8 +1888,8 @@ function renderWorkflowsView() {
                     <a href="#/c/${encodeURIComponent(c.id)}">${escapeHtml(c.name)}</a>
                     ${c.subtitle ? `<div>${escapeHtml(c.subtitle)}</div>` : ''}
                   </td>
-                  <td style="font-variant-numeric: tabular-nums;">${total}</td>
-                  <td style="font-variant-numeric: tabular-nums;">${withBpmn}</td>
+                  <td class="tabular-nums">${total}</td>
+                  <td class="tabular-nums">${withBpmn}</td>
                   <td>
                     <div style="display:flex; flex-wrap: wrap; gap: var(--space-2);">
                       <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:excel">
@@ -2047,7 +2050,7 @@ function renderSearchResults(q) {
           <div class="title-block-subtitle">Sammlungen und Prozesse durchsuchen.</div>
         </div>
       </div>
-      <p style="color: var(--color-text-secondary);">Geben Sie oben einen Suchbegriff ein.</p>
+      <p class="text-secondary">Geben Sie oben einen Suchbegriff ein.</p>
     </div>`;
   }
 
@@ -2060,7 +2063,7 @@ function renderSearchResults(q) {
     body = `<div class="list-panel" style="text-align:center; padding: var(--space-8);">
       <i data-lucide="search-x" style="width:40px;height:40px; color: var(--color-text-placeholder);"></i>
       <h3 style="margin-top: var(--space-3);">Keine Treffer</h3>
-      <p style="color: var(--color-text-secondary);">Keine Sammlungen oder Prozesse passen zu „${escapeHtml(trimmed)}".</p>
+      <p class="text-secondary">Keine Sammlungen oder Prozesse passen zu „${escapeHtml(trimmed)}".</p>
     </div>`;
   } else {
     body = '<div class="list-panel">';
@@ -2109,7 +2112,7 @@ function renderRecents() {
     return `<div class="content-wrapper">
       ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Zuletzt angesehen' }])}
       <h1 class="title-block-name" style="margin-bottom: var(--space-4);">Zuletzt angesehen</h1>
-      <p style="color: var(--color-text-secondary);">Noch keine Prozesse geöffnet.</p>
+      <p class="text-secondary">Noch keine Prozesse geöffnet.</p>
     </div>`;
   }
   return `<div class="content-wrapper">
