@@ -719,6 +719,32 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
   clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
+/* Clickable [role="link"] elements and .clickable-row table rows aren't
+   focusable by default. Use the element itself as the tab stop so the
+   global keydown handler can turn Enter/Space into a click. */
+.nav-item,
+.clickable-row,
+.search-dropdown-item,
+.search-dropdown-cta,
+.search-result-item,
+.grouping-option { -webkit-user-select: none; user-select: none; }
+.nav-item[role="link"],
+.clickable-row,
+.search-dropdown-item,
+.search-dropdown-cta,
+.search-result-item,
+.grouping-option { cursor: pointer; }
+.nav-item[role="link"]:focus-visible,
+.clickable-row:focus-visible,
+.search-dropdown-item:focus-visible,
+.search-dropdown-cta:focus-visible,
+.search-result-item:focus-visible,
+.grouping-option:focus-visible {
+  outline: 2px solid var(--color-border-accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
 /* Text utility classes — extracted from repeated inline styles so app.js
    stops carrying typography/colour knowledge in string templates. */
 .text-placeholder { color: var(--color-text-placeholder); }

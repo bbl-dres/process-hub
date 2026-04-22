@@ -14,7 +14,12 @@
       "Bash(pdftotext -enc UTF-8 -layout \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/TQ.21.00.00.02 Machbarkeit Proje_df7d3fcd00244e42a8c555c697d1086a-220426-2114-6.pdf\" -)",
       "Bash(node -e ' *)",
       "Bash(node --input-type=module -e ' *)",
-      "Bash(pdfimages -list \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/TQ.21.00.00.02 Machbarkeit Proje_df7d3fcd00244e42a8c555c697d1086a-220426-2114-6.pdf\")"
+      "Bash(pdfimages -list \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/TQ.21.00.00.02 Machbarkeit Proje_df7d3fcd00244e42a8c555c697d1086a-220426-2114-6.pdf\")",
+      "Bash(rm js/app.js.bak tools/_split.py)",
+      "Bash(node -c js/app.js)",
+      "Bash(node -c js/views.js)",
+      "Bash(node -c js/exports.js)",
+      "Bash(node -c js/bpmn.js)"
     ]
   }
 }

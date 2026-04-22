@@ -50,7 +50,10 @@ process-hub/
 │   ├── tokens.css             # Design tokens (colors, spacing, typography)
 │   └── styles.css             # All component + view styles
 ├── js/
-│   └── app.js                 # Router + all views + exports (vanilla, no build)
+│   ├── app.js                 # Entry, state, router, sidebar, global handlers
+│   ├── views.js               # All view renderers (home/collection/process/search/…)
+│   ├── exports.js             # Excel / PDF / BPMN-ZIP downloads
+│   └── bpmn.js                # bpmn-js viewer glue + BPMN XML parser
 ├── data/
 │   ├── collections.json       # Collection index
 │   ├── collections/
