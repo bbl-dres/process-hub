@@ -162,7 +162,6 @@ Tooling: Node 18+ and `pdftotext` on PATH (ships with Git for Windows) for the B
 
 - **BUW-Prozessmodell** — Lehrstuhl für Digital Process and Building Management, [Bergische Universität Wuppertal](https://dpbb.uni-wuppertal.de/de/forschung/buw-prozessmodell-fuer-die-bau-und-immobilienwirtschaft/). Source of the 20 BPMN files under `assets/bpmn/`.
 - **BBL Immobilienmanagement** — Bundesamt für Bauten und Logistik. Process documentation used as the basis for the Immobilienmanagement collection.
-- **SAP Signavio Process Collaboration Hub** — structural inspiration for the landscape + reader UX.
 - **[data-catalog/prototype-sqlite](../data-catalog/prototype-sqlite)** — sibling project, source of the ported tokens + styles that give this UI its look and feel.
 
 ## License
