@@ -1,8 +1,22 @@
 # Process Hub
 
+![Status](https://img.shields.io/badge/status-prototype-orange)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![No build](https://img.shields.io/badge/build-none-brightgreen)
+![Vanilla JS](https://img.shields.io/badge/stack-vanilla_js-yellow?logo=javascript&logoColor=white)
+![BPMN 2.0](https://img.shields.io/badge/BPMN-2.0-0f4c81?logo=bpmn&logoColor=white)
+![bpmn--js](https://img.shields.io/badge/bpmn--js-17-1a1a1a)
+![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
+
 A single-page, vanilla-JS reader for browsing BPMN process landscapes. Inspired by SAP Signavio's Process Collaboration Hub — structured like a data catalog, read-only, and designed for non-modellers to navigate collections of documented business processes.
 
 No build step. No framework. Load over an HTTP server and go.
+
+<p align="center">
+  <img src="assets/images/Preview1.jpg" alt="Process Hub — collection landscape view" width="45%" />
+  &nbsp;
+  <img src="assets/images/Preview2.jpg" alt="Process Hub — process Metadaten tab with BPMN diagram" width="45%" />
+</p>
 
 ## Features
 

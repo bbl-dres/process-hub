@@ -513,6 +513,11 @@ body.sidebar-resizing .header-logo { transition: none !important; }
   padding: 0;
 }
 .nav-item-child.active .nav-child-id { color: var(--color-text-primary); }
+
+/* Collection rows show a folder-tree icon only in collapsed (icon-only)
+   mode, so the rail has a meaningful icon instead of an orphaned chevron. */
+.nav-item-icon-compact { display: none; }
+body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
 .nav-item .nav-count {
   margin-left: auto;
   flex-shrink: 0;

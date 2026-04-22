@@ -502,10 +502,11 @@ function renderSidebar() {
     html += `
       <div class="nav-item ${rowActive ? 'active' : ''}" data-nav="${collectionHrefFor(c.id)}"
            role="link" title="${escapeAttr(c.name)}">
-        <button type="button" class="nav-chevron" data-toggle-collection="${escapeAttr(c.id)}"
+        <button type="button" class="nav-chevron sidebar-collapsed-hide" data-toggle-collection="${escapeAttr(c.id)}"
                 aria-expanded="${expanded}" aria-label="${expanded ? 'Einklappen' : 'Ausklappen'}">
           <i data-lucide="chevron-${expanded ? 'down' : 'right'}" style="width:14px;height:14px;"></i>
         </button>
+        <i data-lucide="folder-tree" class="nav-item-icon-compact" style="width:16px;height:16px;flex-shrink:0;"></i>
         <span>${escapeHtml(c.name)}</span>
         <span class="nav-count">${count}</span>
       </div>`;
@@ -1511,6 +1512,15 @@ function renderProcessMetadataPane(c, area, group) {
 
   return `
     <section class="content-section">
+      <div class="section-label">Prozessverantwortliche</div>
+      ${propsTable([
+        { label: 'Owner',                 value: renderPersonInline(group.owner) },
+        { label: 'Responsible',           value: responsibleList },
+        { label: 'Subject-Matter Expert', value: renderPersonInline(group.expert) }
+      ])}
+    </section>
+
+    <section class="content-section">
       <div class="section-label">Zweck & Kontext</div>
       ${propsTable([
         { label: 'Beschreibung', value: group.description ? escapeHtml(group.description) : dash },
@@ -1519,15 +1529,6 @@ function renderProcessMetadataPane(c, area, group) {
         { label: 'Ergebnisse',   value: outputs.length
             ? `<ul class="bullet-list" style="margin:0;">${outputs.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>`
             : dash }
-      ])}
-    </section>
-
-    <section class="content-section">
-      <div class="section-label">Prozessverantwortliche</div>
-      ${propsTable([
-        { label: 'Owner',                 value: renderPersonInline(group.owner) },
-        { label: 'Responsible',           value: responsibleList },
-        { label: 'Subject-Matter Expert', value: renderPersonInline(group.expert) }
       ])}
     </section>
 
