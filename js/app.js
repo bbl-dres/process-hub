@@ -18,6 +18,7 @@ const state = {
   groupingMenuOpen: false,
   exportMenuOpen: false,  // shared between collection and process export dropdowns
   expandedCollections: new Set(),  // sidebar tree: which collections are expanded
+  skippedCollections: [],  // populated in init() when a collection fails to load/validate
   recents: [],
   bpmnViewer: null,
 };
@@ -68,13 +69,15 @@ async function init() {
       }))
     );
     state.collections = [];
+    state.skippedCollections = [];
     results.forEach((res, i) => {
       const meta = index.collections[i];
       if (res.status === 'fulfilled' && validateCollection(res.value, meta.id)) {
         state.collections.push({ ...meta, landscape: res.value });
       } else {
-        const reason = res.status === 'rejected' ? res.reason?.message : 'schema invalid';
+        const reason = res.status === 'rejected' ? res.reason?.message : 'Schema ungültig';
         console.warn(`Collection "${meta.id}" skipped: ${reason}`);
+        state.skippedCollections.push({ id: meta.id, name: meta.name, reason });
       }
     });
     if (state.collections.length === 0) {
@@ -282,6 +285,17 @@ function handleRoute() {
   state.filterPanelOpen = false;
   hideSearchDropdown();
   syncHeaderSearch(state.route.name === 'search' ? (state.route.q || '') : '');
+
+  // Route-scoped body class → lets CSS cap prose views at --content-max-width
+  // while Tabelle/Diagramm stay full-width canvases.
+  const r = state.route;
+  const routeClass =
+    r.name === 'collection' ? `route-collection-${r.view || 'table'}`
+    : r.name === 'process'   ? `route-process-${r.detailTab || 'diagram'}`
+    :                          `route-${r.name}`;
+  document.body.className = document.body.className
+    .split(/\s+/).filter(c => !c.startsWith('route-')).concat(routeClass).join(' ').trim();
+
   const keepViewer = state.route.name === 'process' && state.route.detailTab === 'diagram';
   if (state.bpmnViewer && !keepViewer) {
     state.bpmnViewer.destroy();

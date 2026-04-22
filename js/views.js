@@ -13,6 +13,17 @@ function renderHome() {
     { icon: 'layers',       count: kpis.areas,       label: 'Bereiche',   sub: 'Level-2-Gruppierungen' },
   ];
 
+  const skipped = state.skippedCollections || [];
+  const skipBanner = skipped.length
+    ? `<div class="load-error-banner" role="alert">
+        <i data-lucide="alert-triangle" style="width:16px;height:16px;"></i>
+        <div>
+          <strong>${skipped.length === 1 ? '1 Sammlung' : `${skipped.length} Sammlungen`} konnten nicht geladen werden.</strong>
+          <div class="text-sub">${skipped.map(s => escapeHtml(s.name || s.id)).join(' · ')} — Details in der Konsole.</div>
+        </div>
+      </div>`
+    : '';
+
   return `
     <div class="content-wrapper">
       <div class="title-block">
@@ -23,6 +34,8 @@ function renderHome() {
           <h1 class="title-block-name">Prozess-Hub</h1>
         </div>
       </div>
+
+      ${skipBanner}
 
       <div class="home-kpi-grid">
         ${kpiCards.map(k => `
@@ -182,10 +195,10 @@ function renderCollection(collId, view) {
         ${view !== 'metadata' ? f.toggleHtml : ''}
         ${view !== 'metadata' ? renderGroupingDropdown(c.id) : ''}
         ${renderExportDropdown('collection', f.filtered)}
+        ${view !== 'metadata' ? f.panelHtml : ''}
       </div>
 
       ${view !== 'metadata' ? f.pillsHtml : ''}
-      ${view !== 'metadata' ? f.panelHtml : ''}
 
       ${view === 'diagram' ? renderDiagramView(c, f.filtered)
         : view === 'metadata' ? renderCollectionMetadataView(c)

@@ -85,7 +85,9 @@ a:hover { color: var(--color-text-link-hover); text-decoration: underline; }
   user-select: none;
 }
 .header-logo {
-  width: var(--sidebar-width);
+  /* Fixed width — was tied to --sidebar-width, which made the logo drag
+     every time a user resized the sidebar. Logo now stays put. */
+  width: 240px;
   flex-shrink: 0;
   display: flex; align-items: center;
   gap: var(--space-3);
@@ -272,6 +274,9 @@ body.sidebar-collapsed .sidebar .nav-item {
   justify-content: center;
   padding-left: 0; padding-right: 0;
 }
+/* Shrink logo block to a single icon-width when sidebar is collapsed —
+   otherwise a 240 px logo block hovers over an empty 64 px rail. */
+body.sidebar-collapsed .header-logo { width: 64px; }
 .sidebar-toggle {
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 36px;
@@ -388,6 +393,18 @@ body.sidebar-resizing .header-logo { transition: none !important; }
   width: 100%;
   animation: fadeIn 200ms ease;
 }
+/* Cap prose-heavy views at --content-max-width so 4K monitors don't
+   stretch KPIs, Metadaten cards, or the chat placeholder all the way
+   across. Route-specific body classes opt in. The Tabelle / Diagramm
+   views deliberately go full-width (they're canvases). */
+body.route-home .content-wrapper,
+body.route-workflows .content-wrapper,
+body.route-chat .content-wrapper,
+body.route-search .content-wrapper,
+body.route-collection-metadata .content-wrapper,
+body.route-process-metadata .content-wrapper {
+  max-width: var(--content-max-width);
+}
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
@@ -474,7 +491,7 @@ body.sidebar-resizing .header-logo { transition: none !important; }
 /* Sidebar tree — chevron toggle + child process rows */
 .nav-chevron {
   flex-shrink: 0;
-  width: 20px; height: 20px;
+  width: 28px; height: 28px;
   padding: 0;
   display: flex; align-items: center; justify-content: center;
   background: transparent;
@@ -609,10 +626,13 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
 }
 .title-block-content { flex: 1; }
 .title-block-name {
-  font-size: var(--text-display); font-weight: 700;
+  /* Was --text-display (28 px) — dominated dense views. Stepping down
+     to heading-l (18 px) in bold reads as a proper page-title without
+     crowding the tab-bar beneath it. */
+  font-size: var(--text-heading-l); font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1.3; margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 .title-block-badge { flex-shrink: 0; margin-top: 4px; }
 .title-block-actions {
@@ -745,6 +765,22 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
   border-radius: var(--radius-sm);
 }
 
+/* Warning banner used on home when init() silently skipped one or more
+   collections (schema-invalid or HTTP error). Keeps users from wondering
+   why a collection they expected is missing. */
+.load-error-banner {
+  display: flex; align-items: flex-start; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  color: var(--color-warning);
+}
+.load-error-banner > i { flex-shrink: 0; margin-top: 2px; }
+.load-error-banner strong { color: var(--color-text-primary); }
+.load-error-banner .text-sub { margin-top: 2px; color: var(--color-text-secondary); }
+
 /* Text utility classes — extracted from repeated inline styles so app.js
    stops carrying typography/colour knowledge in string templates. */
 .text-placeholder { color: var(--color-text-placeholder); }
@@ -772,15 +808,27 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
 }
 
 .filter-panel {
+  /* Overlay instead of inline block — dropping into the document flow
+     used to reflow the whole Tabelle/Diagramm below it every toggle.
+     Now it floats below the Filter button in the tab-bar. */
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-2));
+  z-index: 30;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  margin-top: var(--space-3);
-  margin-bottom: var(--space-3);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
   display: flex; flex-wrap: wrap; gap: var(--space-5);
+  min-width: 360px;
+  max-width: 640px;
+  max-height: calc(100vh - var(--header-height) - 120px);
+  overflow-y: auto;
 }
 .filter-panel[hidden] { display: none; }
+/* The tab-bar anchors the panel, so mark it as the positioning parent. */
+.tab-bar { position: relative; }
 .filter-group { min-width: 180px; flex: 1 1 220px; }
 .filter-group-label {
   font-size: var(--text-label); font-weight: 500;
@@ -831,7 +879,7 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
 .filter-pill-val { font-weight: 500; }
 .filter-pill-remove {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; margin-left: 2px;
+  width: 24px; height: 24px; margin-left: 2px;
   background: transparent; border: none; border-radius: 50%;
   color: var(--color-text-link); cursor: pointer;
 }
@@ -955,16 +1003,27 @@ button.badge-filterable {
   text-align: left;
   border-bottom: 2px solid var(--color-border-subtle);
   white-space: nowrap;
+  /* Clip header text + sort-arrow glyph inside the cell — otherwise on
+     narrow laptops PROZESS runs into BEREICH and the sort ::after glyph
+     bleeds into the next column. */
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer; user-select: none;
   transition: color 100ms ease;
 }
 .data-table thead th:hover { color: var(--color-text-secondary); }
+/* Sort indicator hidden until client-side sort is wired — we don't want
+   the ▲▼ glyph implying sortability that doesn't exist. Re-enable by
+   deleting the `display: none` below when sort handlers land. */
 .data-table thead th::after {
-  content: ''; display: inline-block; width: 14px; height: 14px;
+  display: none;
+  content: ''; width: 14px; height: 14px;
   vertical-align: -2px; margin-left: 4px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23BFBFBA' stroke-width='2'%3E%3Cpath d='M8 9l4-4 4 4'/%3E%3Cpath d='M16 15l-4 4-4-4'/%3E%3C/svg%3E") center/contain no-repeat;
   opacity: 0.4;
 }
+/* Also drop the pointer cursor that implied sortability. */
+.data-table thead th { cursor: default; }
 .data-table thead th:hover::after { opacity: 0.7; }
 .data-table thead th.sort-asc::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23335E8A' stroke-width='2.5'%3E%3Cpath d='M8 14l4-4 4 4'/%3E%3C/svg%3E");
@@ -2823,7 +2882,11 @@ body.sidebar-collapsed .nav-phase-badge { margin: 0 auto; }
    ============================================================ */
 .bpmn-container {
   position: relative;
-  height: calc(100vh - var(--header-height) - 260px);
+  /* Breakdown of what's above the viewer on the process page:
+     header 56 + content top padding 32 + breadcrumb ~24 + title-block ~56
+     + tab-bar ~48 + footer 32 + buffer 20 ≈ 268. Subtitle/description
+     paragraphs were removed so we gained back ~40 px of canvas. */
+  height: calc(100vh - var(--header-height) - 220px);
   min-height: 420px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
