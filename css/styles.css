@@ -911,6 +911,10 @@ button.badge-filterable {
   padding: var(--space-5) var(--space-6);
   transition: border-color 150ms ease;
 }
+/* Stacked .content-section blocks (e.g. the Metadaten tab) get a vertical
+   gap between them — the data-catalog layout relies on a parent flex-gap
+   which we don't always have. */
+.content-section + .content-section { margin-top: var(--space-4); }
 .content-section:hover {
   border-color: var(--color-border-strong);
 }

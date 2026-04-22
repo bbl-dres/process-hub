@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_99"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_99" name="TQ.21.00.00.99 Planverwaltung / BIM" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_pool_outer" name="TQ.21.00.00.99 Planverwaltung / BIM"/>
+      <bpmn:lane id="lane_dokumentenmanagement" name="TQ Dokumentenmanager/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_pruefen_zuweisen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01_auftragstyp</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_plaene_uebernehmen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_plaene_cafm_aufbereiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_02_merge_cafm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_qualitaetskontrolle</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_03_qs_ok</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_auftrag_zurueckweisen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_auftrag_zurueckgewiesen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_plaene_sichten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_plaene_dala_ablegen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_auftrag_ausgefuehrt_planerstellung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_plaene_abgeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_auftrag_ausgefuehrt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_plaene_bewirtschaften</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_04_bewirtschaftung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_plaene_mutiert</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="Meldung aus TQ.21.00.00.96 / TQ.21.01.01.52 / TQ.21.01.01.53 / D0.21.60.10.10">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Task 01 -->
+    <bpmn:task id="task_01_auftrag_pruefen_zuweisen" name="Auftrag prüfen und zuweisen (TQ.21.00.00.99.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway: auftrag type -->
+    <bpmn:exclusiveGateway id="gw_01_auftragstyp" name="">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 02 Pläne übernehmen -->
+    <bpmn:task id="task_02_plaene_uebernehmen" name="Pläne übernehmen (TQ.21.00.00.99.02)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 03 Pläne für CAFM aufbereiten -->
+    <bpmn:task id="task_03_plaene_cafm_aufbereiten" name="Pläne für CAFM aufbereiten (TQ.21.00.00.99.03)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Merge gateway before QS -->
+    <bpmn:exclusiveGateway id="gw_02_merge_cafm" name="">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 04 Qualitätskontrolle -->
+    <bpmn:task id="task_04_qualitaetskontrolle" name="Qualitätskontrolle durchführen und Zertifizierung prüfen (TQ.21.00.00.99.04)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway QS ok? -->
+    <bpmn:exclusiveGateway id="gw_03_qs_ok" name="">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 06 Auftrag zurückweisen -->
+    <bpmn:task id="task_06_auftrag_zurueckweisen" name="Auftrag an Projektmanagement zurückweisen (TQ.21.00.00.99.06)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_auftrag_zurueckgewiesen" name="TQ Auftrag zurückgewiesen">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Task 05 Pläne sichten -->
+    <bpmn:task id="task_05_plaene_sichten" name="Pläne sichten (TQ.21.00.00.99.05)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 07 Pläne in DALA ablegen -->
+    <bpmn:task id="task_07_plaene_dala_ablegen" name="Pläne in DALA ablegen (TQ.21.00.00.99.07)">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_auftrag_ausgefuehrt_planerstellung" name="TQ Auftrag ausgeführt – Planerstellung">
+      <bpmn:incoming>flow_15</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Task 08 Pläne abgeben -->
+    <bpmn:task id="task_08_plaene_abgeben" name="Pläne abgeben (TQ.21.00.00.99.08)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_auftrag_ausgefuehrt" name="TQ Auftrag ausgeführt">
+      <bpmn:incoming>flow_16</bpmn:incoming>
+      <bpmn:incoming>flow_18</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Task 09 Pläne bewirtschaften -->
+    <bpmn:task id="task_09_plaene_bewirtschaften" name="Pläne bewirtschaften (TQ.21.00.00.99.09)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_17</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_04_bewirtschaftung" name="">
+      <bpmn:incoming>flow_17</bpmn:incoming>
+      <bpmn:outgoing>flow_18</bpmn:outgoing>
+      <bpmn:outgoing>flow_19</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="end_plaene_mutiert" name="TQ Pläne mutiert – Planmeldung D0 Mutation Plan">
+      <bpmn:incoming>flow_19</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_pruefen_zuweisen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_pruefen_zuweisen" targetRef="gw_01_auftragstyp"/>
+    <bpmn:sequenceFlow id="flow_03" name="Neue Pläne" sourceRef="gw_01_auftragstyp" targetRef="task_02_plaene_uebernehmen"/>
+    <bpmn:sequenceFlow id="flow_04" name="Auftrag Pläne" sourceRef="gw_01_auftragstyp" targetRef="task_08_plaene_abgeben"/>
+    <bpmn:sequenceFlow id="flow_05" name="Bewirtschaftung" sourceRef="gw_01_auftragstyp" targetRef="task_09_plaene_bewirtschaften"/>
+    <bpmn:sequenceFlow id="flow_06" name="Pläne durch Kauf und Anmiete" sourceRef="gw_01_auftragstyp" targetRef="task_03_plaene_cafm_aufbereiten"/>
+    <bpmn:sequenceFlow id="flow_07" name="Pläne vom PM" sourceRef="task_02_plaene_uebernehmen" targetRef="gw_02_merge_cafm"/>
+    <bpmn:sequenceFlow id="flow_08" name="Pläne für CAFM" sourceRef="task_03_plaene_cafm_aufbereiten" targetRef="gw_02_merge_cafm"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="gw_02_merge_cafm" targetRef="task_04_qualitaetskontrolle"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_04_qualitaetskontrolle" targetRef="gw_03_qs_ok"/>
+    <bpmn:sequenceFlow id="flow_11" name="Auftrag nicht OK" sourceRef="gw_03_qs_ok" targetRef="task_06_auftrag_zurueckweisen"/>
+    <bpmn:sequenceFlow id="flow_12" name="Auftrag OK" sourceRef="gw_03_qs_ok" targetRef="task_05_plaene_sichten"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="task_06_auftrag_zurueckweisen" targetRef="end_auftrag_zurueckgewiesen"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_05_plaene_sichten" targetRef="task_07_plaene_dala_ablegen"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="task_07_plaene_dala_ablegen" targetRef="end_auftrag_ausgefuehrt_planerstellung"/>
+    <bpmn:sequenceFlow id="flow_16" sourceRef="task_08_plaene_abgeben" targetRef="end_auftrag_ausgefuehrt"/>
+    <bpmn:sequenceFlow id="flow_17" sourceRef="task_09_plaene_bewirtschaften" targetRef="gw_04_bewirtschaftung"/>
+    <bpmn:sequenceFlow id="flow_18" name="Alle anderen Vorgänge" sourceRef="gw_04_bewirtschaftung" targetRef="end_auftrag_ausgefuehrt"/>
+    <bpmn:sequenceFlow id="flow_19" name="Bei Planmutation" sourceRef="gw_04_bewirtschaftung" targetRef="end_plaene_mutiert"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_99">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_pool_outer" bpmnElement="lane_pool_outer" isHorizontal="true">
+        <dc:Bounds x="160" y="40" width="2320" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_dokumentenmanagement" bpmnElement="lane_dokumentenmanagement" isHorizontal="true">
+        <dc:Bounds x="160" y="220" width="2320" height="600"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Start -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="240" y="432" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 01 -->
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_pruefen_zuweisen">
+        <dc:Bounds x="320" y="410" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 01 -->
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01_auftragstyp" isMarkerVisible="true">
+        <dc:Bounds x="470" y="425" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 02 -->
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_plaene_uebernehmen">
+        <dc:Bounds x="600" y="410" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 03 (top branch - Kauf und Anmiete) -->
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_plaene_cafm_aufbereiten">
+        <dc:Bounds x="750" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Merge gateway before QS -->
+      <bpmndi:BPMNShape id="shape_gw_02" bpmnElement="gw_02_merge_cafm" isMarkerVisible="true">
+        <dc:Bounds x="900" y="425" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 04 QS -->
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_qualitaetskontrolle">
+        <dc:Bounds x="1000" y="410" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway QS OK -->
+      <bpmndi:BPMNShape id="shape_gw_03" bpmnElement="gw_03_qs_ok" isMarkerVisible="true">
+        <dc:Bounds x="1150" y="425" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 06 zurückweisen (top branch) -->
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_auftrag_zurueckweisen">
+        <dc:Bounds x="1250" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End zurückgewiesen -->
+      <bpmndi:BPMNShape id="shape_end_zurueckgewiesen" bpmnElement="end_auftrag_zurueckgewiesen">
+        <dc:Bounds x="1400" y="312" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 05 Pläne sichten -->
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_plaene_sichten">
+        <dc:Bounds x="1250" y="410" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 07 Pläne in DALA -->
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_plaene_dala_ablegen">
+        <dc:Bounds x="1400" y="410" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End Planerstellung -->
+      <bpmndi:BPMNShape id="shape_end_planerstellung" bpmnElement="end_auftrag_ausgefuehrt_planerstellung">
+        <dc:Bounds x="1550" y="432" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 08 Pläne abgeben (middle-low branch) -->
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_plaene_abgeben">
+        <dc:Bounds x="600" y="530" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End Auftrag ausgeführt -->
+      <bpmndi:BPMNShape id="shape_end_auftrag_ausgefuehrt" bpmnElement="end_auftrag_ausgefuehrt">
+        <dc:Bounds x="900" y="552" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Task 09 Pläne bewirtschaften (lowest branch) -->
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_plaene_bewirtschaften">
+        <dc:Bounds x="600" y="660" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway 04 bewirtschaftung -->
+      <bpmndi:BPMNShape id="shape_gw_04" bpmnElement="gw_04_bewirtschaftung" isMarkerVisible="true">
+        <dc:Bounds x="760" y="675" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End Pläne mutiert -->
+      <bpmndi:BPMNShape id="shape_end_plaene_mutiert" bpmnElement="end_plaene_mutiert">
+        <dc:Bounds x="900" y="682" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="276" y="450"/>
+        <di:waypoint x="320" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="420" y="450"/>
+        <di:waypoint x="470" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="520" y="450"/>
+        <di:waypoint x="600" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="495" y="475"/>
+        <di:waypoint x="495" y="570"/>
+        <di:waypoint x="600" y="570"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="495" y="475"/>
+        <di:waypoint x="495" y="700"/>
+        <di:waypoint x="600" y="700"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="495" y="425"/>
+        <di:waypoint x="495" y="330"/>
+        <di:waypoint x="750" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="700" y="450"/>
+        <di:waypoint x="900" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="850" y="330"/>
+        <di:waypoint x="925" y="330"/>
+        <di:waypoint x="925" y="425"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="950" y="450"/>
+        <di:waypoint x="1000" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1100" y="450"/>
+        <di:waypoint x="1150" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1175" y="425"/>
+        <di:waypoint x="1175" y="330"/>
+        <di:waypoint x="1250" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1200" y="450"/>
+        <di:waypoint x="1250" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1350" y="330"/>
+        <di:waypoint x="1400" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1350" y="450"/>
+        <di:waypoint x="1400" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="1500" y="450"/>
+        <di:waypoint x="1550" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_16" bpmnElement="flow_16">
+        <di:waypoint x="700" y="570"/>
+        <di:waypoint x="918" y="570"/>
+        <di:waypoint x="918" y="552"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_17" bpmnElement="flow_17">
+        <di:waypoint x="700" y="700"/>
+        <di:waypoint x="760" y="700"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_18" bpmnElement="flow_18">
+        <di:waypoint x="785" y="675"/>
+        <di:waypoint x="785" y="588"/>
+        <di:waypoint x="900" y="588"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_19" bpmnElement="flow_19">
+        <di:waypoint x="810" y="700"/>
+        <di:waypoint x="900" y="700"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

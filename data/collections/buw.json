@@ -9,12 +9,26 @@
       "accent": "#1F4E8A",
       "description": "Projektinitiierung, Machbarkeitsstudie und Entwicklung des Bauvorhabens vor der Planungsphase.",
       "groups": [
-        { "id": "1.1b", "name": "Entwicklung", "active": true,
+        {
+          "id": "1.1b",
+          "name": "Entwicklung",
+          "active": true,
           "bpmn": "assets/bpmn/1.1b_Entwicklung_E3.bpmn",
           "description": "Projektidee, Standort- und Nutzungsanalyse, Wirtschaftlichkeitsbetrachtung und Entscheidung für oder gegen die Umsetzung.",
-          "owner": "p_mueller", "responsible": ["p_weber"], "expert": "p_wagner",
-          "status": "approved", "version": "1.2", "updatedAt": "2024-09-18", "reviewCycleMonths": 12,
-          "tags": ["Projektinitiierung", "Machbarkeit"] }
+          "owner": "p_mueller",
+          "responsible": [
+            "p_weber"
+          ],
+          "expert": "p_wagner",
+          "status": "approved",
+          "version": "1.2",
+          "updatedAt": "2024-09-18",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Projektinitiierung",
+            "Machbarkeit"
+          ]
+        }
       ]
     },
     {
@@ -25,36 +39,106 @@
       "accent": "#2E7D32",
       "description": "Schrittweise Planungsphasen von der Grundlagenermittlung bis zur Ausführungsplanung.",
       "groups": [
-        { "id": "2.1b", "name": "Grundlagenermittlung und Vergabe der Fachplanung", "active": true,
+        {
+          "id": "2.1b",
+          "name": "Grundlagenermittlung und Vergabe der Fachplanung",
+          "active": true,
           "bpmn": "assets/bpmn/2.1b_Planung_GrundlagenermittlungUndVergabeDerFachplanung_E3.bpmn",
           "description": "Klärung der Aufgabenstellung und Beauftragung der erforderlichen Fachplaner.",
-          "owner": "p_schmidt", "responsible": ["p_mueller"], "expert": "p_richter",
-          "status": "approved", "version": "1.3", "updatedAt": "2024-10-02", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 1", "HOAI Lph 2", "Vergabe"] },
-        { "id": "2.2b", "name": "Vorplanung", "active": true,
+          "owner": "p_schmidt",
+          "responsible": [
+            "p_mueller"
+          ],
+          "expert": "p_richter",
+          "status": "approved",
+          "version": "1.3",
+          "updatedAt": "2024-10-02",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 1",
+            "HOAI Lph 2",
+            "Vergabe"
+          ]
+        },
+        {
+          "id": "2.2b",
+          "name": "Vorplanung",
+          "active": true,
           "bpmn": "assets/bpmn/2.2b_Planung_Vorplanung_E3.bpmn",
           "description": "Entwicklung eines Planungskonzepts mit Varianten und Kostenschätzung.",
-          "owner": "p_schmidt", "responsible": ["p_mueller"],
-          "status": "approved", "version": "1.1", "updatedAt": "2024-10-02", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 2", "Kostenschätzung"] },
-        { "id": "2.3b", "name": "Entwurfsplanung", "active": true,
+          "owner": "p_schmidt",
+          "responsible": [
+            "p_mueller"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.1",
+          "updatedAt": "2024-10-02",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 2",
+            "Kostenschätzung"
+          ]
+        },
+        {
+          "id": "2.3b",
+          "name": "Entwurfsplanung",
+          "active": true,
           "bpmn": "assets/bpmn/2.3b_Planung_Entwurfsplanung_E3.bpmn",
           "description": "Durcharbeitung des Planungskonzepts zu einer genehmigungsfähigen Entwurfslösung.",
-          "owner": "p_schmidt", "responsible": ["p_mueller"],
-          "status": "approved", "version": "1.4", "updatedAt": "2024-11-05", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 3"] },
-        { "id": "2.4b", "name": "Genehmigungsplanung", "active": true,
+          "owner": "p_schmidt",
+          "responsible": [
+            "p_mueller"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.4",
+          "updatedAt": "2024-11-05",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 3"
+          ]
+        },
+        {
+          "id": "2.4b",
+          "name": "Genehmigungsplanung",
+          "active": true,
           "bpmn": "assets/bpmn/2.4b_Planung_Genehmigungsplanung_E3.bpmn",
           "description": "Erstellung der für die öffentlich-rechtliche Genehmigung erforderlichen Unterlagen.",
-          "owner": "p_schmidt", "responsible": ["p_mueller"], "expert": "p_richter",
-          "status": "in-review", "version": "1.0", "updatedAt": "2024-12-01", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 4", "Behörde"] },
-        { "id": "2.5b", "name": "Ausführungsplanung", "active": true,
+          "owner": "p_schmidt",
+          "responsible": [
+            "p_mueller"
+          ],
+          "expert": "p_richter",
+          "status": "in-review",
+          "version": "1.0",
+          "updatedAt": "2024-12-01",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 4",
+            "Behörde"
+          ]
+        },
+        {
+          "id": "2.5b",
+          "name": "Ausführungsplanung",
+          "active": true,
           "bpmn": "assets/bpmn/2.5b_Planung_Ausführungsplanung_E3.bpmn",
           "description": "Zeichnerische und rechnerische Lösung als Grundlage für die Ausführung.",
-          "owner": "p_schmidt", "responsible": ["p_mueller", "p_becker"],
-          "status": "approved", "version": "1.2", "updatedAt": "2024-11-05", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 5"] }
+          "owner": "p_schmidt",
+          "responsible": [
+            "p_mueller",
+            "p_becker"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.2",
+          "updatedAt": "2024-11-05",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 5"
+          ]
+        }
       ]
     },
     {
@@ -65,30 +149,86 @@
       "accent": "#B45309",
       "description": "Vergabe, Arbeitsvorbereitung und Bauausführung bis zur Abnahme.",
       "groups": [
-        { "id": "3.1b", "name": "Vergabe der Bauausführung", "active": true,
+        {
+          "id": "3.1b",
+          "name": "Vergabe der Bauausführung",
+          "active": true,
           "bpmn": "assets/bpmn/3.1b_Ausführung_VergabeDerBauausführung_E3.bpmn",
           "description": "Vorbereitung und Mitwirkung bei der Vergabe von Bauleistungen.",
-          "owner": "p_becker", "responsible": ["p_schmidt"], "expert": "p_richter",
-          "status": "approved", "version": "1.1", "updatedAt": "2024-10-22", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 6", "HOAI Lph 7", "Vergabe"] },
-        { "id": "3.2b", "name": "Arbeitsvorbereitung", "active": true,
+          "owner": "p_becker",
+          "responsible": [
+            "p_schmidt"
+          ],
+          "expert": "p_richter",
+          "status": "approved",
+          "version": "1.1",
+          "updatedAt": "2024-10-22",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 6",
+            "HOAI Lph 7",
+            "Vergabe"
+          ]
+        },
+        {
+          "id": "3.2b",
+          "name": "Arbeitsvorbereitung",
+          "active": true,
           "bpmn": "assets/bpmn/3.2b_Ausführung_Arbeitsvorbereitung_E3.bpmn",
           "description": "Detaillierte Planung der Bauabwicklung durch die ausführenden Unternehmen.",
-          "owner": "p_becker", "responsible": ["p_becker"],
-          "status": "approved", "version": "1.0", "updatedAt": "2024-08-14", "reviewCycleMonths": 12,
-          "tags": ["Bauausführung"] },
-        { "id": "3.3b", "name": "Fertigung", "active": true,
+          "owner": "p_becker",
+          "responsible": [
+            "p_becker"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "2024-08-14",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Bauausführung"
+          ]
+        },
+        {
+          "id": "3.3b",
+          "name": "Fertigung",
+          "active": true,
           "bpmn": "assets/bpmn/3.3b_Ausführung_Fertigung_E3.bpmn",
           "description": "Bauliche Umsetzung auf der Baustelle einschließlich Bauüberwachung.",
-          "owner": "p_becker", "responsible": ["p_becker"], "expert": "p_schmidt",
-          "status": "approved", "version": "1.3", "updatedAt": "2024-11-11", "reviewCycleMonths": 6,
-          "tags": ["HOAI Lph 8", "Bauausführung"] },
-        { "id": "3.4b", "name": "Abnahme und Übergabe", "active": true,
+          "owner": "p_becker",
+          "responsible": [
+            "p_becker"
+          ],
+          "expert": "p_schmidt",
+          "status": "approved",
+          "version": "1.3",
+          "updatedAt": "2024-11-11",
+          "reviewCycleMonths": 6,
+          "tags": [
+            "HOAI Lph 8",
+            "Bauausführung"
+          ]
+        },
+        {
+          "id": "3.4b",
+          "name": "Abnahme und Übergabe",
+          "active": true,
           "bpmn": "assets/bpmn/3.4b_Ausführung_AbnahmeÜbergabe_E3.bpmn",
           "description": "Förmliche Abnahme der Leistungen und Übergabe an den Bauherrn.",
-          "owner": "p_becker", "responsible": ["p_weber"],
-          "status": "approved", "version": "1.1", "updatedAt": "2024-09-30", "reviewCycleMonths": 12,
-          "tags": ["HOAI Lph 8", "Abnahme"] }
+          "owner": "p_becker",
+          "responsible": [
+            "p_weber"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.1",
+          "updatedAt": "2024-09-30",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "HOAI Lph 8",
+            "Abnahme"
+          ]
+        }
       ]
     },
     {
@@ -99,36 +239,104 @@
       "accent": "#7C3AED",
       "description": "Inbetriebnahme, laufender Betrieb und Nutzerwechsel über den Lebenszyklus.",
       "groups": [
-        { "id": "4.1b", "name": "Vergabe des Betriebs", "active": true,
+        {
+          "id": "4.1b",
+          "name": "Vergabe des Betriebs",
+          "active": true,
           "bpmn": "assets/bpmn/4.1b_Betrieb_VergabeDesBetriebs_E3.bpmn",
           "description": "Auswahl und Beauftragung der Betreiber und Facility-Management-Dienstleister.",
-          "owner": "p_hoffmann", "responsible": ["p_neumann"], "expert": "p_richter",
-          "status": "approved", "version": "1.0", "updatedAt": "2024-06-03", "reviewCycleMonths": 12,
-          "tags": ["Vergabe", "Facility Management"] },
-        { "id": "4.2b", "name": "Inbetriebnahmevorbereitung", "active": true,
+          "owner": "p_hoffmann",
+          "responsible": [
+            "p_neumann"
+          ],
+          "expert": "p_richter",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "2024-06-03",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Vergabe",
+            "Facility Management"
+          ]
+        },
+        {
+          "id": "4.2b",
+          "name": "Inbetriebnahmevorbereitung",
+          "active": true,
           "bpmn": "assets/bpmn/4.2b_Betrieb_Inbetriebnahmevorbereitung_E3.bpmn",
           "description": "Organisatorische und technische Vorbereitung der Inbetriebnahme.",
-          "owner": "p_hoffmann", "responsible": ["p_neumann"],
-          "status": "draft", "version": "0.9", "updatedAt": "2024-12-10", "reviewCycleMonths": 12,
-          "tags": ["Inbetriebnahme"] },
-        { "id": "4.3b", "name": "Inbetriebnahme", "active": true,
+          "owner": "p_hoffmann",
+          "responsible": [
+            "p_neumann"
+          ],
+          "expert": "",
+          "status": "draft",
+          "version": "0.9",
+          "updatedAt": "2024-12-10",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Inbetriebnahme"
+          ]
+        },
+        {
+          "id": "4.3b",
+          "name": "Inbetriebnahme",
+          "active": true,
           "bpmn": "assets/bpmn/4.3b_Betrieb_Inbetriebnahme_E3.bpmn",
           "description": "Übernahme in den Regelbetrieb und Einweisung der Nutzer.",
-          "owner": "p_hoffmann", "responsible": ["p_neumann"],
-          "status": "approved", "version": "1.0", "updatedAt": "2024-07-19", "reviewCycleMonths": 12,
-          "tags": ["Inbetriebnahme"] },
-        { "id": "4.4b", "name": "Laufender Betrieb", "active": true,
+          "owner": "p_hoffmann",
+          "responsible": [
+            "p_neumann"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "2024-07-19",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Inbetriebnahme"
+          ]
+        },
+        {
+          "id": "4.4b",
+          "name": "Laufender Betrieb",
+          "active": true,
           "bpmn": "assets/bpmn/4.4b_Betrieb_LaufenderBetrieb_E3.bpmn",
           "description": "Regelbetrieb mit Instandhaltung, Bewirtschaftung und kontinuierlicher Verbesserung.",
-          "owner": "p_hoffmann", "responsible": ["p_neumann", "p_fischer"],
-          "status": "approved", "version": "2.0", "updatedAt": "2024-11-27", "reviewCycleMonths": 24,
-          "tags": ["Facility Management", "Betrieb"] },
-        { "id": "4.5b", "name": "Besitzer-/Betreiberwechsel", "active": true,
+          "owner": "p_hoffmann",
+          "responsible": [
+            "p_neumann",
+            "p_fischer"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "2.0",
+          "updatedAt": "2024-11-27",
+          "reviewCycleMonths": 24,
+          "tags": [
+            "Facility Management",
+            "Betrieb"
+          ]
+        },
+        {
+          "id": "4.5b",
+          "name": "Besitzer-/Betreiberwechsel",
+          "active": true,
           "bpmn": "assets/bpmn/4.5b_Betrieb_BesitzerBetreiberwechsel_E3.bpmn",
           "description": "Übergang des Objekts an einen neuen Eigentümer oder Betreiber.",
-          "owner": "p_hoffmann", "responsible": ["p_fischer"], "expert": "p_richter",
-          "status": "in-review", "version": "0.8", "updatedAt": "2024-12-05", "reviewCycleMonths": 12,
-          "tags": ["Eigentümerwechsel"] }
+          "owner": "p_hoffmann",
+          "responsible": [
+            "p_fischer"
+          ],
+          "expert": "p_richter",
+          "status": "in-review",
+          "version": "0.8",
+          "updatedAt": "2024-12-05",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Eigentümerwechsel"
+          ]
+        }
       ]
     },
     {
@@ -139,40 +347,123 @@
       "accent": "#B02A1F",
       "description": "Planung, Vergabe und Durchführung des Rückbaus am Ende des Lebenszyklus.",
       "groups": [
-        { "id": "5.1b", "name": "Rückbauentwicklung", "active": false,
+        {
+          "id": "5.1b",
+          "name": "Rückbauentwicklung",
+          "active": false,
+          "bpmn": "",
           "description": "Konzeptionelle Vorbereitung des Rückbaus. (Diagramm noch nicht verfügbar.)",
           "owner": "p_koch",
-          "status": "draft", "tags": ["Rückbau"] },
-        { "id": "5.2b", "name": "Rückbaugenehmigungsplanung", "active": true,
+          "responsible": [],
+          "expert": "",
+          "status": "draft",
+          "version": "",
+          "updatedAt": "",
+          "reviewCycleMonths": null,
+          "tags": [
+            "Rückbau"
+          ]
+        },
+        {
+          "id": "5.2b",
+          "name": "Rückbaugenehmigungsplanung",
+          "active": true,
           "bpmn": "assets/bpmn/5.2b_Rückbau_Rückbaugenehmigungsplanung_E3.bpmn",
           "description": "Erstellung der Genehmigungsunterlagen für den Rückbau.",
-          "owner": "p_koch", "responsible": ["p_schmidt"], "expert": "p_richter",
-          "status": "approved", "version": "1.0", "updatedAt": "2024-08-21", "reviewCycleMonths": 12,
-          "tags": ["Rückbau", "Behörde"] },
-        { "id": "5.3b", "name": "Rückbauvergabe", "active": true,
+          "owner": "p_koch",
+          "responsible": [
+            "p_schmidt"
+          ],
+          "expert": "p_richter",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "2024-08-21",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Rückbau",
+            "Behörde"
+          ]
+        },
+        {
+          "id": "5.3b",
+          "name": "Rückbauvergabe",
+          "active": true,
           "bpmn": "assets/bpmn/5.3b_Rückbau_Rückbauvergabe_E3.bpmn",
           "description": "Vergabe der Rückbauleistungen an ausführende Unternehmen.",
-          "owner": "p_koch", "responsible": ["p_richter"],
-          "status": "approved", "version": "1.0", "updatedAt": "2024-09-03", "reviewCycleMonths": 12,
-          "tags": ["Rückbau", "Vergabe"] },
-        { "id": "5.4b", "name": "Rückbau-Arbeitsvorbereitung", "active": true,
+          "owner": "p_koch",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "2024-09-03",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Rückbau",
+            "Vergabe"
+          ]
+        },
+        {
+          "id": "5.4b",
+          "name": "Rückbau-Arbeitsvorbereitung",
+          "active": true,
           "bpmn": "assets/bpmn/5.4b_Rückbau_RückbauArbeitsvorbereitung_E3.bpmn",
           "description": "Detaillierte Vorbereitung der Rückbauarbeiten.",
-          "owner": "p_koch", "responsible": ["p_becker"],
-          "status": "approved", "version": "1.0", "updatedAt": "2024-09-20", "reviewCycleMonths": 12,
-          "tags": ["Rückbau", "Bauausführung"] },
-        { "id": "5.5b", "name": "Rückbauumsetzung", "active": true,
+          "owner": "p_koch",
+          "responsible": [
+            "p_becker"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "2024-09-20",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Rückbau",
+            "Bauausführung"
+          ]
+        },
+        {
+          "id": "5.5b",
+          "name": "Rückbauumsetzung",
+          "active": true,
           "bpmn": "assets/bpmn/5.5b_Rückbau_Rückbauumsetzung_E3.bpmn",
           "description": "Durchführung des Rückbaus einschließlich Entsorgung.",
-          "owner": "p_koch", "responsible": ["p_koch"],
-          "status": "approved", "version": "1.1", "updatedAt": "2024-10-11", "reviewCycleMonths": 12,
-          "tags": ["Rückbau", "Entsorgung"] },
-        { "id": "5.6b", "name": "Rückbauübernahme", "active": true,
+          "owner": "p_koch",
+          "responsible": [
+            "p_koch"
+          ],
+          "expert": "",
+          "status": "approved",
+          "version": "1.1",
+          "updatedAt": "2024-10-11",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Rückbau",
+            "Entsorgung"
+          ]
+        },
+        {
+          "id": "5.6b",
+          "name": "Rückbauübernahme",
+          "active": true,
           "bpmn": "assets/bpmn/5.6b_Rückbau_Rückbauübernahme_E3.bpmn",
           "description": "Abnahme der Rückbauleistungen und Übergabe der Fläche.",
-          "owner": "p_koch", "responsible": ["p_weber"],
-          "status": "draft", "version": "0.5", "updatedAt": "2024-12-12", "reviewCycleMonths": 12,
-          "tags": ["Rückbau", "Abnahme"] }
+          "owner": "p_koch",
+          "responsible": [
+            "p_weber"
+          ],
+          "expert": "",
+          "status": "draft",
+          "version": "0.5",
+          "updatedAt": "2024-12-12",
+          "reviewCycleMonths": 12,
+          "tags": [
+            "Rückbau",
+            "Abnahme"
+          ]
+        }
       ]
     }
   ]

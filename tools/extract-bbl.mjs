@@ -391,6 +391,7 @@ function writeCollectionJson(processes) {
       id: p.process_id,
       name: p.name,
       active: true,
+      bpmn: `assets/bpmn-bbl/${p.process_id}.bpmn`,
       description: p.purpose || '',
       status: p.status || 'approved',
       version: '1.0',

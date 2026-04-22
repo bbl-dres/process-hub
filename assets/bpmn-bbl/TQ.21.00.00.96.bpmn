@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_96"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_96" name="TQ.21.00.00.96 Immostammdaten Energiedatenverwaltung" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_collaboration_sap" name="CollaborationSAP"/>
+      <bpmn:lane id="lane_immostammdatenmanager" name="TQ Immostammdatenmanager/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_eingang_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_stammdaten_anlegen_pflegen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_daten_plausibilisieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_daten_eingeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_02</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_information_weitergeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_objektmanagement" name="TQ Objektmanagement">
+        <bpmn:flowNodeRef>task_02_energiedaten_ablesen</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Allgemeine Mutationsmeldungen und Ersterfassungen TQ Stammdatenblatt">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks -->
+    <bpmn:task id="task_01_eingang_pruefen" name="Eingang prüfen (TQ.21.00.00.96.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_05_stammdaten_anlegen_pflegen" name="Stammdaten anlegen / pflegen (TQ.21.00.00.96.05)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_daten_plausibilisieren" name="Daten plausibilisieren (TQ.21.00.00.96.03)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_daten_eingeben" name="Daten eingeben (TQ.21.00.00.96.04)">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_energiedaten_ablesen" name="Energiedaten ablesen (TQ.21.00.00.96.02)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_02" name="">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_06_information_weitergeben" name="Information weitergeben (TQ.21.00.00.96.06)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_1" name="TQ Vollzugsmeldung Anmiete Pacht / TQ Stammdaten erfasst Verurkundung Kauf Baurecht / Meldung TQ.21.00.00.96 Immostammdaten Energiedatenverwaltung">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_eingang_pruefen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_eingang_pruefen" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_03" name="Immobilienstammdaten (SAP RE)" sourceRef="gw_01" targetRef="task_05_stammdaten_anlegen_pflegen"/>
+    <bpmn:sequenceFlow id="flow_04" name="ESTAT / RUMBA" sourceRef="gw_01" targetRef="task_03_daten_plausibilisieren"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="gw_01" targetRef="task_02_energiedaten_ablesen"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_05_stammdaten_anlegen_pflegen" targetRef="gw_02"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_03_daten_plausibilisieren" targetRef="task_04_daten_eingeben"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_04_daten_eingeben" targetRef="gw_02"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="task_02_energiedaten_ablesen" targetRef="gw_02"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="gw_02" targetRef="task_06_information_weitergeben"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="task_06_information_weitergeben" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_96">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_collaboration_sap" bpmnElement="lane_collaboration_sap" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2200" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_immostammdatenmanager" bpmnElement="lane_immostammdatenmanager" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="2200" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_objektmanagement" bpmnElement="lane_objektmanagement" isHorizontal="true">
+        <dc:Bounds x="200" y="580" width="2200" height="180"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Immostammdatenmanager lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="382" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_eingang_pruefen">
+        <dc:Bounds x="340" y="360" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="490" y="375" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_stammdaten_anlegen_pflegen">
+        <dc:Bounds x="700" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_daten_plausibilisieren">
+        <dc:Bounds x="1000" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_daten_eingeben">
+        <dc:Bounds x="1180" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_02" bpmnElement="gw_02" isMarkerVisible="true">
+        <dc:Bounds x="1500" y="375" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_information_weitergeben">
+        <dc:Bounds x="1600" y="360" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="1760" y="382" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Objektmanagement lane nodes -->
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_energiedaten_ablesen">
+        <dc:Bounds x="1000" y="630" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="400"/>
+        <di:waypoint x="340" y="400"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="400"/>
+        <di:waypoint x="490" y="400"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="515" y="375"/>
+        <di:waypoint x="515" y="300"/>
+        <di:waypoint x="700" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="540" y="400"/>
+        <di:waypoint x="770" y="400"/>
+        <di:waypoint x="770" y="480"/>
+        <di:waypoint x="1000" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="515" y="425"/>
+        <di:waypoint x="515" y="670"/>
+        <di:waypoint x="1000" y="670"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="800" y="300"/>
+        <di:waypoint x="1525" y="300"/>
+        <di:waypoint x="1525" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="1100" y="480"/>
+        <di:waypoint x="1180" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="1280" y="480"/>
+        <di:waypoint x="1525" y="480"/>
+        <di:waypoint x="1525" y="425"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1100" y="670"/>
+        <di:waypoint x="1600" y="670"/>
+        <di:waypoint x="1600" y="450"/>
+        <di:waypoint x="1540" y="450"/>
+        <di:waypoint x="1540" y="425"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1550" y="400"/>
+        <di:waypoint x="1600" y="400"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1700" y="400"/>
+        <di:waypoint x="1760" y="400"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

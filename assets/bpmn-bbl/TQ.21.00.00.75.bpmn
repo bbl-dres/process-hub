@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_75"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_75" name="TQ.21.00.00.75 Verurkundung Verkauf, Baurechtrückgabe" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_external" name="TQ Kunde / Notar"/>
+      <bpmn:lane id="lane_lig" name="TQ Liegenschaften (LIG)">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_ueberpruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_auftrag_zurueckgeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_auftrag_zurueckgegeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_vertrag_erstellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_vertragsentwurf_bereinigen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_bewirtschaftung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_unterschriftsreifmacht_einholen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_verurkundung_vertrages</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_mutationsblatt_ausfuellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_eingang_verkaufspreis</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10_stammdaten_mutieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_11_dossier_vervollstaendigen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_akten</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Auftrag Verurkundung Verkauf / Baurechtrückgabe erhalten">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Task 01: Auftrag überprüfen -->
+    <bpmn:task id="task_01_auftrag_ueberpruefen" name="Auftrag überprüfen (TQ.21.00.00.75.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway: Auftrag OK? -->
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 02: Auftrag zurückgeben (reject path) -->
+    <bpmn:task id="task_02_auftrag_zurueckgeben" name="Auftrag zurückgeben (TQ.21.00.00.75.02)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_auftrag_zurueckgegeben" name="TQ Auftrag zurückgegeben">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Task 03: Verkauf- / Auflösung BR-Vertrag erstellen -->
+    <bpmn:task id="task_03_vertrag_erstellen" name="Verkauf- / Auflösung BR-Vertrag erstellen (TQ.21.00.00.75.03)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 04: Vertragsentwurf bereinigen -->
+    <bpmn:task id="task_04_vertragsentwurf_bereinigen" name="Vertragsentwurf bereinigen (TQ.21.00.00.75.04)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 05: Linked sub-process TQ.21.00.00.30 Bewirtschaftung Anmiet-/Pachtverträge, Eigene Baurechte -->
+    <bpmn:task id="task_05_bewirtschaftung" name="TQ.21.00.00.30 Bewirtschaftung Anmiet-/Pachtverträge, Eigene Baurechte (TQ.21.00.00.75.05)">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 06: Unterschriftsreifmacht einholen -->
+    <bpmn:task id="task_06_unterschriftsreifmacht_einholen" name="Unterschriftsreifmacht einholen (TQ.21.00.00.75.06)">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 07: Verurkundung des Vertrages -->
+    <bpmn:task id="task_07_verurkundung_vertrages" name="Verurkundung des Vertrages (TQ.21.00.00.75.07)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 08: Mutationsblatt ausfüllen -->
+    <bpmn:task id="task_08_mutationsblatt_ausfuellen" name="Mutationsblatt ausfüllen (TQ.21.00.00.75.08)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 09: Eingang Verkaufspreis überwachen -->
+    <bpmn:task id="task_09_eingang_verkaufspreis" name="Eingang Verkaufspreis überwachen (TQ.21.00.00.75.09)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 10: Stammdaten mutieren -->
+    <bpmn:task id="task_10_stammdaten_mutieren" name="Stammdaten mutieren (TQ.21.00.00.75.10)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 11: Dossier vervollständigen / Pendenzen aufnehmen/terminieren -->
+    <bpmn:task id="task_11_dossier_vervollstaendigen" name="Dossier vervollständigen / Pendenzen aufnehmen/terminieren (TQ.21.00.00.75.11)">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- End event -->
+    <bpmn:endEvent id="end_akten" name="TQ Akten - Verurkundung Verkauf, Baurechtrückgabe abgeschlossen">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_ueberpruefen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_ueberpruefen" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_03" name="Auftrag nicht OK" sourceRef="gw_01" targetRef="task_02_auftrag_zurueckgeben"/>
+    <bpmn:sequenceFlow id="flow_04" name="Auftrag OK" sourceRef="gw_01" targetRef="task_03_vertrag_erstellen"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_02_auftrag_zurueckgeben" targetRef="end_auftrag_zurueckgegeben"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_03_vertrag_erstellen" targetRef="task_04_vertragsentwurf_bereinigen"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_04_vertragsentwurf_bereinigen" targetRef="task_05_bewirtschaftung"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_05_bewirtschaftung" targetRef="task_06_unterschriftsreifmacht_einholen"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="task_06_unterschriftsreifmacht_einholen" targetRef="task_07_verurkundung_vertrages"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_07_verurkundung_vertrages" targetRef="task_08_mutationsblatt_ausfuellen"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="task_08_mutationsblatt_ausfuellen" targetRef="task_09_eingang_verkaufspreis"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="task_09_eingang_verkaufspreis" targetRef="task_10_stammdaten_mutieren"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="task_10_stammdaten_mutieren" targetRef="task_11_dossier_vervollstaendigen"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_11_dossier_vervollstaendigen" targetRef="end_akten"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_75">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_external" bpmnElement="lane_external" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2100" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_lig" bpmnElement="lane_lig" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="2100" height="260"/>
+      </bpmndi:BPMNShape>
+
+      <!-- LIG lane nodes (main flow y-centerline ~370) -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="240" y="352" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_ueberpruefen">
+        <dc:Bounds x="320" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="460" y="345" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Reject path (above main path) -->
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_auftrag_zurueckgeben">
+        <dc:Bounds x="560" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_auftrag_zurueckgegeben" bpmnElement="end_auftrag_zurueckgegeben">
+        <dc:Bounds x="700" y="262" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Main path -->
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_vertrag_erstellen">
+        <dc:Bounds x="560" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_vertragsentwurf_bereinigen">
+        <dc:Bounds x="700" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_bewirtschaftung">
+        <dc:Bounds x="840" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_unterschriftsreifmacht_einholen">
+        <dc:Bounds x="980" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_verurkundung_vertrages">
+        <dc:Bounds x="1120" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_mutationsblatt_ausfuellen">
+        <dc:Bounds x="1260" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_eingang_verkaufspreis">
+        <dc:Bounds x="1400" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_stammdaten_mutieren">
+        <dc:Bounds x="1540" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_11" bpmnElement="task_11_dossier_vervollstaendigen">
+        <dc:Bounds x="1680" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_akten" bpmnElement="end_akten">
+        <dc:Bounds x="1820" y="352" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="276" y="370"/>
+        <di:waypoint x="320" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="420" y="370"/>
+        <di:waypoint x="460" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="485" y="345"/>
+        <di:waypoint x="485" y="280"/>
+        <di:waypoint x="560" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="510" y="370"/>
+        <di:waypoint x="560" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="660" y="280"/>
+        <di:waypoint x="700" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="660" y="370"/>
+        <di:waypoint x="700" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="800" y="370"/>
+        <di:waypoint x="840" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="940" y="370"/>
+        <di:waypoint x="980" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1080" y="370"/>
+        <di:waypoint x="1120" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1220" y="370"/>
+        <di:waypoint x="1260" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1360" y="370"/>
+        <di:waypoint x="1400" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1500" y="370"/>
+        <di:waypoint x="1540" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1640" y="370"/>
+        <di:waypoint x="1680" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1780" y="370"/>
+        <di:waypoint x="1820" y="370"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

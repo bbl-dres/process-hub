@@ -118,7 +118,9 @@ function parseRoute() {
       const detailTab = (rawTab === 'metadata' || rawTab === 'steps') ? rawTab : 'diagram';
       return { name: 'process', collId, processId: decodeURIComponent(parts[3]), detailTab };
     }
-    const view = parts[2] === 'diagram' ? 'diagram' : 'table';
+    const view = parts[2] === 'diagram' ? 'diagram'
+               : parts[2] === 'metadata' ? 'metadata'
+               : 'table';
     return { name: 'collection', collId, view };
   }
   return { name: 'home' };
@@ -137,8 +139,8 @@ function handleRoute() {
   const main = document.getElementById('main-content');
   switch (state.route.name) {
     case 'home':       main.innerHTML = renderHome(); break;
-    case 'chat':       main.innerHTML = renderPlaceholder('KI-Assistent', 'Chat-Oberfläche für Fragen zur Prozesslandschaft (Platzhalter).'); break;
-    case 'workflows':  main.innerHTML = renderPlaceholder('Workflows & API', 'API-Dokumentation und Workflow-Definitionen (Platzhalter).'); break;
+    case 'chat':       main.innerHTML = renderChatView(); break;
+    case 'workflows':  main.innerHTML = renderWorkflowsView(); break;
     case 'recents':    main.innerHTML = renderRecents(); break;
     case 'collection': main.innerHTML = renderCollection(state.route.collId, state.route.view); break;
     case 'process':    renderProcess(state.route.collId, state.route.processId, state.route.detailTab); break;
@@ -237,6 +239,19 @@ function wireGlobalHandlers() {
       state.grouping[state.route.collId] = gOpt.dataset.grouping;
       state.groupingMenuOpen = false;
       rerenderCollection(); return;
+    }
+
+    // Workflows view: per-collection export buttons
+    const collExportBtn = e.target.closest('[data-export-coll]');
+    if (collExportBtn) {
+      const [collId, kind] = collExportBtn.dataset.exportColl.split(':');
+      const c = state.collections.find(x => x.id === collId);
+      if (!c) return;
+      const { filtered } = buildFilterContext(c, state.filters[c.id]);
+      if (kind === 'excel') exportCollectionExcel(c, filtered);
+      else if (kind === 'pdf')   exportCollectionPdf(c, filtered);
+      else if (kind === 'bpmn')  downloadCollectionBpmnZip(c, filtered);
+      return;
     }
 
     // Export dropdown
@@ -385,16 +400,61 @@ function renderHome() {
         </div>
       </div>
 
-      ${state.recents.length > 0 ? `
-        <div class="section-label" style="margin-top: var(--space-6);">Zuletzt angesehen</div>
-        <ul class="recents-list">
-          ${state.recents.map(r => `
-            <li><a href="${escapeAttr(r.hash)}" class="recents-list-item">
-              <i data-lucide="file-text" style="width:16px;height:16px;"></i>
-              <span>${escapeHtml(r.title)}</span>
-            </a></li>`).join('')}
-        </ul>
-      ` : ''}
+      <div class="section-label" style="margin-top: var(--space-6);">Letzte Aktivitäten</div>
+      ${renderRecentActivityTable()}
+    </div>
+  `;
+}
+
+function renderRecentActivityTable() {
+  const all = [];
+  state.collections.forEach(c => {
+    c.landscape.areas.forEach(a => {
+      a.groups.forEach(g => {
+        if (g.updatedAt) all.push({ c, a, g });
+      });
+    });
+  });
+  if (all.length === 0) {
+    return `<p style="color: var(--color-text-secondary);">Keine Aktivitäten erfasst.</p>`;
+  }
+  all.sort((x, y) => (y.g.updatedAt || '').localeCompare(x.g.updatedAt || ''));
+  const top = all.slice(0, 5);
+  return `
+    <div class="list-panel">
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <colgroup>
+            <col style="width: 140px;">
+            <col>
+            <col style="width: 220px;">
+            <col style="width: 140px;">
+            <col style="width: 130px;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Nr.</th>
+              <th scope="col">Prozess</th>
+              <th scope="col">Sammlung</th>
+              <th scope="col">Status</th>
+              <th scope="col">Aktualisiert</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${top.map(({ c, a, g }) => {
+              const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(g.id)}`;
+              return `
+                <tr class="clickable-row" data-href="${escapeAttr(href)}">
+                  <td style="font-variant-numeric: tabular-nums;">${escapeHtml(g.id)}</td>
+                  <td>${escapeHtml(g.name)}</td>
+                  <td>${escapeHtml(c.name)}</td>
+                  <td>${renderStatusBadge(g.status)}</td>
+                  <td>${escapeHtml(g.updatedAt)}</td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 }
@@ -460,29 +520,63 @@ function renderCollection(collId, view) {
         </div>
       </div>
 
-      ${c.description ? `<p class="collection-description">${escapeHtml(c.description)}</p>` : ''}
-      ${c.owner ? `<p class="collection-meta">
-        <span class="detail-label-inline">Quelle:</span>
-        ${c.ownerUrl
-          ? `<a href="${escapeAttr(c.ownerUrl)}" target="_blank" rel="noopener">${escapeHtml(c.owner)}</a>`
-          : escapeHtml(c.owner)}
-      </p>` : ''}
-
       <div class="tab-bar" role="tablist">
         <div class="tab-bar-scroll">
           <button class="tab ${view === 'table' ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}/table" role="tab" aria-selected="${view === 'table'}">Tabelle</button>
           <button class="tab ${view === 'diagram' ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}/diagram" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
+          <button class="tab ${view === 'metadata' ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}/metadata" role="tab" aria-selected="${view === 'metadata'}">Metadaten</button>
         </div>
-        ${f.toggleHtml}
+        ${view !== 'metadata' ? f.toggleHtml : ''}
         ${view === 'table' ? renderGroupingDropdown(c.id) : ''}
         ${renderExportDropdown('collection', f.filtered)}
       </div>
 
-      ${f.pillsHtml}
-      ${f.panelHtml}
+      ${view !== 'metadata' ? f.pillsHtml : ''}
+      ${view !== 'metadata' ? f.panelHtml : ''}
 
-      ${view === 'diagram' ? renderDiagramView(c, f.filtered) : renderTableView(c, f.filtered)}
+      ${view === 'diagram' ? renderDiagramView(c, f.filtered)
+        : view === 'metadata' ? renderCollectionMetadataView(c)
+        : renderTableView(c, f.filtered)}
     </div>
+  `;
+}
+
+function renderCollectionMetadataView(c) {
+  const ownerHtml = c.owner
+    ? (c.ownerUrl
+        ? `<a href="${escapeAttr(c.ownerUrl)}" target="_blank" rel="noopener">${escapeHtml(c.owner)}</a>`
+        : escapeHtml(c.owner))
+    : '<span style="color: var(--color-text-placeholder);">—</span>';
+
+  return `
+    <section class="content-section">
+      <div class="section-label">Beschreibung</div>
+      ${c.description
+        ? `<p style="margin:0; max-width: var(--prose-max-width); line-height:1.6;">${escapeHtml(c.description)}</p>`
+        : `<p style="margin:0; color: var(--color-text-placeholder);">Keine Beschreibung hinterlegt.</p>`}
+    </section>
+
+    <section class="content-section">
+      <div class="section-label">Herausgeber</div>
+      <table class="props-table">
+        <tbody>
+          <tr>
+            <th scope="row">Sammlung</th>
+            <td>${escapeHtml(c.name)}</td>
+          </tr>
+          ${c.subtitle ? `<tr><th scope="row">Untertitel</th><td>${escapeHtml(c.subtitle)}</td></tr>` : ''}
+          <tr>
+            <th scope="row">Quelle</th>
+            <td>${ownerHtml}</td>
+          </tr>
+          <tr>
+            <th scope="row">Aktualisiert</th>
+            <td>${escapeHtml(c.updatedAt || '—')}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
   `;
 }
 
@@ -635,11 +729,11 @@ function renderProcessTable(c, rows) {
     <div class="data-table-wrap">
       <table class="data-table">
         <colgroup>
-          <col style="width: 56px;">
+          <col style="width: 140px;">
           <col>
-          <col style="width: 180px;">
-          <col style="width: 200px;">
-          <col style="width: 130px;">
+          <col style="width: 220px;">
+          <col style="width: 220px;">
+          <col style="width: 150px;">
         </colgroup>
         <thead>
           <tr>
@@ -664,18 +758,15 @@ function renderProcessRow(c, a, g) {
   const filterActive = state.filters[c.id]?.phases.has(a.id);
   return `
     <tr class="clickable-row" data-href="${escapeAttr(href)}">
-      <td style="font-variant-numeric: tabular-nums; color: var(--color-text-secondary);">${escapeHtml(g.id)}</td>
-      <td>
-        <div style="font-weight:500;">${escapeHtml(g.name)}</div>
-        ${g.description ? `<div style="font-size: var(--text-small); color: var(--color-text-secondary);">${escapeHtml(g.description)}</div>` : ''}
-      </td>
+      <td style="font-variant-numeric: tabular-nums;">${escapeHtml(g.id)}</td>
+      <td>${escapeHtml(g.name)}</td>
       <td>
         <button type="button" class="badge badge-domain badge-filterable"
                 data-filter-phase="${escapeAttr(a.id)}"
                 ${filterActive ? 'aria-pressed="true"' : ''}
                 title="Nach Bereich filtern">${escapeHtml(a.name)}</button>
       </td>
-      <td>${owner ? `<div>${escapeHtml(owner.name)}</div>${owner.org ? `<div style="font-size: var(--text-small); color: var(--color-text-secondary);">${escapeHtml(owner.org)}</div>` : ''}` : '<span style="color: var(--color-text-placeholder);">—</span>'}</td>
+      <td>${owner ? escapeHtml(owner.name) : '<span style="color: var(--color-text-placeholder);">—</span>'}</td>
       <td>${renderStatusBadge(g.status)}</td>
     </tr>`;
 }
@@ -1477,12 +1568,95 @@ function onFullscreenChange() {
   try { state.bpmnViewer?.get('canvas').zoom('fit-viewport', 'auto'); } catch { /* viewer gone */ }
 }
 
-// ─── Placeholder / recents views ────────────────────────────────────
-function renderPlaceholder(title, body) {
+// ─── Chat / Workflows views ─────────────────────────────────────────
+function renderChatView() {
   return `<div class="content-wrapper">
-    ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: title }])}
-    <h1 class="title-block-name" style="margin-bottom: var(--space-3);">${escapeHtml(title)}</h1>
-    <p style="color: var(--color-text-secondary); max-width: var(--prose-max-width);">${escapeHtml(body)}</p>
+    ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'KI-Assistent' }])}
+
+    <div class="title-block">
+      <div class="title-block-icon">
+        <i data-lucide="sparkles" style="width:20px;height:20px;"></i>
+      </div>
+      <div class="title-block-content">
+        <h1 class="title-block-name">KI-Assistent</h1>
+        <div class="title-block-subtitle">Stellen Sie Fragen zur Prozesslandschaft. Diese Funktion ist ein Platzhalter.</div>
+      </div>
+    </div>
+
+    <div class="chat-placeholder">
+      <div class="chat-placeholder-body">
+        <i data-lucide="message-square-text" style="width:56px;height:56px;"></i>
+        <h3 class="chat-placeholder-title">Chat-Funktion noch nicht verfügbar</h3>
+        <p class="chat-placeholder-description">In einer zukünftigen Version können Sie hier mit einem KI-Assistenten über die Inhalte des Process Hub sprechen. Der Assistent wird Prozesse erklären, Zusammenhänge zwischen Schritten und Rollen aufzeigen und Sie bei der Navigation durch die Sammlungen unterstützen.</p>
+      </div>
+      <div class="chat-placeholder-input">
+        <input type="text" disabled placeholder="Stellen Sie eine Frage zum Prozessmodell…">
+        <button class="btn btn-primary" disabled>Senden</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderWorkflowsView() {
+  const collsWithBpmn = state.collections.filter(c => processesWithBpmn(c.landscape) > 0);
+
+  return `<div class="content-wrapper">
+    ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Workflows & API' }])}
+
+    <div class="title-block">
+      <div class="title-block-icon">
+        <i data-lucide="workflow" style="width:20px;height:20px;"></i>
+      </div>
+      <div class="title-block-content">
+        <h1 class="title-block-name">Workflows & API</h1>
+        <div class="title-block-subtitle">Exporte und Integrationen für alle Prozess-Sammlungen.</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--space-4);margin-top: var(--space-5);">
+      ${state.collections.map(c => {
+        const total = totalProcesses(c.landscape);
+        const withBpmn = processesWithBpmn(c.landscape);
+        const hasBpmn = withBpmn > 0;
+        return `
+          <div class="content-section">
+            <div class="section-label">${escapeHtml(c.name)}</div>
+            <p style="color:var(--color-text-secondary); margin-bottom: var(--space-3); font-size: var(--text-small);">
+              ${total} Prozesse · ${withBpmn} mit Diagramm
+            </p>
+            <div style="display:flex; flex-wrap: wrap; gap: var(--space-2);">
+              <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:excel">
+                <i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Als Excel
+              </button>
+              <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:pdf">
+                <i data-lucide="file-text" style="width:14px;height:14px;"></i> Als PDF
+              </button>
+              <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:bpmn" ${hasBpmn ? '' : 'disabled'}>
+                <i data-lucide="archive" style="width:14px;height:14px;"></i> BPMN als ZIP
+              </button>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <section class="content-section" style="margin-top: var(--space-5);">
+      <div class="section-label">REST API</div>
+      <p style="color:var(--color-text-secondary); margin-bottom: var(--space-4);">
+        Programmatischer Zugriff auf Sammlungen, Prozesse und Schritte. Eine OpenAPI-Spezifikation ist in Vorbereitung.
+      </p>
+      <button type="button" class="tool-btn" disabled title="Noch nicht verfügbar">
+        <i data-lucide="book-open" style="width:14px;height:14px;"></i> API-Dokumentation (bald)
+      </button>
+    </section>
+
+    <section class="content-section">
+      <div class="section-label">Import</div>
+      <p style="color:var(--color-text-secondary); margin-bottom: var(--space-2);">
+        Import aus strukturierten PDF-Exporten (Confluence / bpanda) läuft aktuell über <code>tools/extract-bbl.mjs</code>.
+        Eine Weboberfläche ist geplant.
+      </p>
+      <p style="color: var(--color-text-placeholder); font-size: var(--text-small); margin:0;">${collsWithBpmn.length} von ${state.collections.length} Sammlungen enthalten BPMN-Diagramme.</p>
+    </section>
   </div>`;
 }
 
