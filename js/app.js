@@ -286,8 +286,9 @@ function handleRoute() {
   hideSearchDropdown();
   syncHeaderSearch(state.route.name === 'search' ? (state.route.q || '') : '');
 
-  // Route-scoped body class → lets CSS cap prose views at --content-max-width
-  // while Tabelle/Diagramm stay full-width canvases.
+  // Route-scoped body class — generic hook for any view-specific CSS
+  // tweaks (e.g. `body.route-process-diagram .app-footer { display: none }`
+  // if we ever want to hide chrome in specific routes).
   const r = state.route;
   const routeClass =
     r.name === 'collection' ? `route-collection-${r.view || 'table'}`
