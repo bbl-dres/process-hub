@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_02"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_02" name="TQ.21.00.00.02 Machbarkeit Projektdefinition" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_antragsteller" name="TQ Antragsteller"/>
+      <bpmn:lane id="lane_ppe" name="TQ Programm- und Projektentwickler/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_vorgehen_festlegen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_04</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_pm_om_lig_beauftragen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_dienstleister_beauftragen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_dienstleister_fuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_05</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_machbarkeitsnachweis_erstellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_berechnung_unterbringungskosten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10_variante_empfehlen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_14_projektauftrag_erarbeiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_projektauftrag_genehmigt</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_pfm" name="TQ Portfoliomanager/in">
+        <bpmn:flowNodeRef>gw_02</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_rueckfragen_bereinigen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_mit_begruendung_rueckweisen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_abbruch_02</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_11_variante_pruefen_festlegen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_06</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_12_antragsteller_informieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_13_folgeauftrag_an_ppe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_abbruch_12</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event: TQ Strategische Planung liegt vor -->
+    <bpmn:startEvent id="start_1" name="TQ Strategische Planung liegt vor">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks in PPE lane -->
+    <bpmn:task id="task_01_auftrag_pruefen" name="Auftrag prüfen (TQ.21.00.00.02.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:exclusiveGateway id="gw_merge" name="">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_04_vorgehen_festlegen" name="Vorgehen festlegen (TQ.21.00.00.02.04)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_04" name="">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_06_dienstleister_beauftragen" name="Dienstleister beauftragen (TQ.21.00.00.02.06)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_07_dienstleister_fuehren" name="Dienstleister führen (TQ.21.00.00.02.07)">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_05_pm_om_lig_beauftragen" name="PM, OM und LIG beauftragen (TQ.21.00.00.02.05)">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:outgoing>flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_05" name="">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:incoming>flow_15</bpmn:incoming>
+      <bpmn:incoming>flow_16</bpmn:incoming>
+      <bpmn:outgoing>flow_17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_08_machbarkeitsnachweis_erstellen" name="Machbarkeitsnachweis erstellen (TQ.21.00.00.02.08)">
+      <bpmn:incoming>flow_17</bpmn:incoming>
+      <bpmn:outgoing>flow_18</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_09_berechnung_unterbringungskosten" name="Gegebenfalls Berechnung Auswirkung Unterbringungskosten erstellen (TQ.21.00.00.02.09)">
+      <bpmn:incoming>flow_18</bpmn:incoming>
+      <bpmn:outgoing>flow_19</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_10_variante_empfehlen" name="Variante empfehlen (TQ.21.00.00.02.10)">
+      <bpmn:incoming>flow_19</bpmn:incoming>
+      <bpmn:outgoing>flow_20</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_14_projektauftrag_erarbeiten" name="Projektauftrag und allenfalls Projektdefinition erarbeiten (TQ.21.00.00.02.14)">
+      <bpmn:incoming>flow_25</bpmn:incoming>
+      <bpmn:outgoing>flow_26</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_projektauftrag_genehmigt" name="TQ Projektauftrag genehmigt">
+      <bpmn:incoming>flow_26</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Nodes in PFM lane -->
+    <bpmn:exclusiveGateway id="gw_02" name="">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_03_rueckfragen_bereinigen" name="Rückfragen / Auftrag bereinigen (TQ.21.00.00.02.03)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_mit_begruendung_rueckweisen" name="Mit Begründung rückweisen (TQ.21.00.00.02.02)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_abbruch_02" name="TQ Machbarkeit Projektdefinition abgebrochen">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:task id="task_11_variante_pruefen_festlegen" name="Variante prüfen und festlegen (TQ.21.00.00.02.11)">
+      <bpmn:incoming>flow_20</bpmn:incoming>
+      <bpmn:outgoing>flow_21</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_06" name="">
+      <bpmn:incoming>flow_21</bpmn:incoming>
+      <bpmn:outgoing>flow_22</bpmn:outgoing>
+      <bpmn:outgoing>flow_23</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_12_antragsteller_informieren" name="Antragsteller inkl. Begründung informieren (TQ.21.00.00.02.12)">
+      <bpmn:incoming>flow_22</bpmn:incoming>
+      <bpmn:outgoing>flow_24</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_13_folgeauftrag_an_ppe" name="Folgeauftrag wird von PFM an PPE erteilt (TQ.21.00.00.02.13)">
+      <bpmn:incoming>flow_23</bpmn:incoming>
+      <bpmn:outgoing>flow_25</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_abbruch_12" name="TQ Machbarkeit Projektdefinition abgebrochen">
+      <bpmn:incoming>flow_24</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_pruefen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_pruefen" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_03" name="Auftrag Ok" sourceRef="gw_01" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_04" name="Auftrag nicht OK" sourceRef="gw_01" targetRef="gw_02"/>
+    <bpmn:sequenceFlow id="flow_05" name="Rückfragen" sourceRef="gw_02" targetRef="task_03_rueckfragen_bereinigen"/>
+    <bpmn:sequenceFlow id="flow_06" name="Rückweisung" sourceRef="gw_02" targetRef="task_02_mit_begruendung_rueckweisen"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_03_rueckfragen_bereinigen" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_02_mit_begruendung_rueckweisen" targetRef="end_abbruch_02"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="gw_merge" targetRef="task_04_vorgehen_festlegen"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_04_vorgehen_festlegen" targetRef="gw_04"/>
+    <bpmn:sequenceFlow id="flow_11" name="Machbarkeitsnachweis und / oder Tätigkeitsanalyse Bürokonzept durch Dienstleister" sourceRef="gw_04" targetRef="task_06_dienstleister_beauftragen"/>
+    <bpmn:sequenceFlow id="flow_12" name="Machbarkeitsnachweis durch PPE" sourceRef="gw_04" targetRef="gw_05"/>
+    <bpmn:sequenceFlow id="flow_13" name="Machbarkeitsnachweis PM / LIG / OM" sourceRef="gw_04" targetRef="task_05_pm_om_lig_beauftragen"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_06_dienstleister_beauftragen" targetRef="task_07_dienstleister_fuehren"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="task_07_dienstleister_fuehren" targetRef="gw_05"/>
+    <bpmn:sequenceFlow id="flow_16" sourceRef="task_05_pm_om_lig_beauftragen" targetRef="gw_05"/>
+    <bpmn:sequenceFlow id="flow_17" sourceRef="gw_05" targetRef="task_08_machbarkeitsnachweis_erstellen"/>
+    <bpmn:sequenceFlow id="flow_18" sourceRef="task_08_machbarkeitsnachweis_erstellen" targetRef="task_09_berechnung_unterbringungskosten"/>
+    <bpmn:sequenceFlow id="flow_19" sourceRef="task_09_berechnung_unterbringungskosten" targetRef="task_10_variante_empfehlen"/>
+    <bpmn:sequenceFlow id="flow_20" sourceRef="task_10_variante_empfehlen" targetRef="task_11_variante_pruefen_festlegen"/>
+    <bpmn:sequenceFlow id="flow_21" sourceRef="task_11_variante_pruefen_festlegen" targetRef="gw_06"/>
+    <bpmn:sequenceFlow id="flow_22" name="Projekt nicht weiterverfolgen" sourceRef="gw_06" targetRef="task_12_antragsteller_informieren"/>
+    <bpmn:sequenceFlow id="flow_23" name="Projekt weiterverfolgen" sourceRef="gw_06" targetRef="task_13_folgeauftrag_an_ppe"/>
+    <bpmn:sequenceFlow id="flow_24" sourceRef="task_12_antragsteller_informieren" targetRef="end_abbruch_12"/>
+    <bpmn:sequenceFlow id="flow_25" sourceRef="task_13_folgeauftrag_an_ppe" targetRef="task_14_projektauftrag_erarbeiten"/>
+    <bpmn:sequenceFlow id="flow_26" sourceRef="task_14_projektauftrag_erarbeiten" targetRef="end_projektauftrag_genehmigt"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_02">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_antragsteller" bpmnElement="lane_antragsteller" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2300" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_ppe" bpmnElement="lane_ppe" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="2300" height="260"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_pfm" bpmnElement="lane_pfm" isHorizontal="true">
+        <dc:Bounds x="200" y="480" width="2300" height="260"/>
+      </bpmndi:BPMNShape>
+
+      <!-- PPE lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="332" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_pruefen">
+        <dc:Bounds x="340" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="490" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_merge" bpmnElement="gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="620" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_vorgehen_festlegen">
+        <dc:Bounds x="700" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_04" bpmnElement="gw_04" isMarkerVisible="true">
+        <dc:Bounds x="850" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_dienstleister_beauftragen">
+        <dc:Bounds x="960" y="230" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_dienstleister_fuehren">
+        <dc:Bounds x="1110" y="230" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_pm_om_lig_beauftragen">
+        <dc:Bounds x="960" y="390" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_05" bpmnElement="gw_05" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_machbarkeitsnachweis_erstellen">
+        <dc:Bounds x="1350" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_berechnung_unterbringungskosten">
+        <dc:Bounds x="1500" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_variante_empfehlen">
+        <dc:Bounds x="1650" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_14" bpmnElement="task_14_projektauftrag_erarbeiten">
+        <dc:Bounds x="2180" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_projektauftrag" bpmnElement="end_projektauftrag_genehmigt">
+        <dc:Bounds x="2330" y="332" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- PFM lane nodes -->
+      <bpmndi:BPMNShape id="shape_gw_02" bpmnElement="gw_02" isMarkerVisible="true">
+        <dc:Bounds x="490" y="585" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_rueckfragen_bereinigen">
+        <dc:Bounds x="590" y="510" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_mit_begruendung_rueckweisen">
+        <dc:Bounds x="700" y="630" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_abbruch_02" bpmnElement="end_abbruch_02">
+        <dc:Bounds x="860" y="652" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_11" bpmnElement="task_11_variante_pruefen_festlegen">
+        <dc:Bounds x="1800" y="570" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_06" bpmnElement="gw_06" isMarkerVisible="true">
+        <dc:Bounds x="1950" y="585" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_12" bpmnElement="task_12_antragsteller_informieren">
+        <dc:Bounds x="2040" y="510" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_13" bpmnElement="task_13_folgeauftrag_an_ppe">
+        <dc:Bounds x="2040" y="630" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_abbruch_12" bpmnElement="end_abbruch_12">
+        <dc:Bounds x="2180" y="532" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="350"/>
+        <di:waypoint x="340" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="350"/>
+        <di:waypoint x="490" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="540" y="350"/>
+        <di:waypoint x="620" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="515" y="375"/>
+        <di:waypoint x="515" y="610"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="540" y="600"/>
+        <di:waypoint x="570" y="600"/>
+        <di:waypoint x="570" y="550"/>
+        <di:waypoint x="590" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="540" y="620"/>
+        <di:waypoint x="620" y="620"/>
+        <di:waypoint x="620" y="670"/>
+        <di:waypoint x="700" y="670"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="640" y="510"/>
+        <di:waypoint x="640" y="400"/>
+        <di:waypoint x="645" y="400"/>
+        <di:waypoint x="645" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="800" y="670"/>
+        <di:waypoint x="860" y="670"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="670" y="350"/>
+        <di:waypoint x="700" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="800" y="350"/>
+        <di:waypoint x="850" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="875" y="325"/>
+        <di:waypoint x="875" y="270"/>
+        <di:waypoint x="960" y="270"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="900" y="350"/>
+        <di:waypoint x="1270" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="875" y="375"/>
+        <di:waypoint x="875" y="430"/>
+        <di:waypoint x="960" y="430"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1060" y="270"/>
+        <di:waypoint x="1110" y="270"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="1210" y="270"/>
+        <di:waypoint x="1295" y="270"/>
+        <di:waypoint x="1295" y="325"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_16" bpmnElement="flow_16">
+        <di:waypoint x="1060" y="430"/>
+        <di:waypoint x="1295" y="430"/>
+        <di:waypoint x="1295" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_17" bpmnElement="flow_17">
+        <di:waypoint x="1320" y="350"/>
+        <di:waypoint x="1350" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_18" bpmnElement="flow_18">
+        <di:waypoint x="1450" y="350"/>
+        <di:waypoint x="1500" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_19" bpmnElement="flow_19">
+        <di:waypoint x="1600" y="350"/>
+        <di:waypoint x="1650" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_20" bpmnElement="flow_20">
+        <di:waypoint x="1750" y="350"/>
+        <di:waypoint x="1775" y="350"/>
+        <di:waypoint x="1775" y="610"/>
+        <di:waypoint x="1800" y="610"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_21" bpmnElement="flow_21">
+        <di:waypoint x="1900" y="610"/>
+        <di:waypoint x="1950" y="610"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_22" bpmnElement="flow_22">
+        <di:waypoint x="1975" y="585"/>
+        <di:waypoint x="1975" y="550"/>
+        <di:waypoint x="2040" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_23" bpmnElement="flow_23">
+        <di:waypoint x="1975" y="635"/>
+        <di:waypoint x="1975" y="670"/>
+        <di:waypoint x="2040" y="670"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_24" bpmnElement="flow_24">
+        <di:waypoint x="2140" y="550"/>
+        <di:waypoint x="2180" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_25" bpmnElement="flow_25">
+        <di:waypoint x="2140" y="670"/>
+        <di:waypoint x="2230" y="670"/>
+        <di:waypoint x="2230" y="390"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_26" bpmnElement="flow_26">
+        <di:waypoint x="2280" y="350"/>
+        <di:waypoint x="2330" y="350"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

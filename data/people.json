@@ -1,0 +1,14 @@
+{
+  "people": [
+    { "id": "p_mueller",    "name": "Dr. Anna Müller",   "org": "Projektleitung",       "email": "anna.mueller@example.org" },
+    { "id": "p_schmidt",    "name": "Tobias Schmidt",    "org": "Fachplanung",          "email": "tobias.schmidt@example.org" },
+    { "id": "p_weber",      "name": "Lena Weber",        "org": "Bauherrenvertretung",  "email": "lena.weber@example.org" },
+    { "id": "p_becker",     "name": "Martin Becker",     "org": "Bauausführung",        "email": "martin.becker@example.org" },
+    { "id": "p_hoffmann",   "name": "Sandra Hoffmann",   "org": "Facility Management",  "email": "sandra.hoffmann@example.org" },
+    { "id": "p_koch",       "name": "Daniel Koch",       "org": "Rückbau & Entsorgung", "email": "daniel.koch@example.org" },
+    { "id": "p_richter",    "name": "Julia Richter",     "org": "Recht & Vergabe",      "email": "julia.richter@example.org" },
+    { "id": "p_wagner",     "name": "Oliver Wagner",     "org": "Portfolio-Strategie",  "email": "oliver.wagner@example.org" },
+    { "id": "p_fischer",    "name": "Carla Fischer",     "org": "Liegenschaften",       "email": "carla.fischer@example.org" },
+    { "id": "p_neumann",    "name": "Michael Neumann",   "org": "Technisches FM",       "email": "michael.neumann@example.org" }
+  ]
+}

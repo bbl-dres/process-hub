@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_50"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_50" name="TQ.21.00.00.50 Objektübergabe an LB, Mieter" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_im_inv_top" name="TQ Immobilienmanager/in, TQ Interne Vermietung (INV)">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_objektuebergabe_vorbereiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_objektbetrieb</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_im_middle" name="TQ Immobilienmanager/in">
+        <bpmn:flowNodeRef>task_04_unterlagen_uebergeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_akten</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_im_inv_obs_bottom" name="TQ Immobilienmanager/in, TQ Interne Vermietung (INV), TQ Objektbewirtschaftung und Service (OBS)">
+        <bpmn:flowNodeRef>task_03_uebergabe_vor_ort</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_mieter_lb" name="TQ Mieter/in, TQ Leistungsbezüger/in"/>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Schlussbericht mit Empfehlung / TQ Meldung Bezugsbereitschaft">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks -->
+    <bpmn:task id="task_01_objektuebergabe_vorbereiten" name="Objektübergabe vorbereiten (TQ.21.00.00.50.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:subProcess id="subproc_objektbetrieb" name="TQ.21.03.03.40 Objektbetrieb (TQ.21.00.00.50.02)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <bpmn:task id="task_03_uebergabe_vor_ort" name="Übergabe vor Ort durchführen (TQ.21.00.00.50.03)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_unterlagen_uebergeben" name="Unterlagen zur Bewirtschaftung übergeben (TQ.21.00.00.50.04)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_akten" name="TQ Akten - Objektübergabe an LB, Mieter">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_objektuebergabe_vorbereiten"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_objektuebergabe_vorbereiten" targetRef="subproc_objektbetrieb"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="subproc_objektbetrieb" targetRef="task_03_uebergabe_vor_ort"/>
+    <bpmn:sequenceFlow id="flow_04" sourceRef="task_03_uebergabe_vor_ort" targetRef="task_04_unterlagen_uebergeben"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_04_unterlagen_uebergeben" targetRef="end_akten"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_50">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_im_inv_top" bpmnElement="lane_im_inv_top" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="1400" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_im_middle" bpmnElement="lane_im_middle" isHorizontal="true">
+        <dc:Bounds x="200" y="240" width="1400" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_im_inv_obs_bottom" bpmnElement="lane_im_inv_obs_bottom" isHorizontal="true">
+        <dc:Bounds x="200" y="420" width="1400" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_mieter_lb" bpmnElement="lane_mieter_lb" isHorizontal="true">
+        <dc:Bounds x="200" y="600" width="1400" height="120"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Top lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="122" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_objektuebergabe_vorbereiten">
+        <dc:Bounds x="360" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_objektbetrieb" bpmnElement="subproc_objektbetrieb">
+        <dc:Bounds x="540" y="100" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Middle lane nodes -->
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_unterlagen_uebergeben">
+        <dc:Bounds x="1160" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_akten" bpmnElement="end_akten">
+        <dc:Bounds x="1340" y="312" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Bottom lane nodes -->
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_uebergabe_vor_ort">
+        <dc:Bounds x="900" y="470" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="140"/>
+        <di:waypoint x="360" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="460" y="140"/>
+        <di:waypoint x="540" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="600" y="180"/>
+        <di:waypoint x="600" y="510"/>
+        <di:waypoint x="900" y="510"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="1000" y="510"/>
+        <di:waypoint x="1210" y="510"/>
+        <di:waypoint x="1210" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="1260" y="330"/>
+        <di:waypoint x="1340" y="330"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

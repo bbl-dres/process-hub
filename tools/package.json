@@ -1,0 +1,13 @@
+{
+  "name": "process-hub-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One-off extraction scripts for process-hub (not part of the app runtime).",
+  "scripts": {
+    "extract:bbl": "node extract-bbl.mjs"
+  },
+  "dependencies": {
+    "xlsx": "0.18.5"
+  }
+}

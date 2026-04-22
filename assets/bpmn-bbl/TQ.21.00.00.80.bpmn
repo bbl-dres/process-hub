@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_80"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_80" name="TQ.21.00.00.80 Objektrücknahme von LB, Mieter" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_leistungsbezueger" name="TQ Leistungsbezüger/in"/>
+      <bpmn:lane id="lane_immobilienmanagement" name="TQ Immobilienmanagement">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_objekt_ruecknahme_vorbereiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_objektbetrieb</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_ruecknahme_vor_ort</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Objektrücknahme angekündigt (z.B. Kündigung erfolgt)">
+      <bpmn:outgoing>flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks -->
+    <bpmn:task id="task_01_objekt_ruecknahme_vorbereiten" name="Objekt Rücknahme vorbereiten (TQ.21.00.00.80.01)">
+      <bpmn:incoming>flow_1</bpmn:incoming>
+      <bpmn:outgoing>flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_objektbetrieb" name="TQ.21.03.03.80 Objektbetrieb (TQ.21.00.00.80.02)">
+      <bpmn:incoming>flow_2</bpmn:incoming>
+      <bpmn:outgoing>flow_3</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_ruecknahme_vor_ort" name="Rücknahme vor Ort (TQ.21.00.00.80.03)">
+      <bpmn:incoming>flow_3</bpmn:incoming>
+      <bpmn:outgoing>flow_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- End event -->
+    <bpmn:endEvent id="end_1" name="TQ Akten - Objektrücknahme am LB, Mieter">
+      <bpmn:incoming>flow_4</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_1" sourceRef="start_1" targetRef="task_01_objekt_ruecknahme_vorbereiten"/>
+    <bpmn:sequenceFlow id="flow_2" sourceRef="task_01_objekt_ruecknahme_vorbereiten" targetRef="task_02_objektbetrieb"/>
+    <bpmn:sequenceFlow id="flow_3" sourceRef="task_02_objektbetrieb" targetRef="task_03_ruecknahme_vor_ort"/>
+    <bpmn:sequenceFlow id="flow_4" sourceRef="task_03_ruecknahme_vor_ort" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_80">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_leistungsbezueger" bpmnElement="lane_leistungsbezueger" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="1400" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_immobilienmanagement" bpmnElement="lane_immobilienmanagement" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="1400" height="180"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Flow nodes (Immobilienmanagement lane, y-centerline ~310) -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="292" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_objekt_ruecknahme_vorbereiten">
+        <dc:Bounds x="360" y="270" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_objektbetrieb">
+        <dc:Bounds x="560" y="270" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_ruecknahme_vor_ort">
+        <dc:Bounds x="760" y="270" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="960" y="292" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_1" bpmnElement="flow_1">
+        <di:waypoint x="296" y="310"/>
+        <di:waypoint x="360" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_2" bpmnElement="flow_2">
+        <di:waypoint x="460" y="310"/>
+        <di:waypoint x="560" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_3" bpmnElement="flow_3">
+        <di:waypoint x="660" y="310"/>
+        <di:waypoint x="760" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_4" bpmnElement="flow_4">
+        <di:waypoint x="860" y="310"/>
+        <di:waypoint x="960" y="310"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,25 @@
+{
+  "collections": [
+    {
+      "id": "buw",
+      "name": "BUW-Prozessmodell",
+      "subtitle": "Bau- und Immobilienwirtschaft",
+      "description": "Referenzprozessmodell der Bergischen Universität Wuppertal für den gesamten Lebenszyklus von Bauvorhaben — von der Entwicklung bis zum Rückbau.",
+      "owner": "Lehrstuhl für Digital Process and Building Management, BUW",
+      "ownerUrl": "https://dpbb.uni-wuppertal.de/de/forschung/buw-prozessmodell-fuer-die-bau-und-immobilienwirtschaft/",
+      "file": "data/collections/buw.json",
+      "level2Label": "Lebenszyklus",
+      "updatedAt": "2024-11-05"
+    },
+    {
+      "id": "bbl-immobilien",
+      "name": "BBL Immobilienmanagement",
+      "subtitle": "TQ.21.00 Immobilienmanagement (K0)",
+      "description": "Prozesssammlung rund um Akquisition, Vollzug, Bewirtschaftung und Rückgabe von Liegenschaften des Bundes. Extrahiert aus der bestehenden PDF-Dokumentation; Diagramme und Detailfelder folgen.",
+      "owner": "Bundesamt für Bauten und Logistik (BBL)",
+      "file": "data/collections/bbl-immobilien.json",
+      "level2Label": "Leistungsbereich",
+      "updatedAt": "2023-12-21"
+    }
+  ]
+}

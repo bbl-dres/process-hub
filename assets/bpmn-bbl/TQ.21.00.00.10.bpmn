@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_10"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_10" name="TQ.21.00.00.10 Vollzug Anmiete Pacht" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_antragsteller" name="TQ Antragsteller"/>
+      <bpmn:lane id="lane_lig" name="TQ Leiter Liegenschaften">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_ueberpruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_vertragsentwurf_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_vertragsentwurf_realisierung_ueberpruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_02</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_unterschriften_einholen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_betroffene_orientieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_bewirtschaftung_anmiet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_vertrag_sap_erfassen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_vertrag_grundbuch_vormerken</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10_auftragsabschluss_durchfuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_auftrag_abgeschlossen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_pfm" name="TQ Portfoliomanager/in">
+        <bpmn:flowNodeRef>task_05_absage_vollziehen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_absage_vollzogen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_vermieter" name="TQ Vermieter"/>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Auftrag Anmiete/Pacht liegt vor">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks in LIG lane -->
+    <bpmn:task id="task_01_auftrag_ueberpruefen" name="Auftrag überprüfen (TQ.21.00.00.10.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_02_vertragsentwurf_pruefen" name="Vertragsentwurf prüfen (TQ.21.00.00.10.02)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_vertragsentwurf_realisierung_ueberpruefen" name="Vertragsentwurf mit Realisierungsauftrag überprüfen (TQ.21.00.00.10.03)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_02" name="">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_04_unterschriften_einholen" name="Unterschriften einholen (TQ.21.00.00.10.04)">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_06_betroffene_orientieren" name="Betroffene orientieren (TQ.21.00.00.10.06)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_07_bewirtschaftung_anmiet" name="TQ.21.00.00.30 Bewirtschaftung Anmiet-/Pachtverträge, Eigene Bauwerke (TQ.21.00.00.10.07)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_08_vertrag_sap_erfassen" name="Vertrag im SAP erfassen (TQ.21.00.00.10.08)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_09_vertrag_grundbuch_vormerken" name="Vertrag im Grundbuch vormerken (TQ.21.00.00.10.09)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_10_auftragsabschluss_durchfuehren" name="Auftragsabschluss durchführen (TQ.21.00.00.10.10)">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_auftrag_abgeschlossen" name="TQ Vollzug Anmiete/Pacht abgeschlossen">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Tasks in PFM lane (Absage path) -->
+    <bpmn:task id="task_05_absage_vollziehen" name="Absage vollziehen (TQ.21.00.00.10.05)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_absage_vollzogen" name="TQ Vollzug Anmiete/Pacht abgebrochen">
+      <bpmn:incoming>flow_15</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_ueberpruefen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_ueberpruefen" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_03" name="Auftrag OK" sourceRef="gw_01" targetRef="task_02_vertragsentwurf_pruefen"/>
+    <bpmn:sequenceFlow id="flow_04" name="Auftrag nicht OK" sourceRef="gw_01" targetRef="task_05_absage_vollziehen"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_02_vertragsentwurf_pruefen" targetRef="task_03_vertragsentwurf_realisierung_ueberpruefen"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_03_vertragsentwurf_realisierung_ueberpruefen" targetRef="gw_02"/>
+    <bpmn:sequenceFlow id="flow_07" name="Vertrag OK" sourceRef="gw_02" targetRef="task_04_unterschriften_einholen"/>
+    <bpmn:sequenceFlow id="flow_08" name="Vertrag nicht OK" sourceRef="gw_02" targetRef="task_05_absage_vollziehen"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="task_04_unterschriften_einholen" targetRef="task_06_betroffene_orientieren"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_06_betroffene_orientieren" targetRef="task_07_bewirtschaftung_anmiet"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="task_07_bewirtschaftung_anmiet" targetRef="task_08_vertrag_sap_erfassen"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="task_08_vertrag_sap_erfassen" targetRef="task_09_vertrag_grundbuch_vormerken"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="task_09_vertrag_grundbuch_vormerken" targetRef="task_10_auftragsabschluss_durchfuehren"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_10_auftragsabschluss_durchfuehren" targetRef="end_auftrag_abgeschlossen"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="task_05_absage_vollziehen" targetRef="end_absage_vollzogen"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_10">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_antragsteller" bpmnElement="lane_antragsteller" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="1900" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_lig" bpmnElement="lane_lig" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="1900" height="220"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_pfm" bpmnElement="lane_pfm" isHorizontal="true">
+        <dc:Bounds x="200" y="440" width="1900" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_vermieter" bpmnElement="lane_vermieter" isHorizontal="true">
+        <dc:Bounds x="200" y="640" width="1900" height="160"/>
+      </bpmndi:BPMNShape>
+
+      <!-- LIG lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="312" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_ueberpruefen">
+        <dc:Bounds x="340" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="490" y="305" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_vertragsentwurf_pruefen">
+        <dc:Bounds x="590" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_vertragsentwurf_realisierung_ueberpruefen">
+        <dc:Bounds x="740" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_02" bpmnElement="gw_02" isMarkerVisible="true">
+        <dc:Bounds x="890" y="305" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_unterschriften_einholen">
+        <dc:Bounds x="990" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_betroffene_orientieren">
+        <dc:Bounds x="1140" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_bewirtschaftung_anmiet">
+        <dc:Bounds x="1290" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_vertrag_sap_erfassen">
+        <dc:Bounds x="1440" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_vertrag_grundbuch_vormerken">
+        <dc:Bounds x="1590" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_auftragsabschluss_durchfuehren">
+        <dc:Bounds x="1740" y="290" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_auftrag" bpmnElement="end_auftrag_abgeschlossen">
+        <dc:Bounds x="1890" y="312" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- PFM lane nodes -->
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_absage_vollziehen">
+        <dc:Bounds x="590" y="500" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_absage" bpmnElement="end_absage_vollzogen">
+        <dc:Bounds x="740" y="522" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="330"/>
+        <di:waypoint x="340" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="330"/>
+        <di:waypoint x="490" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="540" y="330"/>
+        <di:waypoint x="590" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="515" y="355"/>
+        <di:waypoint x="515" y="540"/>
+        <di:waypoint x="590" y="540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="690" y="330"/>
+        <di:waypoint x="740" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="840" y="330"/>
+        <di:waypoint x="890" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="940" y="330"/>
+        <di:waypoint x="990" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="915" y="355"/>
+        <di:waypoint x="915" y="480"/>
+        <di:waypoint x="640" y="480"/>
+        <di:waypoint x="640" y="500"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1090" y="330"/>
+        <di:waypoint x="1140" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1240" y="330"/>
+        <di:waypoint x="1290" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1390" y="330"/>
+        <di:waypoint x="1440" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1540" y="330"/>
+        <di:waypoint x="1590" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1690" y="330"/>
+        <di:waypoint x="1740" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1840" y="330"/>
+        <di:waypoint x="1890" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="690" y="540"/>
+        <di:waypoint x="740" y="540"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

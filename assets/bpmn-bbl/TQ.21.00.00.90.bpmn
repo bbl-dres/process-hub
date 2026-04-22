@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_90"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_90" name="TQ.21.00.00.90 Objektrückgabe" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_antragsteller" name="TQ Antragsteller"/>
+      <bpmn:lane id="lane_objektrueckgabe" name="TQ.21.00.00.90 Objektrückgabe">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_objektrueckgabe_vorbereiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_objektrueckgabe_vor_ort</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_kaeufer_akten_uebergeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_anmietspez_akten_uebergeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_rueckgabeprotokoll_erstellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_02</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_aktenmanagement</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_schluesseluebergabe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_maengel_beheben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_maengelbehebung_ueberpruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_merge_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10_bereinigung_administration</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_vermietung" name="TQ Vermietung"/>
+      <bpmn:lane id="lane_einzahler" name="TQ Einzahler"/>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Kündigung Anmiete / Verkauf liegt vor">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Main flow tasks -->
+    <bpmn:task id="task_01_objektrueckgabe_vorbereiten" name="Objektrückgabe vorbereiten (TQ.21.00.00.90.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_objektrueckgabe_vor_ort" name="Objektrückgabe vor Ort durchführen (TQ.21.00.00.90.02)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_03_kaeufer_akten_uebergeben" name="Käufer:in, Bewirtschaftungsakten übergeben (TQ.21.00.00.90.03)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_05_anmietspez_akten_uebergeben" name="Anmietspez. Bewirtschaftungsakten übergeben (TQ.21.00.00.90.05)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_merge" name="">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_04_rueckgabeprotokoll_erstellen" name="Rückgabeprotokoll erstellen (TQ.21.00.00.90.04)">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_02" name="">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_06_aktenmanagement" name="TQ.21.00.00.97 Aktenmanagement (TQ.21.00.00.90.06)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_07_schluesseluebergabe" name="Schlüsselübergabe durchführen (TQ.21.00.00.90.07)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_08_maengel_beheben" name="Allfällige Mängel beheben (TQ.21.00.00.90.08)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_09_maengelbehebung_ueberpruefen" name="Mängelbehebung überprüfen (TQ.21.00.00.90.09)">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_merge_2" name="">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:incoming>flow_15</bpmn:incoming>
+      <bpmn:outgoing>flow_16</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_10_bereinigung_administration" name="Bereinigung interne Administration erstellen (TQ.21.00.00.90.10)">
+      <bpmn:incoming>flow_16</bpmn:incoming>
+      <bpmn:outgoing>flow_17</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_1" name="TQ Objektrückgabe abgeschlossen">
+      <bpmn:incoming>flow_17</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_objektrueckgabe_vorbereiten"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_objektrueckgabe_vorbereiten" targetRef="task_02_objektrueckgabe_vor_ort"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="task_02_objektrueckgabe_vor_ort" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_04" name="Verkauf" sourceRef="gw_01" targetRef="task_03_kaeufer_akten_uebergeben"/>
+    <bpmn:sequenceFlow id="flow_05" name="Anmiete" sourceRef="gw_01" targetRef="task_05_anmietspez_akten_uebergeben"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_03_kaeufer_akten_uebergeben" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_05_anmietspez_akten_uebergeben" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="gw_merge" targetRef="task_04_rueckgabeprotokoll_erstellen"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="task_04_rueckgabeprotokoll_erstellen" targetRef="gw_02"/>
+    <bpmn:sequenceFlow id="flow_10" name="keine Mängel" sourceRef="gw_02" targetRef="task_06_aktenmanagement"/>
+    <bpmn:sequenceFlow id="flow_11" name="Mietschäden vorhanden" sourceRef="gw_02" targetRef="task_08_maengel_beheben"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="task_06_aktenmanagement" targetRef="task_07_schluesseluebergabe"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="task_07_schluesseluebergabe" targetRef="gw_merge_2"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_08_maengel_beheben" targetRef="task_09_maengelbehebung_ueberpruefen"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="task_09_maengelbehebung_ueberpruefen" targetRef="gw_merge_2"/>
+    <bpmn:sequenceFlow id="flow_16" sourceRef="gw_merge_2" targetRef="task_10_bereinigung_administration"/>
+    <bpmn:sequenceFlow id="flow_17" sourceRef="task_10_bereinigung_administration" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_90">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_antragsteller" bpmnElement="lane_antragsteller" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2100" height="120"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_objektrueckgabe" bpmnElement="lane_objektrueckgabe" isHorizontal="true">
+        <dc:Bounds x="200" y="160" width="2100" height="260"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_vermietung" bpmnElement="lane_vermietung" isHorizontal="true">
+        <dc:Bounds x="200" y="420" width="2100" height="120"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_einzahler" bpmnElement="lane_einzahler" isHorizontal="true">
+        <dc:Bounds x="200" y="540" width="2100" height="120"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="272" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_objektrueckgabe_vorbereiten">
+        <dc:Bounds x="340" y="250" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_objektrueckgabe_vor_ort">
+        <dc:Bounds x="490" y="250" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="640" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_kaeufer_akten_uebergeben">
+        <dc:Bounds x="740" y="180" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_anmietspez_akten_uebergeben">
+        <dc:Bounds x="740" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_merge" bpmnElement="gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="890" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_rueckgabeprotokoll_erstellen">
+        <dc:Bounds x="990" y="250" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_02" bpmnElement="gw_02" isMarkerVisible="true">
+        <dc:Bounds x="1140" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_aktenmanagement">
+        <dc:Bounds x="1240" y="180" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_schluesseluebergabe">
+        <dc:Bounds x="1390" y="180" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_maengel_beheben">
+        <dc:Bounds x="1240" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_maengelbehebung_ueberpruefen">
+        <dc:Bounds x="1390" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_merge_2" bpmnElement="gw_merge_2" isMarkerVisible="true">
+        <dc:Bounds x="1540" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_bereinigung_administration">
+        <dc:Bounds x="1640" y="250" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="1790" y="272" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="290"/>
+        <di:waypoint x="340" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="290"/>
+        <di:waypoint x="490" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="590" y="290"/>
+        <di:waypoint x="640" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="665" y="265"/>
+        <di:waypoint x="665" y="220"/>
+        <di:waypoint x="740" y="220"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="665" y="315"/>
+        <di:waypoint x="665" y="360"/>
+        <di:waypoint x="740" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="840" y="220"/>
+        <di:waypoint x="915" y="220"/>
+        <di:waypoint x="915" y="265"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="840" y="360"/>
+        <di:waypoint x="915" y="360"/>
+        <di:waypoint x="915" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="940" y="290"/>
+        <di:waypoint x="990" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1090" y="290"/>
+        <di:waypoint x="1140" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1165" y="265"/>
+        <di:waypoint x="1165" y="220"/>
+        <di:waypoint x="1240" y="220"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1165" y="315"/>
+        <di:waypoint x="1165" y="360"/>
+        <di:waypoint x="1240" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1340" y="220"/>
+        <di:waypoint x="1390" y="220"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1490" y="220"/>
+        <di:waypoint x="1565" y="220"/>
+        <di:waypoint x="1565" y="265"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1340" y="360"/>
+        <di:waypoint x="1390" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="1490" y="360"/>
+        <di:waypoint x="1565" y="360"/>
+        <di:waypoint x="1565" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_16" bpmnElement="flow_16">
+        <di:waypoint x="1590" y="290"/>
+        <di:waypoint x="1640" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_17" bpmnElement="flow_17">
+        <di:waypoint x="1740" y="290"/>
+        <di:waypoint x="1790" y="290"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

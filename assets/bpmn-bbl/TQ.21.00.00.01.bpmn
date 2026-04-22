@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_01"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_01" name="TQ.21.00.00.01 Lösungsvorschläge Anmiete Kauf" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_antragsteller" name="TQ Antragsteller"/>
+      <bpmn:lane id="lane_pfm" name="TQ Portfoliomanager/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_uebergeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_objekt_suchen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_erstbeurteilung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_selektion_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_verwaltungs_bewirtschaftungsanalyse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_selektion_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_empfehlung_erstellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Lösungsvorschläge benötigt">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="task_01_auftrag_uebergeben" name="Auftrag übergeben (TQ.21.00.00.01.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_objekt_suchen" name="Durch BBL oder Makler Objekt suchen (TQ.21.00.00.01.02)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_erstbeurteilung" name="Erstbeurteilung der Angebote vornehmen (TQ.21.00.00.01.03)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_selektion_1" name="1. Selektion vornehmen (TQ.21.00.00.01.04)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_05_verwaltungs_bewirtschaftungsanalyse" name="TQ.21.03.03.22 Verwaltungs- und Bewirtschaftungsanalyse (TQ.21.00.00.01.05)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_merge" name="">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_06_selektion_2" name="2. Selektion vornehmen (TQ.21.00.00.01.06)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_07_empfehlung_erstellen" name="Empfehlung erstellen (TQ.21.00.00.01.07)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_1" name="TQ Empfehlung an LB, Mieter">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_uebergeben"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_uebergeben" targetRef="task_02_objekt_suchen"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="task_02_objekt_suchen" targetRef="task_03_erstbeurteilung"/>
+    <bpmn:sequenceFlow id="flow_04" sourceRef="task_03_erstbeurteilung" targetRef="task_04_selektion_1"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_04_selektion_1" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_06" name="Ja" sourceRef="gw_01" targetRef="task_05_verwaltungs_bewirtschaftungsanalyse"/>
+    <bpmn:sequenceFlow id="flow_07" name="Nein" sourceRef="gw_01" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_05_verwaltungs_bewirtschaftungsanalyse" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="gw_merge" targetRef="task_06_selektion_2"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_06_selektion_2" targetRef="task_07_empfehlung_erstellen"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="task_07_empfehlung_erstellen" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_01">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_antragsteller" bpmnElement="lane_antragsteller" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="1700" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_pfm" bpmnElement="lane_pfm" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="1700" height="260"/>
+      </bpmndi:BPMNShape>
+
+      <!-- PFM lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="332" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_uebergeben">
+        <dc:Bounds x="340" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_objekt_suchen">
+        <dc:Bounds x="490" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_erstbeurteilung">
+        <dc:Bounds x="640" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_selektion_1">
+        <dc:Bounds x="790" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="940" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_verwaltungs_bewirtschaftungsanalyse">
+        <dc:Bounds x="1040" y="230" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_merge" bpmnElement="gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="1190" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_selektion_2">
+        <dc:Bounds x="1290" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_empfehlung_erstellen">
+        <dc:Bounds x="1440" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="1600" y="332" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="350"/>
+        <di:waypoint x="340" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="350"/>
+        <di:waypoint x="490" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="590" y="350"/>
+        <di:waypoint x="640" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="740" y="350"/>
+        <di:waypoint x="790" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="890" y="350"/>
+        <di:waypoint x="940" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="965" y="325"/>
+        <di:waypoint x="965" y="270"/>
+        <di:waypoint x="1040" y="270"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="990" y="350"/>
+        <di:waypoint x="1190" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="1140" y="270"/>
+        <di:waypoint x="1215" y="270"/>
+        <di:waypoint x="1215" y="325"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1240" y="350"/>
+        <di:waypoint x="1290" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1390" y="350"/>
+        <di:waypoint x="1440" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1540" y="350"/>
+        <di:waypoint x="1600" y="350"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_45"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_45" name="TQ.21.00.00.45 Bewirtschaftung von Vermietungen, Verpachtungen, Baurechtsvergaben" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_mieter" name="TQ Mieter / Pächter / Baurechtsnehmer"/>
+      <bpmn:lane id="lane_bewirtschafter" name="TQ Bewirtschafter/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_geschaeftsfall_identifizieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_mieter_suchen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_vertrag_abschliessen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_objektuebergabe_initialisieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01_split</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_matrix_beurteilen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_mietzinsaenderung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_11_kuendigung_erhalten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_12_kuendigung_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_02_kuendigung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_14_kuendigung_bestaetigen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_15_systemablaeufe_koordinieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_16_abnahme_ruecknahme</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_03_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_lig_inv_lcdm" name="TQ LIG / INV / LCDM">
+        <bpmn:flowNodeRef>task_02_lig_inv_lcdm_koordinieren</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_finanzen" name="TQ Finanzen / Debitoren">
+        <bpmn:flowNodeRef>task_08_inkasso_mahnung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_nebenkostenrate_initialisieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10_liegenschaftenabrechnung</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_recht" name="TQ Rechtsberatung"/>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Bewirtschaftungsbedarf ausgelöst">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Bewirtschafter tasks -->
+    <bpmn:task id="task_01_geschaeftsfall_identifizieren" name="Geschäftsfall identifizieren (TQ.21.00.00.45.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_lig_inv_lcdm_koordinieren" name="LIG/INV/LCDM koordinieren (TQ.21.00.00.45.02)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_mieter_suchen" name="Mieter suchen (TQ.21.00.00.45.03)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_vertrag_abschliessen" name="Vertrag abschliessen (TQ.21.00.00.45.04)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_05_objektuebergabe_initialisieren" name="Objektübergabe initialisieren (TQ.21.00.00.45.05)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:parallelGateway id="gw_01_split" name="">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:task id="task_06_matrix_beurteilen" name="Periodisch Matrix beurteilen (TQ.21.00.00.45.06)">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_07_mietzinsaenderung" name="Mietzinsänderung durchführen (TQ.21.00.00.45.07)">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_08_inkasso_mahnung" name="Inkasso überwachen, Mahnungen auslösen (TQ.21.00.00.45.08)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_09_nebenkostenrate_initialisieren" name="Nebenkostenrate initialisieren (TQ.21.00.00.45.09)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_10_liegenschaftenabrechnung" name="Liegenschaftenabrechnung erstellen (TQ.21.00.00.45.10)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_17</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_11_kuendigung_erhalten" name="Kündigung ausspruchen oder entgegennehmen (TQ.21.00.00.45.11)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_18</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_12_kuendigung_pruefen" name="Kündigung prüfen (TQ.21.00.00.45.12)">
+      <bpmn:incoming>flow_18</bpmn:incoming>
+      <bpmn:outgoing>flow_19</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_02_kuendigung" name="">
+      <bpmn:incoming>flow_19</bpmn:incoming>
+      <bpmn:outgoing>flow_20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_14_kuendigung_bestaetigen" name="Kündigung bestätigen, Prozesse im System eingeben (TQ.21.00.00.45.14)">
+      <bpmn:incoming>flow_20</bpmn:incoming>
+      <bpmn:outgoing>flow_21</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:parallelGateway id="gw_03_merge" name="">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:incoming>flow_14</bpmn:incoming>
+      <bpmn:incoming>flow_15</bpmn:incoming>
+      <bpmn:incoming>flow_16</bpmn:incoming>
+      <bpmn:incoming>flow_17</bpmn:incoming>
+      <bpmn:incoming>flow_21</bpmn:incoming>
+      <bpmn:outgoing>flow_22</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:task id="task_15_systemablaeufe_koordinieren" name="Systemabläufe koordinieren (TQ.21.00.00.45.15)">
+      <bpmn:incoming>flow_22</bpmn:incoming>
+      <bpmn:outgoing>flow_23</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_16_abnahme_ruecknahme" name="Abnahmen/Rücknahmen planen / durchführen (TQ.21.00.00.45.16)">
+      <bpmn:incoming>flow_23</bpmn:incoming>
+      <bpmn:outgoing>flow_24</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_1" name="TQ Bewirtschaftung abgeschlossen">
+      <bpmn:incoming>flow_24</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_geschaeftsfall_identifizieren"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_geschaeftsfall_identifizieren" targetRef="task_02_lig_inv_lcdm_koordinieren"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="task_02_lig_inv_lcdm_koordinieren" targetRef="task_03_mieter_suchen"/>
+    <bpmn:sequenceFlow id="flow_04" sourceRef="task_03_mieter_suchen" targetRef="task_04_vertrag_abschliessen"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_04_vertrag_abschliessen" targetRef="task_05_objektuebergabe_initialisieren"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_05_objektuebergabe_initialisieren" targetRef="gw_01_split"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="gw_01_split" targetRef="task_06_matrix_beurteilen"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="gw_01_split" targetRef="task_07_mietzinsaenderung"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="gw_01_split" targetRef="task_08_inkasso_mahnung"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="gw_01_split" targetRef="task_09_nebenkostenrate_initialisieren"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="gw_01_split" targetRef="task_10_liegenschaftenabrechnung"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="gw_01_split" targetRef="task_11_kuendigung_erhalten"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="task_06_matrix_beurteilen" targetRef="gw_03_merge"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_07_mietzinsaenderung" targetRef="gw_03_merge"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="task_08_inkasso_mahnung" targetRef="gw_03_merge"/>
+    <bpmn:sequenceFlow id="flow_16" sourceRef="task_09_nebenkostenrate_initialisieren" targetRef="gw_03_merge"/>
+    <bpmn:sequenceFlow id="flow_17" sourceRef="task_10_liegenschaftenabrechnung" targetRef="gw_03_merge"/>
+    <bpmn:sequenceFlow id="flow_18" sourceRef="task_11_kuendigung_erhalten" targetRef="task_12_kuendigung_pruefen"/>
+    <bpmn:sequenceFlow id="flow_19" sourceRef="task_12_kuendigung_pruefen" targetRef="gw_02_kuendigung"/>
+    <bpmn:sequenceFlow id="flow_20" name="Kündigung OK" sourceRef="gw_02_kuendigung" targetRef="task_14_kuendigung_bestaetigen"/>
+    <bpmn:sequenceFlow id="flow_21" sourceRef="task_14_kuendigung_bestaetigen" targetRef="gw_03_merge"/>
+    <bpmn:sequenceFlow id="flow_22" sourceRef="gw_03_merge" targetRef="task_15_systemablaeufe_koordinieren"/>
+    <bpmn:sequenceFlow id="flow_23" sourceRef="task_15_systemablaeufe_koordinieren" targetRef="task_16_abnahme_ruecknahme"/>
+    <bpmn:sequenceFlow id="flow_24" sourceRef="task_16_abnahme_ruecknahme" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_45">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_mieter" bpmnElement="lane_mieter" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2600" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_bewirtschafter" bpmnElement="lane_bewirtschafter" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="2600" height="260"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_lig_inv_lcdm" bpmnElement="lane_lig_inv_lcdm" isHorizontal="true">
+        <dc:Bounds x="200" y="480" width="2600" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_finanzen" bpmnElement="lane_finanzen" isHorizontal="true">
+        <dc:Bounds x="200" y="660" width="2600" height="260"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_recht" bpmnElement="lane_recht" isHorizontal="true">
+        <dc:Bounds x="200" y="920" width="2600" height="180"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Bewirtschafter lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="332" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_geschaeftsfall_identifizieren">
+        <dc:Bounds x="340" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_mieter_suchen">
+        <dc:Bounds x="640" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_vertrag_abschliessen">
+        <dc:Bounds x="790" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_objektuebergabe_initialisieren">
+        <dc:Bounds x="940" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01_split" isMarkerVisible="true">
+        <dc:Bounds x="1090" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_matrix_beurteilen">
+        <dc:Bounds x="1200" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_mietzinsaenderung">
+        <dc:Bounds x="1350" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_11" bpmnElement="task_11_kuendigung_erhalten">
+        <dc:Bounds x="1200" y="380" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_12" bpmnElement="task_12_kuendigung_pruefen">
+        <dc:Bounds x="1350" y="380" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_02" bpmnElement="gw_02_kuendigung" isMarkerVisible="true">
+        <dc:Bounds x="1500" y="405" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_14" bpmnElement="task_14_kuendigung_bestaetigen">
+        <dc:Bounds x="1600" y="380" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_03" bpmnElement="gw_03_merge" isMarkerVisible="true">
+        <dc:Bounds x="2050" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_15" bpmnElement="task_15_systemablaeufe_koordinieren">
+        <dc:Bounds x="2160" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_16" bpmnElement="task_16_abnahme_ruecknahme">
+        <dc:Bounds x="2310" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="2460" y="332" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- LIG / INV / LCDM lane nodes -->
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_lig_inv_lcdm_koordinieren">
+        <dc:Bounds x="490" y="530" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Finanzen lane nodes -->
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_inkasso_mahnung">
+        <dc:Bounds x="1200" y="720" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_nebenkostenrate_initialisieren">
+        <dc:Bounds x="1350" y="720" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_liegenschaftenabrechnung">
+        <dc:Bounds x="1500" y="720" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="350"/>
+        <di:waypoint x="340" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="390" y="390"/>
+        <di:waypoint x="390" y="570"/>
+        <di:waypoint x="490" y="570"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="590" y="570"/>
+        <di:waypoint x="690" y="570"/>
+        <di:waypoint x="690" y="390"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="740" y="350"/>
+        <di:waypoint x="790" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="890" y="350"/>
+        <di:waypoint x="940" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="1040" y="350"/>
+        <di:waypoint x="1090" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="1115" y="325"/>
+        <di:waypoint x="1115" y="280"/>
+        <di:waypoint x="1200" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="1140" y="340"/>
+        <di:waypoint x="1170" y="340"/>
+        <di:waypoint x="1170" y="280"/>
+        <di:waypoint x="1350" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1115" y="375"/>
+        <di:waypoint x="1115" y="760"/>
+        <di:waypoint x="1200" y="760"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1140" y="360"/>
+        <di:waypoint x="1170" y="360"/>
+        <di:waypoint x="1170" y="760"/>
+        <di:waypoint x="1350" y="760"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1140" y="350"/>
+        <di:waypoint x="1180" y="350"/>
+        <di:waypoint x="1180" y="760"/>
+        <di:waypoint x="1500" y="760"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1115" y="375"/>
+        <di:waypoint x="1115" y="420"/>
+        <di:waypoint x="1200" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1300" y="280"/>
+        <di:waypoint x="2075" y="280"/>
+        <di:waypoint x="2075" y="325"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1450" y="280"/>
+        <di:waypoint x="2075" y="280"/>
+        <di:waypoint x="2075" y="325"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="1300" y="760"/>
+        <di:waypoint x="2075" y="760"/>
+        <di:waypoint x="2075" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_16" bpmnElement="flow_16">
+        <di:waypoint x="1450" y="760"/>
+        <di:waypoint x="2075" y="760"/>
+        <di:waypoint x="2075" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_17" bpmnElement="flow_17">
+        <di:waypoint x="1600" y="760"/>
+        <di:waypoint x="2075" y="760"/>
+        <di:waypoint x="2075" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_18" bpmnElement="flow_18">
+        <di:waypoint x="1300" y="420"/>
+        <di:waypoint x="1350" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_19" bpmnElement="flow_19">
+        <di:waypoint x="1450" y="420"/>
+        <di:waypoint x="1500" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_20" bpmnElement="flow_20">
+        <di:waypoint x="1550" y="430"/>
+        <di:waypoint x="1600" y="430"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_21" bpmnElement="flow_21">
+        <di:waypoint x="1700" y="420"/>
+        <di:waypoint x="2075" y="420"/>
+        <di:waypoint x="2075" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_22" bpmnElement="flow_22">
+        <di:waypoint x="2100" y="350"/>
+        <di:waypoint x="2160" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_23" bpmnElement="flow_23">
+        <di:waypoint x="2260" y="350"/>
+        <di:waypoint x="2310" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_24" bpmnElement="flow_24">
+        <di:waypoint x="2410" y="350"/>
+        <di:waypoint x="2460" y="350"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

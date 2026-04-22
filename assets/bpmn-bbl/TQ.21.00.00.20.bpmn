@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_20"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_20" name="TQ.21.00.00.20 Objektübernahme" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_pool_outer" name="TQ.21.00.00.20 Objektübernahme"/>
+      <bpmn:lane id="lane_bewirtschafter" name="TQ Bewirtschafter/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_objektuebernahme_vorbereiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_objektuebernahme_durchfuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_03_bewirtschaftung_anmiet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_maengelrechtmaessige_abschluesse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_05_kreditorenmanagement</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_maengelbearbeitung_ueberwachen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_administratives_aufarbeiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_08_bewirtschaftung_anmiet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_umbauarbeiten_bbl_intern</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_10_umsetzung_unterhalt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_11_immostammdaten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_12_aktenmanagement</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_13_unterlagen_bewirtschaftung_uebergeben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_objektuebernahme</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Kauf-/Mietobjekt bereit">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Task 01 -->
+    <bpmn:task id="task_01_objektuebernahme_vorbereiten" name="Objektübernahme vorbereiten (TQ.21.00.00.20.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 02 -->
+    <bpmn:task id="task_02_objektuebernahme_durchfuehren" name="Objektübernahme durchführen (TQ.21.00.00.20.02)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Linked sub-process: Bewirtschaftung Anmiet-/Pachtverträge (03) -->
+    <bpmn:subProcess id="subproc_03_bewirtschaftung_anmiet" name="TQ.21.00.00.30 Bewirtschaftung Anmiet-/Pachtverträge, Eigene Bauwerke (TQ.21.00.00.20.03)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <!-- Task 04 -->
+    <bpmn:task id="task_04_maengelrechtmaessige_abschluesse" name="Mängelrechtmässige Abschlüsse prüfen (TQ.21.00.00.20.04)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Linked sub-process: Kreditorenmanagement (05) -->
+    <bpmn:subProcess id="subproc_05_kreditorenmanagement" name="TQ.42.18.18.20 Kreditorenmanagement (TQ.21.00.00.20.05)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <!-- Task 06 -->
+    <bpmn:task id="task_06_maengelbearbeitung_ueberwachen" name="Mängelbearbeitung überwachen (TQ.21.00.00.20.06)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Task 07 -->
+    <bpmn:task id="task_07_administratives_aufarbeiten" name="Administratives aufarbeiten (TQ.21.00.00.20.07)">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Linked sub-process: Bewirtschaftung Anmiet-/Pachtverträge (08) -->
+    <bpmn:subProcess id="subproc_08_bewirtschaftung_anmiet" name="TQ.21.00.00.30 Bewirtschaftung Anmiet-/Pachtverträge, Eigene Bauwerke (TQ.21.00.00.20.08)">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <!-- Gateway: Umbau BBL-intern? -->
+    <bpmn:exclusiveGateway id="gw_01" name="">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 09 -->
+    <bpmn:task id="task_09_umbauarbeiten_bbl_intern" name="Umbauarbeiten BBL-intern auslösen (TQ.21.00.00.20.09)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Linked sub-process: Umsetzung Unterhalt und Kleinprojekte (10) -->
+    <bpmn:subProcess id="subproc_10_umsetzung_unterhalt" name="TQ.21.00.00.50 Umsetzung Unterhalt und Kleinprojekte (TQ.21.00.00.20.10)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <!-- Merge gateway -->
+    <bpmn:exclusiveGateway id="gw_merge" name="">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Linked sub-process: Immostammdaten Energiedatenverwaltung (11) -->
+    <bpmn:subProcess id="subproc_11_immostammdaten" name="TQ.21.00.00.96 Immostammdaten Energiedatenverwaltung (TQ.21.00.00.20.11)">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <!-- Linked sub-process: Aktenmanagement (12) -->
+    <bpmn:subProcess id="subproc_12_aktenmanagement" name="TQ.21.00.00.97 Aktenmanagement (TQ.21.00.00.20.12)">
+      <bpmn:incoming>flow_15</bpmn:incoming>
+      <bpmn:outgoing>flow_16</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <!-- Task 13 -->
+    <bpmn:task id="task_13_unterlagen_bewirtschaftung_uebergeben" name="Unterlagen zur Bewirtschaftung übergeben (TQ.21.00.00.20.13)">
+      <bpmn:incoming>flow_16</bpmn:incoming>
+      <bpmn:outgoing>flow_17</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- End event -->
+    <bpmn:endEvent id="end_objektuebernahme" name="TQ Objektübernahme abgeschlossen">
+      <bpmn:incoming>flow_17</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_objektuebernahme_vorbereiten"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_objektuebernahme_vorbereiten" targetRef="task_02_objektuebernahme_durchfuehren"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="task_02_objektuebernahme_durchfuehren" targetRef="subproc_03_bewirtschaftung_anmiet"/>
+    <bpmn:sequenceFlow id="flow_04" sourceRef="subproc_03_bewirtschaftung_anmiet" targetRef="task_04_maengelrechtmaessige_abschluesse"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_04_maengelrechtmaessige_abschluesse" targetRef="subproc_05_kreditorenmanagement"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="subproc_05_kreditorenmanagement" targetRef="task_06_maengelbearbeitung_ueberwachen"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_06_maengelbearbeitung_ueberwachen" targetRef="task_07_administratives_aufarbeiten"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_07_administratives_aufarbeiten" targetRef="subproc_08_bewirtschaftung_anmiet"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="subproc_08_bewirtschaftung_anmiet" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_10" name="Umbau BBL-intern" sourceRef="gw_01" targetRef="task_09_umbauarbeiten_bbl_intern"/>
+    <bpmn:sequenceFlow id="flow_11" name="Unterhalt / Kleinprojekt" sourceRef="gw_01" targetRef="subproc_10_umsetzung_unterhalt"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="task_09_umbauarbeiten_bbl_intern" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="subproc_10_umsetzung_unterhalt" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="gw_merge" targetRef="subproc_11_immostammdaten"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="subproc_11_immostammdaten" targetRef="subproc_12_aktenmanagement"/>
+    <bpmn:sequenceFlow id="flow_16" sourceRef="subproc_12_aktenmanagement" targetRef="task_13_unterlagen_bewirtschaftung_uebergeben"/>
+    <bpmn:sequenceFlow id="flow_17" sourceRef="task_13_unterlagen_bewirtschaftung_uebergeben" targetRef="end_objektuebernahme"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_20">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_pool_outer" bpmnElement="lane_pool_outer" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2700" height="100"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_bewirtschafter" bpmnElement="lane_bewirtschafter" isHorizontal="true">
+        <dc:Bounds x="200" y="140" width="2700" height="400"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Flow nodes (row 1: main flow at y ~ 260) -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="282" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_objektuebernahme_vorbereiten">
+        <dc:Bounds x="340" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_objektuebernahme_durchfuehren">
+        <dc:Bounds x="480" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_03" bpmnElement="subproc_03_bewirtschaftung_anmiet">
+        <dc:Bounds x="620" y="260" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_maengelrechtmaessige_abschluesse">
+        <dc:Bounds x="780" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_05" bpmnElement="subproc_05_kreditorenmanagement">
+        <dc:Bounds x="920" y="260" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_maengelbearbeitung_ueberwachen">
+        <dc:Bounds x="1080" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_administratives_aufarbeiten">
+        <dc:Bounds x="1220" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_08" bpmnElement="subproc_08_bewirtschaftung_anmiet">
+        <dc:Bounds x="1360" y="260" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="1520" y="275" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_umbauarbeiten_bbl_intern">
+        <dc:Bounds x="1610" y="190" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_10" bpmnElement="subproc_10_umsetzung_unterhalt">
+        <dc:Bounds x="1600" y="340" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_merge" bpmnElement="gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="1770" y="275" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_11" bpmnElement="subproc_11_immostammdaten">
+        <dc:Bounds x="1870" y="260" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_12" bpmnElement="subproc_12_aktenmanagement">
+        <dc:Bounds x="2030" y="260" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_13" bpmnElement="task_13_unterlagen_bewirtschaftung_uebergeben">
+        <dc:Bounds x="2190" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_objektuebernahme" bpmnElement="end_objektuebernahme">
+        <dc:Bounds x="2330" y="282" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="300"/>
+        <di:waypoint x="340" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="300"/>
+        <di:waypoint x="480" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="580" y="300"/>
+        <di:waypoint x="620" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="740" y="300"/>
+        <di:waypoint x="780" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="880" y="300"/>
+        <di:waypoint x="920" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="1040" y="300"/>
+        <di:waypoint x="1080" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="1180" y="300"/>
+        <di:waypoint x="1220" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="1320" y="300"/>
+        <di:waypoint x="1360" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1480" y="300"/>
+        <di:waypoint x="1520" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1545" y="275"/>
+        <di:waypoint x="1545" y="230"/>
+        <di:waypoint x="1610" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1545" y="325"/>
+        <di:waypoint x="1545" y="380"/>
+        <di:waypoint x="1600" y="380"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1710" y="230"/>
+        <di:waypoint x="1795" y="230"/>
+        <di:waypoint x="1795" y="275"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1720" y="380"/>
+        <di:waypoint x="1795" y="380"/>
+        <di:waypoint x="1795" y="325"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1820" y="300"/>
+        <di:waypoint x="1870" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="1990" y="300"/>
+        <di:waypoint x="2030" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_16" bpmnElement="flow_16">
+        <di:waypoint x="2150" y="300"/>
+        <di:waypoint x="2190" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_17" bpmnElement="flow_17">
+        <di:waypoint x="2290" y="300"/>
+        <di:waypoint x="2330" y="300"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

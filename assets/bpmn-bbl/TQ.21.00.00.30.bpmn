@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_30"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_30" name="TQ.21.00.00.30 Bewirtschaftung Anmiet-, Pachtverträge, Eigene Baurechte" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_vermieter" name="TQ Vermieter / Verpächter"/>
+      <bpmn:lane id="lane_lig" name="TQ Leiter/in Liegenschaften (LIG)">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_akten_bearbeiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_habenstellung_bearbeiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_mv_vermieter_verhandeln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_mietzinsreduktion_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_vertragsergaenzungen_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_objektuebernahme</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_split</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_option_ausueben</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_kuendigung_schicken</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_erlaubnis_einholen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_10_mietzinsanpassung_kontrollieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_11_nebenkosten_kontrollieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_12_vermieterforderungen_kontrollieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_13_kuendigung_bearbeiten</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_14_sap_vertragsdaten_anpassen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Vertrag übernommen / in Bewirtschaftung">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Sequential tasks 01-06 -->
+    <bpmn:task id="task_01_akten_bearbeiten" name="Übernommene Akten bearbeiten (TQ.21.00.00.30.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_02_habenstellung_bearbeiten" name="Liste Habenstellung bearbeiten (TQ.21.00.00.30.02)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_mv_vermieter_verhandeln" name="MV Vermieter verhandeln (TQ.21.00.00.30.03)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_mietzinsreduktion_pruefen" name="Mietzinsreduktion prüfen (TQ.21.00.00.30.04)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_05_vertragsergaenzungen_pruefen" name="Vertragsergänzungen prüfen (TQ.21.00.00.30.05)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_06_objektuebernahme" name="Objektübernahme (TQ.21.00.00.30.06)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Parallel split into the ongoing management activities -->
+    <bpmn:parallelGateway id="gw_split" name="">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:task id="task_07_option_ausueben" name="Evtl. Option ausüben (TQ.21.00.00.30.07)">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_08_kuendigung_schicken" name="Kündigung an Vermieter schicken (TQ.21.00.00.30.08)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_15</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_09_erlaubnis_einholen" name="Erlaubnis Vermieter einholen (TQ.21.00.00.30.09)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_10_mietzinsanpassung_kontrollieren" name="Mietzinsanpassung kontrollieren (TQ.21.00.00.30.10)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_17</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_11_nebenkosten_kontrollieren" name="Nebenkostenabrechnung kontrollieren (TQ.21.00.00.30.11)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_18</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_12_vermieterforderungen_kontrollieren" name="Vermieterforderungen kontrollieren (TQ.21.00.00.30.12)">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:outgoing>flow_19</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Merge gateway -->
+    <bpmn:parallelGateway id="gw_merge" name="">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+      <bpmn:incoming>flow_15</bpmn:incoming>
+      <bpmn:incoming>flow_16</bpmn:incoming>
+      <bpmn:incoming>flow_17</bpmn:incoming>
+      <bpmn:incoming>flow_18</bpmn:incoming>
+      <bpmn:incoming>flow_19</bpmn:incoming>
+      <bpmn:outgoing>flow_20</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:task id="task_13_kuendigung_bearbeiten" name="Kündigung bearbeiten (TQ.21.00.00.30.13)">
+      <bpmn:incoming>flow_20</bpmn:incoming>
+      <bpmn:outgoing>flow_21</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_14_sap_vertragsdaten_anpassen" name="SAP Vertragsdaten anpassen (TQ.21.00.00.30.14)">
+      <bpmn:incoming>flow_21</bpmn:incoming>
+      <bpmn:outgoing>flow_22</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_1" name="TQ Vertrag bewirtschaftet / beendet">
+      <bpmn:incoming>flow_22</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_akten_bearbeiten"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_akten_bearbeiten" targetRef="task_02_habenstellung_bearbeiten"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="task_02_habenstellung_bearbeiten" targetRef="task_03_mv_vermieter_verhandeln"/>
+    <bpmn:sequenceFlow id="flow_04" sourceRef="task_03_mv_vermieter_verhandeln" targetRef="task_04_mietzinsreduktion_pruefen"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_04_mietzinsreduktion_pruefen" targetRef="task_05_vertragsergaenzungen_pruefen"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_05_vertragsergaenzungen_pruefen" targetRef="task_06_objektuebernahme"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_06_objektuebernahme" targetRef="gw_split"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="gw_split" targetRef="task_07_option_ausueben"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="gw_split" targetRef="task_08_kuendigung_schicken"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="gw_split" targetRef="task_09_erlaubnis_einholen"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="gw_split" targetRef="task_10_mietzinsanpassung_kontrollieren"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="gw_split" targetRef="task_11_nebenkosten_kontrollieren"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="gw_split" targetRef="task_12_vermieterforderungen_kontrollieren"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_07_option_ausueben" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="task_08_kuendigung_schicken" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_16" sourceRef="task_09_erlaubnis_einholen" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_17" sourceRef="task_10_mietzinsanpassung_kontrollieren" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_18" sourceRef="task_11_nebenkosten_kontrollieren" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_19" sourceRef="task_12_vermieterforderungen_kontrollieren" targetRef="gw_merge"/>
+    <bpmn:sequenceFlow id="flow_20" sourceRef="gw_merge" targetRef="task_13_kuendigung_bearbeiten"/>
+    <bpmn:sequenceFlow id="flow_21" sourceRef="task_13_kuendigung_bearbeiten" targetRef="task_14_sap_vertragsdaten_anpassen"/>
+    <bpmn:sequenceFlow id="flow_22" sourceRef="task_14_sap_vertragsdaten_anpassen" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_30">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_vermieter" bpmnElement="lane_vermieter" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2500" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_lig" bpmnElement="lane_lig" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="2500" height="560"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Start / initial sequential tasks -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="462" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_akten_bearbeiten">
+        <dc:Bounds x="340" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_habenstellung_bearbeiten">
+        <dc:Bounds x="490" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_mv_vermieter_verhandeln">
+        <dc:Bounds x="640" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_mietzinsreduktion_pruefen">
+        <dc:Bounds x="790" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_vertragsergaenzungen_pruefen">
+        <dc:Bounds x="940" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_objektuebernahme">
+        <dc:Bounds x="1090" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Split gateway -->
+      <bpmndi:BPMNShape id="shape_gw_split" bpmnElement="gw_split">
+        <dc:Bounds x="1240" y="455" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Parallel branches (6 rows within LIG lane) -->
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_option_ausueben">
+        <dc:Bounds x="1340" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_kuendigung_schicken">
+        <dc:Bounds x="1340" y="330" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_erlaubnis_einholen">
+        <dc:Bounds x="1340" y="420" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_mietzinsanpassung_kontrollieren">
+        <dc:Bounds x="1340" y="510" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_11" bpmnElement="task_11_nebenkosten_kontrollieren">
+        <dc:Bounds x="1340" y="600" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_12" bpmnElement="task_12_vermieterforderungen_kontrollieren">
+        <dc:Bounds x="1340" y="670" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Merge gateway -->
+      <bpmndi:BPMNShape id="shape_gw_merge" bpmnElement="gw_merge">
+        <dc:Bounds x="1500" y="455" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Final tasks -->
+      <bpmndi:BPMNShape id="shape_task_13" bpmnElement="task_13_kuendigung_bearbeiten">
+        <dc:Bounds x="1600" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_14" bpmnElement="task_14_sap_vertragsdaten_anpassen">
+        <dc:Bounds x="1750" y="440" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="1900" y="462" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="480"/>
+        <di:waypoint x="340" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="480"/>
+        <di:waypoint x="490" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="590" y="480"/>
+        <di:waypoint x="640" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="740" y="480"/>
+        <di:waypoint x="790" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="890" y="480"/>
+        <di:waypoint x="940" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="1040" y="480"/>
+        <di:waypoint x="1090" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="1190" y="480"/>
+        <di:waypoint x="1240" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="1265" y="455"/>
+        <di:waypoint x="1265" y="280"/>
+        <di:waypoint x="1340" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1265" y="455"/>
+        <di:waypoint x="1265" y="370"/>
+        <di:waypoint x="1340" y="370"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1290" y="480"/>
+        <di:waypoint x="1320" y="480"/>
+        <di:waypoint x="1320" y="460"/>
+        <di:waypoint x="1340" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1265" y="505"/>
+        <di:waypoint x="1265" y="550"/>
+        <di:waypoint x="1340" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1265" y="505"/>
+        <di:waypoint x="1265" y="640"/>
+        <di:waypoint x="1340" y="640"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1265" y="505"/>
+        <di:waypoint x="1265" y="710"/>
+        <di:waypoint x="1340" y="710"/>
+      </bpmndi:BPMNEdge>
+      <!-- task_12 edge remains aligned at y=710 (task center) -->
+
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1440" y="280"/>
+        <di:waypoint x="1525" y="280"/>
+        <di:waypoint x="1525" y="455"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_15" bpmnElement="flow_15">
+        <di:waypoint x="1440" y="370"/>
+        <di:waypoint x="1525" y="370"/>
+        <di:waypoint x="1525" y="455"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_16" bpmnElement="flow_16">
+        <di:waypoint x="1440" y="460"/>
+        <di:waypoint x="1475" y="460"/>
+        <di:waypoint x="1475" y="480"/>
+        <di:waypoint x="1500" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_17" bpmnElement="flow_17">
+        <di:waypoint x="1440" y="550"/>
+        <di:waypoint x="1525" y="550"/>
+        <di:waypoint x="1525" y="505"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_18" bpmnElement="flow_18">
+        <di:waypoint x="1440" y="640"/>
+        <di:waypoint x="1525" y="640"/>
+        <di:waypoint x="1525" y="505"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_19" bpmnElement="flow_19">
+        <di:waypoint x="1440" y="710"/>
+        <di:waypoint x="1525" y="710"/>
+        <di:waypoint x="1525" y="505"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_20" bpmnElement="flow_20">
+        <di:waypoint x="1550" y="480"/>
+        <di:waypoint x="1600" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_21" bpmnElement="flow_21">
+        <di:waypoint x="1700" y="480"/>
+        <di:waypoint x="1750" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_22" bpmnElement="flow_22">
+        <di:waypoint x="1850" y="480"/>
+        <di:waypoint x="1900" y="480"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

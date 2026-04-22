@@ -1,0 +1,110 @@
+/* ============================================================
+   Design Tokens
+   ============================================================ */
+:root {
+  /* Colors — Background */
+  --color-bg-page: #F5F5F4;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-surface-hover: #F7F7F6;
+  --color-bg-accent: #E8EEF6;
+  --color-bg-accent-strong: #1F4E8A;
+  --color-bg-accent-strong-rgb: 31, 78, 138; /* use with rgba(var(--color-bg-accent-strong-rgb), α) */
+  --color-bg-overlay: #262626;
+
+  /* Colors — Border */
+  --color-border-subtle: #EFEFED;
+  --color-border-default: #D8D8D5;
+  --color-border-strong: #A3A39E;
+  --color-border-accent: #1F4E8A;
+
+  /* Colors — Text */
+  --color-text-primary: #2C2C29;
+  --color-text-secondary: #5F5F5A;
+  --color-text-placeholder: #767672;
+  --color-text-link: #1F4E8A;
+  --color-text-link-hover: #183C6B;
+  --color-text-link-active: #122E54;
+  --color-text-on-accent: #FFFFFF;
+
+  /* Colors — Status */
+  --color-status-certified: #157A42;
+  --color-status-certified-bg: #EDFAF3;
+  --color-status-draft: #A16800;
+  --color-status-draft-bg: #FEF7E8;
+  --color-status-deprecated: #5F5F5A;
+  --color-status-deprecated-bg: #EFEFED;
+  --color-status-restricted: #767672;
+  --color-status-restricted-bg: #F7F7F6;
+
+  /* Colors — Quality (aliased to status hues — same semantic, one palette) */
+  --color-quality-complete: #157A42;
+  --color-quality-null: #A16800;
+  --color-quality-bg: #EFEFED;
+
+  /* Colors — Feedback (warning aliased to draft — one amber for the whole system) */
+  --color-warning: #A16800;
+  --color-warning-bg: #FEF7E8;
+  --color-error: #B02A1F;
+  --color-error-bg: #FEF0EE;
+  --color-success: #15803D;
+  --color-success-bg: #DCFCE7;
+  --color-text-on-success: #FFFFFF;
+
+  /* Colors — Scrollbar / interactive */
+  --color-scrollbar-thumb: #E8E8E6;
+  --color-scrollbar-thumb-hover: #D4D4D0;
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  --text-display-lg: 28px;
+  --text-display: 24px;
+  --text-heading-l: 18px;
+  --text-heading-m: 16px;
+  --text-heading-s: 15px;
+  --text-body: 14px;
+  --text-small: 12px;
+  --text-label: 11px;
+  --text-label-xs: 10px;
+  --text-mono: 13px;
+  --text-mono-sm: 12px;
+  --text-mono-xs: 11px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Shadows */
+  --shadow-header:      0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card:        0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover:  0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-hover:       0 2px 8px rgba(var(--color-bg-accent-strong-rgb), 0.08);
+  --shadow-popover:     0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-tooltip:     0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md:          0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.10);
+
+  /* Motion */
+  --transition-card: border-color 150ms ease;
+  --transition-hover: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 56px;
+  --content-max-width: 960px;
+  --content-padding: 32px;
+  --prose-max-width: 720px;
+}

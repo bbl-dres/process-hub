@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"C:/Users/DavidRasner/Documents/GitHub/data-catalog/prototype-sqlite/css/tokens.css\" \"c:/Users/DavidRasner/Documents/GitHub/process-hub/css/tokens.css\")",
+      "Bash(cp \"C:/Users/DavidRasner/Documents/GitHub/data-catalog/prototype-sqlite/css/styles.css\" \"c:/Users/DavidRasner/Documents/GitHub/process-hub/css/styles.css\")",
+      "Bash(awk '{print $5, $NF}')",
+      "Bash(where pdftoppm *)",
+      "Bash(where pdftotext *)",
+      "Bash(pdftotext -layout \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/TQ.21.00.00.02 Machbarkeit Proje_df7d3fcd00244e42a8c555c697d1086a-220426-2114-6.pdf\" -)",
+      "Bash(pdftotext -layout -enc UTF-8 \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/51612084_7db6b145b0fb40608e2fc9907e5086ef-220426-2113-4.pdf\" -)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(node extract-bbl.mjs)",
+      "Bash(pdftotext -enc UTF-8 -layout \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/TQ.21.00.00.02 Machbarkeit Proje_df7d3fcd00244e42a8c555c697d1086a-220426-2114-6.pdf\" -)",
+      "Bash(node -e ' *)",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(pdfimages -list \"c:/Users/DavidRasner/Documents/GitHub/process-hub/assets/TQ.21.00 Immobilienmanagement \\(K0\\)/TQ.21.00.00.02 Machbarkeit Proje_df7d3fcd00244e42a8c555c697d1086a-220426-2114-6.pdf\")"
+    ]
+  }
+}

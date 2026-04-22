@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_60"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_60" name="TQ.21.00.00.60 Lösungsvorschläge Rückgabe Anmietobjekt, Verkauf" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_auftraggeber" name="TQ Auftraggeber/in"/>
+      <bpmn:lane id="lane_im" name="TQ Immobilienmanager/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_entgegennehmen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01_split</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_02_mieter_rueckbau_verhandeln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_schlussbericht_anmiete</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_dossier_weiterleiten_anmiete</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_anmiete</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_objektwert_ermitteln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>subproc_06_bim_bauen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_fiaa_abgleich</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_hoechstangebot_ermitteln</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_09_schlussbericht_verkauf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_11_dossier_weiterleiten_verkauf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_verkauf</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_entscheider" name="TQ Entscheidungsträger/in">
+        <bpmn:flowNodeRef>task_10_antrag_genehmigen</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ Auftrag Lösungsvorschlag Rückgabe / Verkauf">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Common entry task -->
+    <bpmn:task id="task_01_auftrag_entgegennehmen" name="Auftrag entgegennehmen (TQ.21.00.00.60.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Split: Anmiete vs. Verkauf -->
+    <bpmn:exclusiveGateway id="gw_01_split" name="">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Anmiete path -->
+    <bpmn:task id="task_02_mieter_rueckbau_verhandeln" name="Mieter/Rückbau verhandeln (TQ.21.00.00.60.02)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_schlussbericht_anmiete" name="Schlussbericht mit Empfehlung erstellen (TQ.21.00.00.60.03)">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_dossier_weiterleiten_anmiete" name="Dossier weiterleiten (TQ.21.00.00.60.04)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_anmiete" name="TQ Dossier Rückgabe Anmiete weitergeleitet">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Verkauf path -->
+    <bpmn:task id="task_05_objektwert_ermitteln" name="Objektwert ermitteln (TQ.21.00.00.60.05)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:subProcess id="subproc_06_bim_bauen" name="TQ.21.00.00.95 BIM-Prozess Bauen (TQ.21.00.00.60.06)">
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:subProcess>
+
+    <bpmn:task id="task_07_fiaa_abgleich" name="Abgleich mit FIAA durchführen (TQ.21.00.00.60.07)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_08_hoechstangebot_ermitteln" name="Höchstangebot ermitteln (TQ.21.00.00.60.08)">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+      <bpmn:outgoing>flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_09_schlussbericht_verkauf" name="Schlussbericht mit Empfehlung erstellen (TQ.21.00.00.60.09)">
+      <bpmn:incoming>flow_11</bpmn:incoming>
+      <bpmn:outgoing>flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_10_antrag_genehmigen" name="Antrag genehmigen (TQ.21.00.00.60.10)">
+      <bpmn:incoming>flow_12</bpmn:incoming>
+      <bpmn:outgoing>flow_13</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_11_dossier_weiterleiten_verkauf" name="Dossier weiterleiten (TQ.21.00.00.60.11)">
+      <bpmn:incoming>flow_13</bpmn:incoming>
+      <bpmn:outgoing>flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_verkauf" name="TQ Dossier Verkauf weitergeleitet">
+      <bpmn:incoming>flow_14</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_entgegennehmen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_entgegennehmen" targetRef="gw_01_split"/>
+    <bpmn:sequenceFlow id="flow_03" name="Rückgabe Anmietobjekt" sourceRef="gw_01_split" targetRef="task_02_mieter_rueckbau_verhandeln"/>
+    <bpmn:sequenceFlow id="flow_04" name="Verkauf" sourceRef="gw_01_split" targetRef="task_05_objektwert_ermitteln"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_02_mieter_rueckbau_verhandeln" targetRef="task_03_schlussbericht_anmiete"/>
+    <bpmn:sequenceFlow id="flow_06" sourceRef="task_03_schlussbericht_anmiete" targetRef="task_04_dossier_weiterleiten_anmiete"/>
+    <bpmn:sequenceFlow id="flow_07" sourceRef="task_04_dossier_weiterleiten_anmiete" targetRef="end_anmiete"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_05_objektwert_ermitteln" targetRef="subproc_06_bim_bauen"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="subproc_06_bim_bauen" targetRef="task_07_fiaa_abgleich"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_07_fiaa_abgleich" targetRef="task_08_hoechstangebot_ermitteln"/>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="task_08_hoechstangebot_ermitteln" targetRef="task_09_schlussbericht_verkauf"/>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="task_09_schlussbericht_verkauf" targetRef="task_10_antrag_genehmigen"/>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="task_10_antrag_genehmigen" targetRef="task_11_dossier_weiterleiten_verkauf"/>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="task_11_dossier_weiterleiten_verkauf" targetRef="end_verkauf"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_60">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_auftraggeber" bpmnElement="lane_auftraggeber" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="2100" height="120"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_im" bpmnElement="lane_im" isHorizontal="true">
+        <dc:Bounds x="200" y="160" width="2100" height="320"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_entscheider" bpmnElement="lane_entscheider" isHorizontal="true">
+        <dc:Bounds x="200" y="480" width="2100" height="140"/>
+      </bpmndi:BPMNShape>
+
+      <!-- IM lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="282" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_entgegennehmen">
+        <dc:Bounds x="340" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01_split" bpmnElement="gw_01_split" isMarkerVisible="true">
+        <dc:Bounds x="490" y="275" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Anmiete path (upper in IM lane) -->
+      <bpmndi:BPMNShape id="shape_task_02" bpmnElement="task_02_mieter_rueckbau_verhandeln">
+        <dc:Bounds x="600" y="190" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_schlussbericht_anmiete">
+        <dc:Bounds x="750" y="190" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_dossier_weiterleiten_anmiete">
+        <dc:Bounds x="900" y="190" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_anmiete" bpmnElement="end_anmiete">
+        <dc:Bounds x="1050" y="212" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Verkauf path (lower in IM lane) -->
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_objektwert_ermitteln">
+        <dc:Bounds x="600" y="370" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_subproc_06" bpmnElement="subproc_06_bim_bauen">
+        <dc:Bounds x="750" y="370" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_fiaa_abgleich">
+        <dc:Bounds x="920" y="370" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_hoechstangebot_ermitteln">
+        <dc:Bounds x="1070" y="370" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_09" bpmnElement="task_09_schlussbericht_verkauf">
+        <dc:Bounds x="1220" y="370" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Entscheider lane node -->
+      <bpmndi:BPMNShape id="shape_task_10" bpmnElement="task_10_antrag_genehmigen">
+        <dc:Bounds x="1370" y="510" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Back to IM lane -->
+      <bpmndi:BPMNShape id="shape_task_11" bpmnElement="task_11_dossier_weiterleiten_verkauf">
+        <dc:Bounds x="1520" y="370" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_verkauf" bpmnElement="end_verkauf">
+        <dc:Bounds x="1670" y="392" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="300"/>
+        <di:waypoint x="340" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="300"/>
+        <di:waypoint x="490" y="300"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="515" y="275"/>
+        <di:waypoint x="515" y="230"/>
+        <di:waypoint x="600" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="515" y="325"/>
+        <di:waypoint x="515" y="410"/>
+        <di:waypoint x="600" y="410"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="700" y="230"/>
+        <di:waypoint x="750" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="850" y="230"/>
+        <di:waypoint x="900" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="1000" y="230"/>
+        <di:waypoint x="1050" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="700" y="410"/>
+        <di:waypoint x="750" y="410"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="870" y="410"/>
+        <di:waypoint x="920" y="410"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1020" y="410"/>
+        <di:waypoint x="1070" y="410"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_11" bpmnElement="flow_11">
+        <di:waypoint x="1170" y="410"/>
+        <di:waypoint x="1220" y="410"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_12" bpmnElement="flow_12">
+        <di:waypoint x="1320" y="410"/>
+        <di:waypoint x="1420" y="410"/>
+        <di:waypoint x="1420" y="510"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_13" bpmnElement="flow_13">
+        <di:waypoint x="1470" y="550"/>
+        <di:waypoint x="1570" y="550"/>
+        <di:waypoint x="1570" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_14" bpmnElement="flow_14">
+        <di:waypoint x="1620" y="410"/>
+        <di:waypoint x="1670" y="410"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

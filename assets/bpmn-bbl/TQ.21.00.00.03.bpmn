@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="definitions_TQ_21_00_00_03"
+    targetNamespace="http://process-hub.local/bpmn">
+  <bpmn:process id="proc_TQ_21_00_00_03" name="TQ.21.00.00.03 Auftragskoordination" isExecutable="false">
+    <bpmn:laneSet id="laneSet_1">
+      <bpmn:lane id="lane_antragsteller" name="TQ Antragsteller"/>
+      <bpmn:lane id="lane_ppe" name="TQ Programm- und Projektentwickler/in">
+        <bpmn:flowNodeRef>start_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_01_auftrag_bereitstellen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_03_startsitzung_durchfuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_04_kreditbegehren_genehmigen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_05_phasen_auftrags_abschluss_pruefen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>gw_01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_06_folgeauftrag_erteilen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_07_auftragsabschluss_durchfuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>task_08_debriefing_durchfuehren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Start event -->
+    <bpmn:startEvent id="start_1" name="TQ.21.00.00.02 Machbarkeit / Projektdefinition erledigt">
+      <bpmn:outgoing>flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks -->
+    <bpmn:task id="task_01_auftrag_bereitstellen" name="Auftrag und Auftragsgrundlagen bereitstellen und Organisation verifizieren (TQ.21.00.00.03.01)">
+      <bpmn:incoming>flow_01</bpmn:incoming>
+      <bpmn:outgoing>flow_02</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_03_startsitzung_durchfuehren" name="Startsitzung durchführen und Auftrag formell erteilen (TQ.21.00.00.03.03)">
+      <bpmn:incoming>flow_02</bpmn:incoming>
+      <bpmn:outgoing>flow_03</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_04_kreditbegehren_genehmigen" name="Kreditbegehren, Auftragscontrolling &amp; Projektänderungen genehmigen (TQ.21.00.00.03.04)">
+      <bpmn:incoming>flow_03</bpmn:incoming>
+      <bpmn:incoming>flow_08</bpmn:incoming>
+      <bpmn:outgoing>flow_04</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_05_phasen_auftrags_abschluss_pruefen" name="Phasen-/Auftrags-abschluss prüfen (TQ.21.00.00.03.05)">
+      <bpmn:incoming>flow_04</bpmn:incoming>
+      <bpmn:outgoing>flow_05</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="gw_01" name="Phasenabschluss / letzte Phase">
+      <bpmn:incoming>flow_05</bpmn:incoming>
+      <bpmn:outgoing>flow_06</bpmn:outgoing>
+      <bpmn:outgoing>flow_07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="task_06_folgeauftrag_erteilen" name="Folgeauftrag erteilen (TQ.21.00.00.03.06)">
+      <bpmn:incoming>flow_06</bpmn:incoming>
+      <bpmn:outgoing>flow_08</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_07_auftragsabschluss_durchfuehren" name="Auftragsabschluss durchführen (TQ.21.00.00.03.07)">
+      <bpmn:incoming>flow_07</bpmn:incoming>
+      <bpmn:outgoing>flow_09</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="task_08_debriefing_durchfuehren" name="Gegebenenfalls Debriefing durchführen (TQ.21.00.00.03.08)">
+      <bpmn:incoming>flow_09</bpmn:incoming>
+      <bpmn:outgoing>flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="end_1" name="TQ Auftragskoordination abgeschlossen">
+      <bpmn:incoming>flow_10</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence flows -->
+    <bpmn:sequenceFlow id="flow_01" sourceRef="start_1" targetRef="task_01_auftrag_bereitstellen"/>
+    <bpmn:sequenceFlow id="flow_02" sourceRef="task_01_auftrag_bereitstellen" targetRef="task_03_startsitzung_durchfuehren"/>
+    <bpmn:sequenceFlow id="flow_03" sourceRef="task_03_startsitzung_durchfuehren" targetRef="task_04_kreditbegehren_genehmigen"/>
+    <bpmn:sequenceFlow id="flow_04" sourceRef="task_04_kreditbegehren_genehmigen" targetRef="task_05_phasen_auftrags_abschluss_pruefen"/>
+    <bpmn:sequenceFlow id="flow_05" sourceRef="task_05_phasen_auftrags_abschluss_pruefen" targetRef="gw_01"/>
+    <bpmn:sequenceFlow id="flow_06" name="nächste Phase / Folgeauftrag" sourceRef="gw_01" targetRef="task_06_folgeauftrag_erteilen"/>
+    <bpmn:sequenceFlow id="flow_07" name="letzte Phase abgeschlossen" sourceRef="gw_01" targetRef="task_07_auftragsabschluss_durchfuehren"/>
+    <bpmn:sequenceFlow id="flow_08" sourceRef="task_06_folgeauftrag_erteilen" targetRef="task_04_kreditbegehren_genehmigen"/>
+    <bpmn:sequenceFlow id="flow_09" sourceRef="task_07_auftragsabschluss_durchfuehren" targetRef="task_08_debriefing_durchfuehren"/>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="task_08_debriefing_durchfuehren" targetRef="end_1"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc_TQ_21_00_00_03">
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="shape_lane_antragsteller" bpmnElement="lane_antragsteller" isHorizontal="true">
+        <dc:Bounds x="200" y="40" width="1900" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_lane_ppe" bpmnElement="lane_ppe" isHorizontal="true">
+        <dc:Bounds x="200" y="220" width="1900" height="280"/>
+      </bpmndi:BPMNShape>
+
+      <!-- PPE lane nodes -->
+      <bpmndi:BPMNShape id="shape_start_1" bpmnElement="start_1">
+        <dc:Bounds x="260" y="342" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_01" bpmnElement="task_01_auftrag_bereitstellen">
+        <dc:Bounds x="340" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_03" bpmnElement="task_03_startsitzung_durchfuehren">
+        <dc:Bounds x="500" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_04" bpmnElement="task_04_kreditbegehren_genehmigen">
+        <dc:Bounds x="680" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_05" bpmnElement="task_05_phasen_auftrags_abschluss_pruefen">
+        <dc:Bounds x="840" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_gw_01" bpmnElement="gw_01" isMarkerVisible="true">
+        <dc:Bounds x="990" y="335" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_06" bpmnElement="task_06_folgeauftrag_erteilen">
+        <dc:Bounds x="1090" y="430" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_07" bpmnElement="task_07_auftragsabschluss_durchfuehren">
+        <dc:Bounds x="1090" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_task_08" bpmnElement="task_08_debriefing_durchfuehren">
+        <dc:Bounds x="1250" y="320" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape_end_1" bpmnElement="end_1">
+        <dc:Bounds x="1410" y="342" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="edge_flow_01" bpmnElement="flow_01">
+        <di:waypoint x="296" y="360"/>
+        <di:waypoint x="340" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_02" bpmnElement="flow_02">
+        <di:waypoint x="440" y="360"/>
+        <di:waypoint x="500" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_03" bpmnElement="flow_03">
+        <di:waypoint x="600" y="360"/>
+        <di:waypoint x="680" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_04" bpmnElement="flow_04">
+        <di:waypoint x="780" y="360"/>
+        <di:waypoint x="840" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_05" bpmnElement="flow_05">
+        <di:waypoint x="940" y="360"/>
+        <di:waypoint x="990" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_06" bpmnElement="flow_06">
+        <di:waypoint x="1015" y="385"/>
+        <di:waypoint x="1015" y="470"/>
+        <di:waypoint x="1090" y="470"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_07" bpmnElement="flow_07">
+        <di:waypoint x="1040" y="360"/>
+        <di:waypoint x="1090" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_08" bpmnElement="flow_08">
+        <di:waypoint x="1190" y="470"/>
+        <di:waypoint x="1220" y="470"/>
+        <di:waypoint x="1220" y="260"/>
+        <di:waypoint x="730" y="260"/>
+        <di:waypoint x="730" y="320"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_09" bpmnElement="flow_09">
+        <di:waypoint x="1190" y="360"/>
+        <di:waypoint x="1250" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_10" bpmnElement="flow_10">
+        <di:waypoint x="1350" y="360"/>
+        <di:waypoint x="1410" y="360"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

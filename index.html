@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Process Hub — BUW-Prozessmodell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/diagram-js.css">
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-js.css">
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-font/css/bpmn.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-navigated-viewer.development.js"></script>
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/jspdf-autotable@3.8.1/dist/jspdf.plugin.autotable.min.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+</head>
+<body>
+
+<div class="loading-screen" id="loading-screen">
+  <div style="display:flex;width:100%;height:100%;">
+    <div class="loading-skeleton-sidebar" style="width:260px;background:var(--color-bg-surface);border-right:1px solid var(--color-border-subtle);"></div>
+    <div class="loading-skeleton-main" style="flex:1;padding:32px;">
+      <div class="skeleton-bar skeleton-bar-sm" style="width:30%;"></div>
+      <div class="skeleton-bar skeleton-bar-lg"></div>
+      <div class="skeleton-bar skeleton-bar-md"></div>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+  <header class="app-header">
+    <a class="header-logo" id="header-logo" href="#/">
+      <div class="header-logo-icon"><i data-lucide="workflow" style="width:16px;height:16px;"></i></div>
+      <span>Process Hub</span>
+    </a>
+    <div class="header-search">
+      <div class="search-bar">
+        <i data-lucide="search" class="search-bar-icon" style="width:16px;height:16px;"></i>
+        <input type="text" class="search-bar-input" id="search-input" placeholder="Prozesse durchsuchen..." aria-label="Prozesse durchsuchen" autocomplete="off">
+        <button type="button" class="search-bar-clear" id="search-clear" aria-label="Suche löschen" hidden>
+          <i data-lucide="x" style="width:14px;height:14px;"></i>
+        </button>
+      </div>
+      <div class="search-dropdown" id="search-dropdown" role="listbox" hidden></div>
+    </div>
+    <div class="prototype-hint">Prototyp, fiktive Inhalte – nur zur Demonstration</div>
+    <div class="header-actions">
+      <button class="header-icon-btn" aria-label="Hilfe"><i data-lucide="help-circle" style="width:18px;height:18px;"></i></button>
+      <div class="lang-switcher">
+        <button class="lang-btn" id="lang-btn" aria-label="Sprache wechseln" aria-haspopup="menu" aria-expanded="false" aria-controls="lang-dropdown">
+          <span id="lang-label">DE</span>
+          <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+        </button>
+        <div class="lang-dropdown" id="lang-dropdown" role="menu" aria-labelledby="lang-btn">
+          <button type="button" class="lang-option" data-lang="de" role="menuitemradio"><span class="dot"></span> DE</button>
+          <button type="button" class="lang-option" data-lang="fr" role="menuitemradio"><span class="dot"></span> FR</button>
+          <button type="button" class="lang-option" data-lang="it" role="menuitemradio"><span class="dot"></span> IT</button>
+          <button type="button" class="lang-option" data-lang="en" role="menuitemradio"><span class="dot"></span> EN</button>
+        </div>
+      </div>
+      <div class="user-avatar" role="button" aria-label="Benutzermenu">DR</div>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <nav class="sidebar" id="sidebar" aria-label="Hauptnavigation"></nav>
+    <main class="main-content" id="main-content" tabindex="-1"></main>
+  </div>
+
+  <div id="sr-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <footer class="app-footer">
+    <span class="app-footer-version">Process Hub v0.1.0</span>
+    <span class="prototype-hint-footer">Prototyp, fiktive Inhalte – nur zur Demonstration</span>
+    <div class="app-footer-links">
+      <a href="https://dpbb.uni-wuppertal.de/de/forschung/buw-prozessmodell-fuer-die-bau-und-immobilienwirtschaft/" target="_blank" rel="noopener">BUW-Prozessmodell</a>
+      <a href="https://github.com/davras5/process-hub" target="_blank" rel="noopener">Quellcode</a>
+    </div>
+  </footer>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

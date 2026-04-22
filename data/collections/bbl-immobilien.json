@@ -1,0 +1,230 @@
+{
+  "id": "bbl-immobilien",
+  "areas": [
+    {
+      "id": "akquisition",
+      "number": "1",
+      "name": "Akquisition & Planung",
+      "accent": "#1F4E8A",
+      "description": "Lösungsvorschläge, Machbarkeit, Auftragskoordination",
+      "groups": [
+        {
+          "id": "TQ.21.00.00.01",
+          "name": "Lösungsvorschläge Anmiete Kauf",
+          "active": true,
+          "description": "Mögliche Mietobjekte für eine Anmiete suchen. Mögliche Liegenschaften für einen Kauf suche",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.02",
+          "name": "Machbarkeit Projektdefinition",
+          "active": true,
+          "description": "Dieser Prozess regelt den Ablauf bei A- und B-Geschäften vom Auftrag „Machbarkeit / Projek\nüber den Entscheid Eintreten auf das Projekt bis zum durch den Antragsteller bestätigten P\nZiel ist insbesondere die Prüfung der Machbarkeit inkl. Grobkostenermittlung entscheidorie\nTerminplan sowie die Erstellung der Projektdefinition.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.03",
+          "name": "Auftragskoordination",
+          "active": true,
+          "description": "Dieser Prozess dient der korrekten Koordination und Überwachung von A- und B-Geschäften na\nerfolgter Auftragserteilung bis zum Debriefing des jeweiligen Geschäfts.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        }
+      ]
+    },
+    {
+      "id": "vollzug",
+      "number": "2",
+      "name": "Vollzug & Übernahme",
+      "accent": "#2E7D32",
+      "description": "Vollzug Anmiete/Pacht, Verurkundung Kauf, Objektübernahme",
+      "groups": [
+        {
+          "id": "TQ.21.00.00.10",
+          "name": "Vollzug Anmiete Pacht",
+          "active": true,
+          "description": "Abschluss eines Anmiet- oder Pachtvertrages",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.15",
+          "name": "Verurkundung Kauf Baurecht",
+          "active": true,
+          "description": "Grundlage\nAbschluss eines Kauf- oder Baurechtsvertrages unter der Mitwirkung eines Notars  Status\n                                                                                 Relevante",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.20",
+          "name": "Objektübernahme",
+          "active": true,
+          "description": "Nach einem Kauf oder einer Anmiete wird das Objekt durch das BBL vom Verkäufer oder Vermie\nübernommen.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        }
+      ]
+    },
+    {
+      "id": "bewirtschaftung",
+      "number": "3",
+      "name": "Bewirtschaftung",
+      "accent": "#B45309",
+      "description": "Bewirtschaftung von Anmiet-, Pacht-, Baurechtsverträgen und Eigentum",
+      "groups": [
+        {
+          "id": "TQ.21.00.00.30",
+          "name": "Bewirtschaftung Anmiet-, Pachtverträge, Eigene Baurechte",
+          "active": true,
+          "description": "Ersterfassung von Anmiet-, Pacht- uns Baurechtsverträgen im SAP. Laufende Anpassungen im S\nvornehmen wenn sich diese Verträge verändern.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.35",
+          "name": "Bewirtschaftung Eigentum, Stiftungen",
+          "active": true,
+          "description": "Bewirtschaften von Immobilien im Eigentum des Bundes und im Eigentum von Stiftungen des Bu",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.45",
+          "name": "Bewirtschaftung von Vermietungen, Verpachtungen, Baurechtsvergaben",
+          "active": true,
+          "description": "Verträge von Vermietungen, Verpachtungen und Abgaben im Baurecht bewirtschaften.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        }
+      ]
+    },
+    {
+      "id": "rueckgabe",
+      "number": "4",
+      "name": "Rückgabe & Auflösung",
+      "accent": "#7C3AED",
+      "description": "Objektübergabe, Lösungsvorschläge Rückgabe, Auflösung, Verurkundung Verkauf",
+      "groups": [
+        {
+          "id": "TQ.21.00.00.50",
+          "name": "Objektübergabe an LB, Mieter",
+          "active": true,
+          "description": "Übergabe des Objektes an interne Mieter (Leistungsbezüger) oder externe Mieter (Private)",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.60",
+          "name": "Lösungsvorschläge Rückgabe",
+          "active": true,
+          "description": "Z\nLösungsvorschläge erarbeiten für die Rückgabe einer Anmiete oder für den Verkauf         G\n                                                                                         S",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.70",
+          "name": "Auflösung Anmiete, Pacht",
+          "active": true,
+          "description": "Kündigungen von Anmiete oder Pacht aussprechen. Kündigungen von Anmiete oder Pacht\nentgegennehmen.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.75",
+          "name": "Verurkundung Verkauf, Baurechtrückgabe",
+          "active": true,
+          "description": "Vertrag für den Verkauf oder die Rückgabe eines Baurechtes beim Notar beurkunden",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.80",
+          "name": "Objektrücknahme von LB, Mieter",
+          "active": true,
+          "description": "Rücknahme von Räumlichkeiten von internen Mietern (Leistungsbezügern) oder von privaten Mi",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.90",
+          "name": "Objektrückgabe",
+          "active": true,
+          "description": "Rückgabe der Räumlichkeiten nach der Kündigung einer Anmiete oder dem Verkauf",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        }
+      ]
+    },
+    {
+      "id": "stammdaten",
+      "number": "5",
+      "name": "Stammdaten & Support",
+      "accent": "#5F5F5A",
+      "description": "Immostammdaten/Energiedaten, Aktenmanagement, Planverwaltung / BIM",
+      "groups": [
+        {
+          "id": "TQ.21.00.00.96",
+          "name": "Immostammdaten Energiedatenverwaltung",
+          "active": true,
+          "description": "Ziel dieses Prozesses Immostammdaten Energiedatenverwaltung und Immobilienstammdaten SAP z\nerfassen und diese Daten verschiedenen Bereichen zur Verfügung zu stellen.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.97",
+          "name": "Aktenmanagement",
+          "active": true,
+          "description": "Übernahme der Projekt- und Bewirtschaftungsakten aus Bauprojekten (nur Papier), Bewirtscha\nLangzeitablage.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        },
+        {
+          "id": "TQ.21.00.00.99",
+          "name": "Planverwaltung / BIM",
+          "active": true,
+          "description": "Übernahme / Upload der Pläne und BIM-Modelle ins das Planverwaltungstool (digitales Planar\nBauprojekten, digitale Plangrundlagen aus Anmiete und Kauf.\nBewirtschaftung und Schulung des Planverwaltungstool.",
+          "status": "approved",
+          "version": "1.0",
+          "updatedAt": "",
+          "tags": []
+        }
+      ]
+    }
+  ]
+}
