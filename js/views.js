@@ -381,8 +381,7 @@ function renderAreaCard(c, area) {
   return `
     <section class="area-card" style="--area-accent:${area.accent || 'var(--color-border-strong)'}">
       <header class="area-card-header">
-        <span class="area-card-number">${escapeHtml(area.number || '')}</span>
-        <h3 class="area-card-title">${escapeHtml(area.name)}</h3>
+        <h3 class="area-card-title">${escapeHtml(area.name)} <span class="text-placeholder" style="font-weight:400;">(${area.groups.length})</span></h3>
       </header>
       <div class="tile-grid">
         ${area.groups.map(g => renderTile(c, g)).join('')}
