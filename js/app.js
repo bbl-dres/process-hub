@@ -578,7 +578,6 @@ function renderHome() {
         </div>
         <div class="title-block-content">
           <h1 class="title-block-name">Prozess-Hub</h1>
-          <div class="title-block-subtitle">Durchsuchen und verstehen Sie die Prozesslandschaft verschiedener Sammlungen.</div>
         </div>
       </div>
 
@@ -736,7 +735,6 @@ function renderCollection(collId, view) {
         </div>
         <div class="title-block-content">
           <h1 class="title-block-name">${escapeHtml(c.name)}</h1>
-          ${c.subtitle ? `<div class="title-block-subtitle">${escapeHtml(c.subtitle)}</div>` : ''}
         </div>
       </div>
 
@@ -1419,7 +1417,6 @@ function renderProcess(collId, processId, detailTab) {
         </div>
         <div class="title-block-content">
           <h1 class="title-block-name">${escapeHtml(group.name)}</h1>
-          <div class="title-block-subtitle">${escapeHtml(c.name)} · ${escapeHtml(area.name)} · ${escapeHtml(group.id)}</div>
         </div>
       </div>
 
@@ -1827,7 +1824,6 @@ function renderChatView() {
       </div>
       <div class="title-block-content">
         <h1 class="title-block-name">KI-Assistent</h1>
-        <div class="title-block-subtitle">Stellen Sie Fragen zur Prozesslandschaft. Diese Funktion ist ein Platzhalter.</div>
       </div>
     </div>
 
@@ -1855,7 +1851,6 @@ function renderWorkflowsView() {
       </div>
       <div class="title-block-content">
         <h1 class="title-block-name">Workflows & API</h1>
-        <div class="title-block-subtitle">Exporte und Integrationen für alle Prozess-Sammlungen.</div>
       </div>
     </div>
 
@@ -2047,7 +2042,6 @@ function renderSearchResults(q) {
         <div class="title-block-icon"><i data-lucide="search" style="width:20px;height:20px;"></i></div>
         <div class="title-block-content">
           <h1 class="title-block-name">Suche</h1>
-          <div class="title-block-subtitle">Sammlungen und Prozesse durchsuchen.</div>
         </div>
       </div>
       <p class="text-secondary">Geben Sie oben einen Suchbegriff ein.</p>
@@ -2099,8 +2093,7 @@ function renderSearchResults(q) {
     <div class="title-block">
       <div class="title-block-icon"><i data-lucide="search" style="width:20px;height:20px;"></i></div>
       <div class="title-block-content">
-        <h1 class="title-block-name">Suchergebnisse</h1>
-        <div class="title-block-subtitle">${total} ${noun} für „${escapeHtml(trimmed)}"</div>
+        <h1 class="title-block-name">${total} ${noun} für „${escapeHtml(trimmed)}"</h1>
       </div>
     </div>
     ${body}
