@@ -1,11 +1,17 @@
 // One-off extractor for the BBL "TQ.21.00 Immobilienmanagement (K0)" PDFs.
 // Walks the folder, pdftotext-s every PDF, parses the structured sections
 // (Prozessverantwortliche, Zweck, Grundlagen, Relevante Dokumente,
-// Prozessschritte), and writes a single Excel workbook the user can review
-// and edit before we turn it into data/collections/bbl-immobilien.json.
+// Prozessschritte), writes:
+//   - tools/bbl-extraction.xlsx  (Processes / Steps / Groups sheets for review)
+//   - data/collections/bbl-immobilien.json  (app-facing collection)
+//
+// Source PDFs are NOT tracked in this repo (see .gitignore). To re-run,
+// place the folder `assets/TQ.21.00 Immobilienmanagement (K0)/` back in
+// the project; the derived JSON + BPMN in assets/bpmn-bbl/ already cover
+// the app. Only re-run the extractor when you have updated source PDFs.
 //
 // Requires: pdftotext on PATH (ships with Git for Windows) and xlsx npm package.
-// Run:      npm run extract:bbl
+// Run:      cd tools && npm install && node extract-bbl.mjs
 
 import { spawnSync } from 'node:child_process';
 import { readdirSync, writeFileSync } from 'node:fs';
@@ -387,19 +393,56 @@ function writeCollectionJson(processes) {
     const targetId = p.proposed_group || 'stammdaten';
     const a = byId[targetId];
     if (!a) continue;
+
+    // Split Grundlagen text into a deduped bullet list.
+    const standards = (p.foundations || '')
+      .split(/[\n;|]+/).map(s => s.trim().replace(/^[-•\s]+/, ''))
+      .filter(s => s.length > 3);
+
+    // Pull TQ.XX… references out of linked_docs → linkedProcesses.related.
+    const related = [];
+    const seen = new Set();
+    for (const m of (p.linked_docs || '').matchAll(/(TQ|D\d)\.\d+(?:\.\d+)+/g)) {
+      const pid = m[0];
+      if (pid !== p.process_id && !seen.has(pid)) { seen.add(pid); related.push(pid); }
+    }
+
     a.groups.push({
       id: p.process_id,
       name: p.name,
-      active: true,
       bpmn: `assets/bpmn-bbl/${p.process_id}.bpmn`,
-      description: p.purpose || '',
+
+      // Content — Zweck becomes `purpose` (why); `description` stays empty
+      // until we have a short summary field in the source PDFs.
+      description: '',
+      purpose: p.purpose || '',
+      trigger: '',
+      outputs: [],
+
+      // Ownership — PDFs contain real employee names; leave blank so the
+      // viewer falls back to the people.json roster when a pseudonymization
+      // mapping is added.
+      owner: '',
+      responsible: [],
+      expert: '',
+
+      // Lifecycle
       status: p.status || 'approved',
       version: '1.0',
+      validFrom: normalizeDate(p.release_date),
+      validUntil: '',
       updatedAt: normalizeDate(p.release_date),
-      tags: []
-      // owner/responsible/expert intentionally omitted — the PDFs contain
-      // real employee names; to be pseudonymized or mapped to people.json
-      // in a follow-up. Leaving undefined keeps the table rendering "—".
+      reviewCycleMonths: null,
+
+      // Classification
+      classification: '',
+      tags: [],
+
+      // Context
+      systems: [],
+      standards,
+      linkedProcesses: { predecessor: [], successor: [], related },
+      documents: []
     });
   }
 

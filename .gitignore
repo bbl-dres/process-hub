@@ -1,0 +1,20 @@
+# Node
+**/node_modules/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Transient PDF-page renders used by the BBL extractor (regeneratable)
+tools/bbl-pages/
+
+# Large/confidential source PDFs — processed into data/collections/bbl-immobilien.json
+# and assets/bpmn-bbl/*.bpmn. Keep the derived outputs, not the source.
+assets/TQ.21.00 Immobilienmanagement (K0)/

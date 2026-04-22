@@ -12,6 +12,7 @@ const state = {
   grouping: {},           // grouping[collId] = 'area' | 'owner' | 'status' | 'none'
   groupingMenuOpen: false,
   exportMenuOpen: false,  // shared between collection and process export dropdowns
+  expandedCollections: new Set(),  // sidebar tree: which collections are expanded
   recents: [],
   bpmnViewer: null,
 };
@@ -30,8 +31,12 @@ const STATUS_LABELS = {
   deprecated: { label: 'Veraltet',      badge: 'badge-deprecated' }
 };
 
-const RECENTS_KEY = 'processHub.recents';
-const SIDEBAR_KEY = 'processHub.sidebarCollapsed';
+const RECENTS_KEY      = 'processHub.recents';
+const SIDEBAR_KEY      = 'processHub.sidebarCollapsed';
+const SIDEBAR_WIDTH_KEY = 'processHub.sidebarWidth';
+const EXPANDED_KEY     = 'processHub.expandedCollections';
+const SIDEBAR_MIN_WIDTH = 200;
+const SIDEBAR_MAX_WIDTH = 480;
 
 // ─── Bootstrapping ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);
@@ -76,13 +81,41 @@ function restoreLocalState() {
     const r = JSON.parse(localStorage.getItem(RECENTS_KEY) || '[]');
     if (Array.isArray(r)) state.recents = r.slice(0, 8);
   } catch { /* ignore */ }
+  try {
+    const arr = JSON.parse(localStorage.getItem(EXPANDED_KEY) || '[]');
+    if (Array.isArray(arr)) state.expandedCollections = new Set(arr);
+  } catch { /* ignore */ }
   if (localStorage.getItem(SIDEBAR_KEY) === '1') {
     document.body.classList.add('sidebar-collapsed');
+  }
+  const savedWidth = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
+  if (savedWidth >= SIDEBAR_MIN_WIDTH && savedWidth <= SIDEBAR_MAX_WIDTH) {
+    document.body.style.setProperty('--sidebar-width', savedWidth + 'px');
   }
 }
 
 function persistRecents() {
   try { localStorage.setItem(RECENTS_KEY, JSON.stringify(state.recents)); } catch { /* ignore */ }
+}
+
+function persistExpanded() {
+  try { localStorage.setItem(EXPANDED_KEY, JSON.stringify([...state.expandedCollections])); }
+  catch { /* ignore */ }
+}
+
+// ─── Tab-preserving href helpers ────────────────────────────────────
+// When navigating between same-entity-type items (process → process, or
+// collection → collection), keep the user on the tab they're currently
+// viewing so a click in the tree doesn't snap them back to Diagramm / Tabelle.
+function processHrefFor(collId, processId) {
+  const base = `#/c/${encodeURIComponent(collId)}/process/${encodeURIComponent(processId)}`;
+  const tab = state.route.name === 'process' ? state.route.detailTab : '';
+  return (tab && tab !== 'diagram') ? `${base}/${tab}` : base;
+}
+function collectionHrefFor(collId) {
+  const base = `#/c/${encodeURIComponent(collId)}`;
+  const v = state.route.name === 'collection' ? state.route.view : '';
+  return (v && v !== 'table') ? `${base}/${v}` : base;
 }
 
 function showFatalError(err) {
@@ -106,8 +139,16 @@ function navigate(hash) {
 
 function parseRoute() {
   const hash = window.location.hash || '#/';
-  const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  // Strip query string before splitting the path so "#/search?q=..." works.
+  const qSplit = hash.indexOf('?');
+  const pathPart = qSplit >= 0 ? hash.slice(0, qSplit) : hash;
+  const queryStr = qSplit >= 0 ? hash.slice(qSplit + 1) : '';
+  const parts = pathPart.replace(/^#\/?/, '').split('/').filter(Boolean);
   if (parts.length === 0) return { name: 'home' };
+  if (parts[0] === 'search') {
+    const qMatch = queryStr.match(/(?:^|&)q=([^&]*)/);
+    return { name: 'search', q: qMatch ? decodeURIComponent(qMatch[1].replace(/\+/g, ' ')) : '' };
+  }
   if (parts[0] === 'chat') return { name: 'chat' };
   if (parts[0] === 'workflows') return { name: 'workflows' };
   if (parts[0] === 'recents') return { name: 'recents' };
@@ -129,6 +170,8 @@ function parseRoute() {
 function handleRoute() {
   state.route = parseRoute();
   state.filterPanelOpen = false;
+  hideSearchDropdown();
+  syncHeaderSearch(state.route.name === 'search' ? (state.route.q || '') : '');
   const keepViewer = state.route.name === 'process' && state.route.detailTab === 'diagram';
   if (state.bpmnViewer && !keepViewer) {
     state.bpmnViewer.destroy();
@@ -139,6 +182,7 @@ function handleRoute() {
   const main = document.getElementById('main-content');
   switch (state.route.name) {
     case 'home':       main.innerHTML = renderHome(); break;
+    case 'search':     main.innerHTML = renderSearchResults(state.route.q || ''); break;
     case 'chat':       main.innerHTML = renderChatView(); break;
     case 'workflows':  main.innerHTML = renderWorkflowsView(); break;
     case 'recents':    main.innerHTML = renderRecents(); break;
@@ -162,12 +206,29 @@ function announceRoute() {
 
 // ─── Global handlers ────────────────────────────────────────────────
 function wireGlobalHandlers() {
+  wireSearchInput();
+  wireSidebarResize();
+
   document.addEventListener('click', e => {
     if (e.target.closest('#sidebar-toggle')) {
       document.body.classList.toggle('sidebar-collapsed');
       localStorage.setItem(SIDEBAR_KEY,
         document.body.classList.contains('sidebar-collapsed') ? '1' : '0');
       renderSidebar(); lucide.createIcons();
+      return;
+    }
+
+    // Collection chevron toggle — must beat the parent .nav-item's data-nav.
+    const collToggle = e.target.closest('[data-toggle-collection]');
+    if (collToggle) {
+      e.preventDefault();
+      e.stopPropagation();
+      const cid = collToggle.dataset.toggleCollection;
+      if (state.expandedCollections.has(cid)) state.expandedCollections.delete(cid);
+      else state.expandedCollections.add(cid);
+      persistExpanded();
+      renderSidebar();
+      if (window.lucide?.createIcons) window.lucide.createIcons();
       return;
     }
 
@@ -281,6 +342,132 @@ function wireGlobalHandlers() {
   });
 }
 
+// ─── Search input wiring ────────────────────────────────────────────
+let searchDropdownDebounce = null;
+
+function wireSearchInput() {
+  const input = document.getElementById('search-input');
+  const clearBtn = document.getElementById('search-clear');
+  if (!input) return;
+
+  const currentItems = () =>
+    Array.from(document.querySelectorAll('#search-dropdown [role="option"]'));
+  const currentActiveIdx = (items) =>
+    items.findIndex(el => el.classList.contains('search-dropdown-item-active'));
+
+  input.addEventListener('input', () => {
+    const q = input.value;
+    syncHeaderSearch(q);
+    if (searchDropdownDebounce) clearTimeout(searchDropdownDebounce);
+    searchDropdownDebounce = setTimeout(() => renderSearchDropdown(q), 120);
+  });
+
+  input.addEventListener('focus', () => {
+    // Re-open dropdown on focus if there's any text OR the CTA-only mode.
+    renderSearchDropdown(input.value);
+  });
+
+  input.addEventListener('keydown', e => {
+    const dd = document.getElementById('search-dropdown');
+    if (e.key === 'Escape') {
+      hideSearchDropdown();
+      input.blur();
+      return;
+    }
+    if (e.key === 'Enter') {
+      const items = currentItems();
+      const active = items[currentActiveIdx(items)];
+      if (active && active.dataset.href) {
+        e.preventDefault();
+        hideSearchDropdown();
+        navigate(active.dataset.href);
+        return;
+      }
+      const q = input.value.trim();
+      if (q) {
+        e.preventDefault();
+        hideSearchDropdown();
+        navigate(`#/search?q=${encodeURIComponent(q)}`);
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (!dd || dd.hidden) return;
+      const items = currentItems();
+      if (items.length === 0) return;
+      e.preventDefault();
+      const cur = currentActiveIdx(items);
+      const next = e.key === 'ArrowDown'
+        ? (cur < items.length - 1 ? cur + 1 : 0)
+        : (cur > 0 ? cur - 1 : items.length - 1);
+      setSearchDropdownActive(items, next);
+    }
+  });
+
+  // Close dropdown on click outside the header-search area.
+  document.addEventListener('mousedown', e => {
+    if (!e.target.closest('.header-search')) hideSearchDropdown();
+  });
+
+  // Clear button
+  clearBtn?.addEventListener('click', () => {
+    input.value = '';
+    syncHeaderSearch('');
+    hideSearchDropdown();
+    input.focus();
+  });
+
+  // Ctrl/Cmd+K focuses search.
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      input.focus();
+      input.select();
+    }
+  });
+}
+
+// ─── Sidebar resize ─────────────────────────────────────────────────
+function wireSidebarResize() {
+  const handle = document.getElementById('sidebar-resize-handle');
+  if (!handle) return;
+  let startX = 0, startWidth = 0;
+
+  const onMove = (e) => {
+    const delta = e.clientX - startX;
+    const w = Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, startWidth + delta));
+    document.body.style.setProperty('--sidebar-width', w + 'px');
+  };
+  const onUp = () => {
+    document.body.classList.remove('sidebar-resizing');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    // Persist the final width.
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      try { localStorage.setItem(SIDEBAR_WIDTH_KEY, String(sidebar.offsetWidth)); }
+      catch { /* ignore */ }
+    }
+  };
+
+  handle.addEventListener('mousedown', (e) => {
+    if (document.body.classList.contains('sidebar-collapsed')) return;
+    e.preventDefault();
+    startX = e.clientX;
+    startWidth = document.getElementById('sidebar')?.offsetWidth || 260;
+    document.body.classList.add('sidebar-resizing');
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  // Double-click the handle to reset to default width.
+  handle.addEventListener('dblclick', () => {
+    if (document.body.classList.contains('sidebar-collapsed')) return;
+    document.body.style.removeProperty('--sidebar-width');
+    try { localStorage.removeItem(SIDEBAR_WIDTH_KEY); } catch { /* ignore */ }
+  });
+}
+
 function rerenderCollection() {
   if (state.route.name !== 'collection') return;
   document.getElementById('main-content').innerHTML =
@@ -294,12 +481,6 @@ function renderSidebar() {
   const r = state.route;
 
   let html = `
-    <button type="button" class="sidebar-toggle" id="sidebar-toggle"
-      aria-label="${collapsed ? 'Seitenleiste ausklappen' : 'Seitenleiste einklappen'}"
-      aria-expanded="${!collapsed}">
-      <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
-    </button>
-
     ${navItem('home', 'Home', r.name === 'home', '#/')}
     ${navItem('sparkles', 'KI-Assistent', r.name === 'chat', '#/chat')}
     ${navItem('workflow', 'Workflows & API', r.name === 'workflows', '#/workflows')}
@@ -309,15 +490,42 @@ function renderSidebar() {
   `;
 
   for (const c of state.collections) {
-    const active = (r.name === 'collection' || r.name === 'process') && r.collId === c.id;
+    const onThis = (r.name === 'collection' || r.name === 'process') && r.collId === c.id;
+    // Auto-expand the collection the user is currently inside.
+    if (onThis) state.expandedCollections.add(c.id);
+    const expanded = state.expandedCollections.has(c.id);
     const count = totalProcesses(c.landscape);
+    // The collection row itself is only "active" when we're on its overview,
+    // not when we're deep in one of its processes (child row handles that).
+    const rowActive = r.name === 'collection' && r.collId === c.id;
+
     html += `
-      <div class="nav-item ${active ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}"
+      <div class="nav-item ${rowActive ? 'active' : ''}" data-nav="${collectionHrefFor(c.id)}"
            role="link" title="${escapeAttr(c.name)}">
-        <i data-lucide="folder-tree" style="width:16px;height:16px;flex-shrink:0;"></i>
+        <button type="button" class="nav-chevron" data-toggle-collection="${escapeAttr(c.id)}"
+                aria-expanded="${expanded}" aria-label="${expanded ? 'Einklappen' : 'Ausklappen'}">
+          <i data-lucide="chevron-${expanded ? 'down' : 'right'}" style="width:14px;height:14px;"></i>
+        </button>
         <span>${escapeHtml(c.name)}</span>
         <span class="nav-count">${count}</span>
       </div>`;
+
+    if (expanded) {
+      // Flatten all processes and sort by id (natural order: 1.1b < 2.1b; TQ.21.00.00.02 < TQ.21.00.00.15).
+      const procs = [];
+      for (const a of c.landscape.areas) for (const g of a.groups) procs.push(g);
+      procs.sort((x, y) => x.id.localeCompare(y.id, undefined, { numeric: true }));
+      for (const g of procs) {
+        const procActive = r.name === 'process' && r.collId === c.id && r.processId === g.id;
+        html += `
+          <div class="nav-item nav-item-child sidebar-collapsed-hide ${procActive ? 'active' : ''}"
+               data-nav="${processHrefFor(c.id, g.id)}"
+               role="link" title="${escapeAttr(g.id + ' ' + g.name)}">
+            <code class="nav-child-id">${escapeHtml(g.id)}</code>
+            <span>${escapeHtml(g.name)}</span>
+          </div>`;
+      }
+    }
   }
 
   if (state.recents.length > 0) {
@@ -327,6 +535,17 @@ function renderSidebar() {
       html += `<div class="nav-recent-item" data-nav="${escapeAttr(rec.hash)}" title="${escapeAttr(rec.title)}">${escapeHtml(rec.title)}</div>`;
     });
   }
+
+  // Sticky footer with the collapse/expand toggle.
+  html += `
+    <div class="sidebar-footer">
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle"
+        aria-label="${collapsed ? 'Seitenleiste ausklappen' : 'Seitenleiste einklappen'}"
+        aria-expanded="${!collapsed}">
+        <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
+      </button>
+    </div>
+  `;
 
   document.getElementById('sidebar').innerHTML = html;
 }
@@ -387,9 +606,9 @@ function renderHome() {
             <thead>
               <tr>
                 <th scope="col">Name</th>
-                <th scope="col" style="text-align:right;">Bereiche</th>
-                <th scope="col" style="text-align:right;">Prozesse</th>
-                <th scope="col" style="text-align:right;">Mit Diagramm</th>
+                <th scope="col">Bereiche</th>
+                <th scope="col">Prozesse</th>
+                <th scope="col">Mit Diagramm</th>
                 <th scope="col">Aktualisiert</th>
               </tr>
             </thead>
@@ -469,9 +688,9 @@ function renderCollectionRow(c) {
         <div style="font-weight:500;">${escapeHtml(c.name)}</div>
         ${c.subtitle ? `<div style="font-size: var(--text-small); color: var(--color-text-secondary);">${escapeHtml(c.subtitle)}</div>` : ''}
       </td>
-      <td style="text-align:right; font-variant-numeric: tabular-nums;">${c.landscape.areas.length}</td>
-      <td style="text-align:right; font-variant-numeric: tabular-nums;">${count}</td>
-      <td style="text-align:right; font-variant-numeric: tabular-nums;">${bpmn}</td>
+      <td style="font-variant-numeric: tabular-nums;">${c.landscape.areas.length}</td>
+      <td style="font-variant-numeric: tabular-nums;">${count}</td>
+      <td style="font-variant-numeric: tabular-nums;">${bpmn}</td>
       <td style="color: var(--color-text-secondary); font-size: var(--text-small);">${escapeHtml(c.updatedAt || '—')}</td>
     </tr>
   `;
@@ -585,8 +804,8 @@ function buildFilterContext(c, filters) {
     ...a,
     groups: a.groups.filter(g => {
       if (filters.phases.size > 0 && !filters.phases.has(a.id)) return false;
-      if (filters.status === 'active' && !g.active) return false;
-      if (filters.status === 'inactive' && g.active) return false;
+      if (filters.status === 'active'   && !g.bpmn) return false;
+      if (filters.status === 'inactive' &&  g.bpmn) return false;
       return true;
     })
   })).filter(a => a.groups.length > 0);
@@ -729,11 +948,11 @@ function renderProcessTable(c, rows) {
     <div class="data-table-wrap">
       <table class="data-table">
         <colgroup>
-          <col style="width: 140px;">
+          <col style="width: 170px;">
           <col>
-          <col style="width: 220px;">
-          <col style="width: 220px;">
-          <col style="width: 150px;">
+          <col style="width: 260px;">
+          <col style="width: 260px;">
+          <col style="width: 180px;">
         </colgroup>
         <thead>
           <tr>
@@ -1200,8 +1419,6 @@ function renderProcess(collId, processId, detailTab) {
         </div>
       </div>
 
-      ${group.description ? `<p class="process-description">${escapeHtml(group.description)}</p>` : ''}
-
       <div class="tab-bar" role="tablist">
         <div class="tab-bar-scroll">
           <button class="tab ${tab === 'diagram' ? 'active' : ''}" data-nav="${processBase}" role="tab" aria-selected="${tab === 'diagram'}">Diagramm</button>
@@ -1264,14 +1481,18 @@ function renderProcessDiagramPane(group) {
 
 function renderProcessMetadataPane(c, area, group) {
   const dash = '<span style="color: var(--color-text-placeholder);">—</span>';
-  const hasDescription = !!group.description;
+  const emptyPara = msg => `<p style="margin:0; color: var(--color-text-placeholder);">${escapeHtml(msg)}</p>`;
+
   const responsibleList = (group.responsible || []).map(renderPersonInline).join('<br>') || dash;
   const tagsHtml = (group.tags || []).length
     ? (group.tags || []).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join(' ')
     : dash;
 
-  const standards   = group.standards   || [];
-  const linkedProcs = group.linkedProcesses || {};
+  const outputs   = group.outputs   || [];
+  const systems   = group.systems   || [];
+  const standards = group.standards || [];
+  const documents = group.documents || [];
+  const linkedProcs = group.linkedProcesses || { predecessor: [], successor: [], related: [] };
   const linkedTotal = (linkedProcs.predecessor?.length || 0)
                     + (linkedProcs.successor?.length   || 0)
                     + (linkedProcs.related?.length     || 0);
@@ -1290,10 +1511,15 @@ function renderProcessMetadataPane(c, area, group) {
 
   return `
     <section class="content-section">
-      <div class="section-label">Zweck / Bemerkungen</div>
-      ${hasDescription
-        ? `<p class="process-description" style="margin:0;">${escapeHtml(group.description)}</p>`
-        : `<p style="margin:0; color: var(--color-text-placeholder);">Keine Beschreibung hinterlegt.</p>`}
+      <div class="section-label">Zweck & Kontext</div>
+      ${propsTable([
+        { label: 'Beschreibung', value: group.description ? escapeHtml(group.description) : dash },
+        { label: 'Zweck',        value: group.purpose     ? escapeHtml(group.purpose)     : dash },
+        { label: 'Trigger',      value: group.trigger     ? escapeHtml(group.trigger)     : dash },
+        { label: 'Ergebnisse',   value: outputs.length
+            ? `<ul class="bullet-list" style="margin:0;">${outputs.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>`
+            : dash }
+      ])}
     </section>
 
     <section class="content-section">
@@ -1308,37 +1534,55 @@ function renderProcessMetadataPane(c, area, group) {
     <section class="content-section">
       <div class="section-label">Einordnung & Status</div>
       ${propsTable([
-        { label: 'Sammlung',              value: escapeHtml(c.name) },
-        { label: 'Bereich', value: escapeHtml(area.name) },
-        { label: 'Tags',                  value: tagsHtml },
-        { label: 'Status',                value: renderStatusBadge(group.status) },
-        { label: 'Version',               value: group.version ? escapeHtml(group.version) : dash },
-        { label: 'Aktualisiert',          value: group.updatedAt ? escapeHtml(group.updatedAt) : dash },
-        { label: 'Review-Zyklus',         value: group.reviewCycleMonths ? `${group.reviewCycleMonths} Monate` : dash }
+        { label: 'Sammlung',       value: escapeHtml(c.name) },
+        { label: 'Bereich',        value: escapeHtml(area.name) },
+        { label: 'Klassifikation', value: group.classification ? escapeHtml(group.classification) : dash },
+        { label: 'Tags',           value: tagsHtml },
+        { label: 'Status',         value: renderStatusBadge(group.status) },
+        { label: 'Version',        value: group.version    ? escapeHtml(group.version)    : dash },
+        { label: 'Gültig ab',      value: group.validFrom  ? escapeHtml(group.validFrom)  : dash },
+        { label: 'Gültig bis',     value: group.validUntil ? escapeHtml(group.validUntil) : dash },
+        { label: 'Aktualisiert',   value: group.updatedAt  ? escapeHtml(group.updatedAt)  : dash },
+        { label: 'Review-Zyklus',  value: group.reviewCycleMonths ? `${group.reviewCycleMonths} Monate` : dash }
       ])}
     </section>
 
     <section class="content-section">
-      <div class="section-label">Grundlagen</div>
+      <div class="section-label">Unterstützende Systeme</div>
+      ${systems.length
+        ? `<div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">${
+            systems.map(s => `<span class="tag-chip">${escapeHtml(s)}</span>`).join('')
+          }</div>`
+        : emptyPara('Keine Systeme erfasst.')}
+    </section>
+
+    <section class="content-section">
+      <div class="section-label">Grundlagen & Standards</div>
       ${standards.length
         ? `<ul class="bullet-list">${standards.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`
-        : `<p style="margin:0; color: var(--color-text-placeholder);">Keine Grundlagen erfasst.</p>`}
+        : emptyPara('Keine Grundlagen erfasst.')}
+    </section>
+
+    <section class="content-section">
+      <div class="section-label">Dokumente</div>
+      ${documents.length
+        ? `<ul class="bullet-list">${documents.map(d => `<li>${
+            d.url
+              ? `<a href="${escapeAttr(d.url)}" target="_blank" rel="noopener">${escapeHtml(d.label || d.url)}</a>`
+              : escapeHtml(d.label || '')
+          }</li>`).join('')}</ul>`
+        : emptyPara('Keine Dokumente verknüpft.')}
     </section>
 
     <section class="content-section">
       <div class="section-label">Beziehungen zu anderen Prozessen</div>
       ${linkedTotal === 0
-        ? `<p style="margin:0; color: var(--color-text-placeholder);">Keine Verknüpfungen erfasst.</p>`
+        ? emptyPara('Keine Verknüpfungen erfasst.')
         : propsTable([
             { label: 'Vorgänger',  value: renderLinkedProcesses(c, linkedProcs.predecessor) },
             { label: 'Nachfolger', value: renderLinkedProcesses(c, linkedProcs.successor)   },
             { label: 'Verwandt',   value: renderLinkedProcesses(c, linkedProcs.related)     }
           ])}
-      <div class="detail-footnote">
-        Quelldatei: ${group.bpmn
-          ? `<code>${escapeHtml(group.bpmn)}</code>`
-          : dash}
-      </div>
     </section>
   `;
 }
@@ -1348,7 +1592,7 @@ function renderLinkedProcesses(c, ids) {
   return ids.map(pid => {
     const hit = findGroupInCollection(c, pid);
     if (hit) {
-      const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(pid)}`;
+      const href = processHrefFor(c.id, pid);
       return `<a href="${escapeAttr(href)}">${escapeHtml(pid)} ${escapeHtml(hit.group.name)}</a>`;
     }
     return escapeHtml(pid);
@@ -1598,8 +1842,6 @@ function renderChatView() {
 }
 
 function renderWorkflowsView() {
-  const collsWithBpmn = state.collections.filter(c => processesWithBpmn(c.landscape) > 0);
-
   return `<div class="content-wrapper">
     ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Workflows & API' }])}
 
@@ -1613,33 +1855,58 @@ function renderWorkflowsView() {
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--space-4);margin-top: var(--space-5);">
-      ${state.collections.map(c => {
-        const total = totalProcesses(c.landscape);
-        const withBpmn = processesWithBpmn(c.landscape);
-        const hasBpmn = withBpmn > 0;
-        return `
-          <div class="content-section">
-            <div class="section-label">${escapeHtml(c.name)}</div>
-            <p style="color:var(--color-text-secondary); margin-bottom: var(--space-3); font-size: var(--text-small);">
-              ${total} Prozesse · ${withBpmn} mit Diagramm
-            </p>
-            <div style="display:flex; flex-wrap: wrap; gap: var(--space-2);">
-              <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:excel">
-                <i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Als Excel
-              </button>
-              <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:pdf">
-                <i data-lucide="file-text" style="width:14px;height:14px;"></i> Als PDF
-              </button>
-              <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:bpmn" ${hasBpmn ? '' : 'disabled'}>
-                <i data-lucide="archive" style="width:14px;height:14px;"></i> BPMN als ZIP
-              </button>
-            </div>
-          </div>`;
-      }).join('')}
-    </div>
+    <section class="content-section">
+      <div class="section-label">Export</div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <colgroup>
+            <col>
+            <col style="width: 110px;">
+            <col style="width: 140px;">
+            <col style="width: 420px;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Sammlung</th>
+              <th scope="col">Prozesse</th>
+              <th scope="col">Mit Diagramm</th>
+              <th scope="col">Downloads</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.collections.map(c => {
+              const total = totalProcesses(c.landscape);
+              const withBpmn = processesWithBpmn(c.landscape);
+              const hasBpmn = withBpmn > 0;
+              return `
+                <tr>
+                  <td>
+                    <a href="#/c/${encodeURIComponent(c.id)}">${escapeHtml(c.name)}</a>
+                    ${c.subtitle ? `<div>${escapeHtml(c.subtitle)}</div>` : ''}
+                  </td>
+                  <td style="font-variant-numeric: tabular-nums;">${total}</td>
+                  <td style="font-variant-numeric: tabular-nums;">${withBpmn}</td>
+                  <td>
+                    <div style="display:flex; flex-wrap: wrap; gap: var(--space-2);">
+                      <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:excel">
+                        <i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Als Excel
+                      </button>
+                      <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:pdf">
+                        <i data-lucide="file-text" style="width:14px;height:14px;"></i> Als PDF
+                      </button>
+                      <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:bpmn" ${hasBpmn ? '' : 'disabled'}>
+                        <i data-lucide="archive" style="width:14px;height:14px;"></i> BPMN als ZIP
+                      </button>
+                    </div>
+                  </td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-    <section class="content-section" style="margin-top: var(--space-5);">
+    <section class="content-section">
       <div class="section-label">REST API</div>
       <p style="color:var(--color-text-secondary); margin-bottom: var(--space-4);">
         Programmatischer Zugriff auf Sammlungen, Prozesse und Schritte. Eine OpenAPI-Spezifikation ist in Vorbereitung.
@@ -1648,15 +1915,191 @@ function renderWorkflowsView() {
         <i data-lucide="book-open" style="width:14px;height:14px;"></i> API-Dokumentation (bald)
       </button>
     </section>
+  </div>`;
+}
 
-    <section class="content-section">
-      <div class="section-label">Import</div>
-      <p style="color:var(--color-text-secondary); margin-bottom: var(--space-2);">
-        Import aus strukturierten PDF-Exporten (Confluence / bpanda) läuft aktuell über <code>tools/extract-bbl.mjs</code>.
-        Eine Weboberfläche ist geplant.
-      </p>
-      <p style="color: var(--color-text-placeholder); font-size: var(--text-small); margin:0;">${collsWithBpmn.length} von ${state.collections.length} Sammlungen enthalten BPMN-Diagramme.</p>
-    </section>
+// ─── Search ─────────────────────────────────────────────────────────
+//
+// Searches across all loaded collections. Two entity types:
+//   - Sammlungen: match on name / subtitle / description
+//   - Prozesse:   match on id / name / description / purpose / tags
+// Returns sorted results capped at `limit` per group.
+function searchHub(q, limit) {
+  const needle = (q || '').trim().toLowerCase();
+  if (!needle) return { collections: [], processes: [] };
+
+  const matches = (hay) => (hay || '').toLowerCase().includes(needle);
+
+  const collections = state.collections
+    .filter(c => matches(c.name) || matches(c.subtitle) || matches(c.description))
+    .slice(0, limit);
+
+  const processes = [];
+  outer:
+  for (const c of state.collections) {
+    for (const a of c.landscape.areas) {
+      for (const g of a.groups) {
+        const hitTags = (g.tags || []).some(t => matches(t));
+        if (matches(g.id) || matches(g.name) || matches(g.description) || matches(g.purpose) || hitTags) {
+          processes.push({ c, a, g });
+          if (processes.length >= limit) break outer;
+        }
+      }
+    }
+  }
+
+  return { collections, processes };
+}
+
+function syncHeaderSearch(q) {
+  const input = document.getElementById('search-input');
+  if (input && input.value !== q) input.value = q;
+  const clearBtn = document.getElementById('search-clear');
+  if (clearBtn) clearBtn.hidden = !q.length;
+}
+
+function hideSearchDropdown() {
+  const dd = document.getElementById('search-dropdown');
+  if (dd && !dd.hidden) {
+    dd.hidden = true;
+    dd.innerHTML = '';
+  }
+}
+
+function renderSearchDropdown(q) {
+  const dd = document.getElementById('search-dropdown');
+  if (!dd) return;
+
+  const trimmed = (q || '').trim();
+  const ctaSubtitle = trimmed
+    ? `„${escapeHtml(trimmed)}" an den KI-Assistenten senden`
+    : 'Fragen Sie den KI-Assistenten zur Prozesslandschaft';
+
+  let html = `<div class="search-dropdown-cta" data-href="#/chat" role="option">
+    <div class="search-dropdown-cta-icon"><i data-lucide="sparkles" style="width:16px;height:16px;"></i></div>
+    <div>
+      <div class="search-dropdown-cta-title">KI-Assistent fragen</div>
+      <div class="search-dropdown-cta-subtitle">${ctaSubtitle}</div>
+    </div>
+  </div>`;
+
+  if (trimmed) {
+    const { collections, processes } = searchHub(trimmed, 5);
+    const total = collections.length + processes.length;
+
+    if (total === 0) {
+      html += `<div class="search-dropdown-empty">Keine Treffer für „${escapeHtml(trimmed)}".</div>`;
+    } else {
+      if (collections.length) {
+        html += `<div class="search-dropdown-group">
+          <div class="search-dropdown-group-label">Sammlungen</div>
+          ${collections.map(c => `
+            <div class="search-dropdown-item" data-href="${collectionHrefFor(c.id)}" role="option">
+              <div class="search-dropdown-item-icon"><i data-lucide="folder-tree" style="width:16px;height:16px;"></i></div>
+              <div>
+                <div class="search-dropdown-item-name">${escapeHtml(c.name)}</div>
+                <div class="search-dropdown-item-meta">${escapeHtml(c.subtitle || 'Sammlung')}</div>
+              </div>
+            </div>`).join('')}
+        </div>`;
+      }
+      if (processes.length) {
+        html += `<div class="search-dropdown-group">
+          <div class="search-dropdown-group-label">Prozesse</div>
+          ${processes.map(({ c, a, g }) => `
+            <div class="search-dropdown-item" data-href="${processHrefFor(c.id, g.id)}" role="option">
+              <div class="search-dropdown-item-icon"><i data-lucide="file-text" style="width:16px;height:16px;"></i></div>
+              <div>
+                <div class="search-dropdown-item-name">${escapeHtml(g.name)}</div>
+                <div class="search-dropdown-item-meta">${escapeHtml(g.id)} · ${escapeHtml(c.name)} · ${escapeHtml(a.name)}</div>
+              </div>
+            </div>`).join('')}
+        </div>`;
+      }
+    }
+    html += `<div class="search-dropdown-footer"><kbd>Enter</kbd> für alle Ergebnisse</div>`;
+  }
+
+  dd.innerHTML = html;
+  dd.hidden = false;
+  if (window.lucide?.createIcons) window.lucide.createIcons({ nodes: [dd] });
+}
+
+function setSearchDropdownActive(items, idx) {
+  items.forEach((el, i) => {
+    const active = i === idx;
+    el.setAttribute('aria-selected', String(active));
+    el.classList.toggle('search-dropdown-item-active', active);
+  });
+  items[idx]?.scrollIntoView({ block: 'nearest' });
+}
+
+function renderSearchResults(q) {
+  const trimmed = (q || '').trim();
+  if (!trimmed) {
+    return `<div class="content-wrapper">
+      ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Suche' }])}
+      <div class="title-block">
+        <div class="title-block-icon"><i data-lucide="search" style="width:20px;height:20px;"></i></div>
+        <div class="title-block-content">
+          <h1 class="title-block-name">Suche</h1>
+          <div class="title-block-subtitle">Sammlungen und Prozesse durchsuchen.</div>
+        </div>
+      </div>
+      <p style="color: var(--color-text-secondary);">Geben Sie oben einen Suchbegriff ein.</p>
+    </div>`;
+  }
+
+  const { collections, processes } = searchHub(trimmed, 100);
+  const total = collections.length + processes.length;
+  const noun = total === 1 ? 'Treffer' : 'Treffer';
+
+  let body = '';
+  if (total === 0) {
+    body = `<div class="list-panel" style="text-align:center; padding: var(--space-8);">
+      <i data-lucide="search-x" style="width:40px;height:40px; color: var(--color-text-placeholder);"></i>
+      <h3 style="margin-top: var(--space-3);">Keine Treffer</h3>
+      <p style="color: var(--color-text-secondary);">Keine Sammlungen oder Prozesse passen zu „${escapeHtml(trimmed)}".</p>
+    </div>`;
+  } else {
+    body = '<div class="list-panel">';
+    if (collections.length) {
+      body += `<div class="search-group-label">Sammlungen <span style="color:var(--color-text-placeholder);font-weight:500;margin-left:4px;">${collections.length}</span></div>`;
+      for (const c of collections) {
+        body += `<div class="search-result-item" data-href="${collectionHrefFor(c.id)}">
+          <div class="search-result-icon"><i data-lucide="folder-tree" style="width:16px;height:16px;"></i></div>
+          <div>
+            <div class="search-result-name">${escapeHtml(c.name)}</div>
+            <div class="search-result-type">${escapeHtml(c.subtitle || 'Sammlung')}</div>
+          </div>
+        </div>`;
+      }
+    }
+    if (processes.length) {
+      body += `<div class="search-group-label">Prozesse <span style="color:var(--color-text-placeholder);font-weight:500;margin-left:4px;">${processes.length}</span></div>`;
+      for (const { c, a, g } of processes) {
+        body += `<div class="search-result-item" data-href="${processHrefFor(c.id, g.id)}">
+          <div class="search-result-icon"><i data-lucide="file-text" style="width:16px;height:16px;"></i></div>
+          <div>
+            <div class="search-result-name">${escapeHtml(g.name)}</div>
+            <div class="search-result-type">${escapeHtml(g.id)} · ${escapeHtml(c.name)} · ${escapeHtml(a.name)} ${renderStatusBadge(g.status)}</div>
+          </div>
+        </div>`;
+      }
+    }
+    body += '</div>';
+  }
+
+  return `<div class="content-wrapper">
+    ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Suche' }])}
+    <div class="title-block">
+      <div class="title-block-icon"><i data-lucide="search" style="width:20px;height:20px;"></i></div>
+      <div class="title-block-content">
+        <h1 class="title-block-name">Suchergebnisse</h1>
+        <div class="title-block-subtitle">${total} ${noun} für „${escapeHtml(trimmed)}"</div>
+      </div>
+    </div>
+    ${body}
   </div>`;
 }
 

@@ -12,9 +12,11 @@
         {
           "id": "1.1b",
           "name": "Entwicklung",
-          "active": true,
           "bpmn": "assets/bpmn/1.1b_Entwicklung_E3.bpmn",
           "description": "Projektidee, Standort- und Nutzungsanalyse, Wirtschaftlichkeitsbetrachtung und Entscheidung für oder gegen die Umsetzung.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_mueller",
           "responsible": [
             "p_weber"
@@ -22,12 +24,26 @@
           "expert": "p_wagner",
           "status": "approved",
           "version": "1.2",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-09-18",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Projektinitiierung",
             "Machbarkeit"
-          ]
+          ],
+          "systems": [
+            "Excel",
+            "Projekt-Steckbrief"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -42,9 +58,11 @@
         {
           "id": "2.1b",
           "name": "Grundlagenermittlung und Vergabe der Fachplanung",
-          "active": true,
           "bpmn": "assets/bpmn/2.1b_Planung_GrundlagenermittlungUndVergabeDerFachplanung_E3.bpmn",
           "description": "Klärung der Aufgabenstellung und Beauftragung der erforderlichen Fachplaner.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_schmidt",
           "responsible": [
             "p_mueller"
@@ -52,59 +70,134 @@
           "expert": "p_richter",
           "status": "approved",
           "version": "1.3",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-10-02",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 1",
           "tags": [
             "HOAI Lph 1",
             "HOAI Lph 2",
             "Vergabe"
-          ]
+          ],
+          "systems": [
+            "Allplan",
+            "Revit",
+            "MS Project"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "2.2b",
           "name": "Vorplanung",
-          "active": true,
           "bpmn": "assets/bpmn/2.2b_Planung_Vorplanung_E3.bpmn",
           "description": "Entwicklung eines Planungskonzepts mit Varianten und Kostenschätzung.",
+          "purpose": "Das Planungskonzept wird mit Varianten durchgearbeitet und die Grundlagen für die Kostenschätzung geschaffen. Ziel ist eine belastbare Entscheidungsgrundlage für die Fortsetzung in die Entwurfsplanung.",
+          "trigger": "Beauftragung der Fachplanung gemäß Prozess 2.1b abgeschlossen.",
+          "outputs": [
+            "Vorplanungsbericht (Varianten)",
+            "Kostenschätzung nach DIN 276",
+            "Freigabeempfehlung an den Bauherrn"
+          ],
           "owner": "p_schmidt",
           "responsible": [
             "p_mueller"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.1",
+          "validFrom": "2024-10-02",
+          "validUntil": "",
           "updatedAt": "2024-10-02",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 2",
           "tags": [
             "HOAI Lph 2",
             "Kostenschätzung"
+          ],
+          "systems": [
+            "Allplan",
+            "Revit",
+            "MS Project"
+          ],
+          "standards": [
+            "HOAI § 34 Leistungsphase 2",
+            "DIN 276 Kosten im Bauwesen",
+            "DIN 277 Grundflächen und Rauminhalte"
+          ],
+          "linkedProcesses": {
+            "predecessor": [
+              "2.1b"
+            ],
+            "successor": [
+              "2.3b"
+            ],
+            "related": [
+              "2.4b",
+              "2.5b"
+            ]
+          },
+          "documents": [
+            {
+              "label": "Vorlage Vorplanungsbericht",
+              "url": "https://example.org/vorlagen/vorplanungsbericht.docx"
+            },
+            {
+              "label": "Checkliste Varianten-Abwägung",
+              "url": "https://example.org/vorlagen/checkliste-varianten.pdf"
+            }
           ]
         },
         {
           "id": "2.3b",
           "name": "Entwurfsplanung",
-          "active": true,
           "bpmn": "assets/bpmn/2.3b_Planung_Entwurfsplanung_E3.bpmn",
           "description": "Durcharbeitung des Planungskonzepts zu einer genehmigungsfähigen Entwurfslösung.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_schmidt",
           "responsible": [
             "p_mueller"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.4",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-11-05",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 3",
           "tags": [
             "HOAI Lph 3"
-          ]
+          ],
+          "systems": [
+            "Allplan",
+            "Revit",
+            "MS Project"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "2.4b",
           "name": "Genehmigungsplanung",
-          "active": true,
           "bpmn": "assets/bpmn/2.4b_Planung_Genehmigungsplanung_E3.bpmn",
           "description": "Erstellung der für die öffentlich-rechtliche Genehmigung erforderlichen Unterlagen.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_schmidt",
           "responsible": [
             "p_mueller"
@@ -112,32 +205,64 @@
           "expert": "p_richter",
           "status": "in-review",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-12-01",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 4",
           "tags": [
             "HOAI Lph 4",
             "Behörde"
-          ]
+          ],
+          "systems": [
+            "Allplan",
+            "Revit",
+            "MS Project"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "2.5b",
           "name": "Ausführungsplanung",
-          "active": true,
           "bpmn": "assets/bpmn/2.5b_Planung_Ausführungsplanung_E3.bpmn",
           "description": "Zeichnerische und rechnerische Lösung als Grundlage für die Ausführung.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_schmidt",
           "responsible": [
             "p_mueller",
             "p_becker"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.2",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-11-05",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 5",
           "tags": [
             "HOAI Lph 5"
-          ]
+          ],
+          "systems": [
+            "Allplan",
+            "Revit",
+            "MS Project"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -152,9 +277,11 @@
         {
           "id": "3.1b",
           "name": "Vergabe der Bauausführung",
-          "active": true,
           "bpmn": "assets/bpmn/3.1b_Ausführung_VergabeDerBauausführung_E3.bpmn",
           "description": "Vorbereitung und Mitwirkung bei der Vergabe von Bauleistungen.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_becker",
           "responsible": [
             "p_schmidt"
@@ -162,39 +289,77 @@
           "expert": "p_richter",
           "status": "approved",
           "version": "1.1",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-10-22",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 6",
           "tags": [
             "HOAI Lph 6",
             "HOAI Lph 7",
             "Vergabe"
-          ]
+          ],
+          "systems": [
+            "SAP PS",
+            "BIM 360",
+            "Bautagebuch-App"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "3.2b",
           "name": "Arbeitsvorbereitung",
-          "active": true,
           "bpmn": "assets/bpmn/3.2b_Ausführung_Arbeitsvorbereitung_E3.bpmn",
           "description": "Detaillierte Planung der Bauabwicklung durch die ausführenden Unternehmen.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_becker",
           "responsible": [
             "p_becker"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-08-14",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Bauausführung"
-          ]
+          ],
+          "systems": [
+            "SAP PS",
+            "BIM 360",
+            "Bautagebuch-App"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "3.3b",
           "name": "Fertigung",
-          "active": true,
           "bpmn": "assets/bpmn/3.3b_Ausführung_Fertigung_E3.bpmn",
           "description": "Bauliche Umsetzung auf der Baustelle einschließlich Bauüberwachung.",
+          "purpose": "Die bauliche Umsetzung auf der Baustelle wird gesteuert und überwacht. Es wird sichergestellt, dass Qualität, Kosten und Termine den vertraglichen Vereinbarungen entsprechen.",
+          "trigger": "Arbeitsvorbereitung abgeschlossen; Freigabe zur Ausführung erteilt.",
+          "outputs": [
+            "Errichtetes Bauwerk gemäß Ausführungsplanung",
+            "Bautagebuch und Bauüberwachungsprotokolle",
+            "Mängelliste für die Abnahme"
+          ],
           "owner": "p_becker",
           "responsible": [
             "p_becker"
@@ -202,32 +367,83 @@
           "expert": "p_schmidt",
           "status": "approved",
           "version": "1.3",
+          "validFrom": "2024-11-11",
+          "validUntil": "",
           "updatedAt": "2024-11-11",
           "reviewCycleMonths": 6,
+          "classification": "HOAI Lph 8",
           "tags": [
             "HOAI Lph 8",
             "Bauausführung"
+          ],
+          "systems": [
+            "SAP PS",
+            "BIM 360",
+            "Bautagebuch-App"
+          ],
+          "standards": [
+            "HOAI § 34 Leistungsphase 8",
+            "VOB/B Vertragsbedingungen",
+            "ISO 9001 Qualitätsmanagement"
+          ],
+          "linkedProcesses": {
+            "predecessor": [
+              "3.2b"
+            ],
+            "successor": [
+              "3.4b"
+            ],
+            "related": [
+              "2.5b"
+            ]
+          },
+          "documents": [
+            {
+              "label": "Bautagebuch-Vorlage",
+              "url": "https://example.org/vorlagen/bautagebuch.xlsx"
+            },
+            {
+              "label": "Mängelprotokoll",
+              "url": "https://example.org/vorlagen/maengelprotokoll.pdf"
+            }
           ]
         },
         {
           "id": "3.4b",
           "name": "Abnahme und Übergabe",
-          "active": true,
           "bpmn": "assets/bpmn/3.4b_Ausführung_AbnahmeÜbergabe_E3.bpmn",
           "description": "Förmliche Abnahme der Leistungen und Übergabe an den Bauherrn.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_becker",
           "responsible": [
             "p_weber"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.1",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-09-30",
           "reviewCycleMonths": 12,
+          "classification": "HOAI Lph 8",
           "tags": [
             "HOAI Lph 8",
             "Abnahme"
-          ]
+          ],
+          "systems": [
+            "SAP PS",
+            "BIM 360",
+            "Bautagebuch-App"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -242,9 +458,11 @@
         {
           "id": "4.1b",
           "name": "Vergabe des Betriebs",
-          "active": true,
           "bpmn": "assets/bpmn/4.1b_Betrieb_VergabeDesBetriebs_E3.bpmn",
           "description": "Auswahl und Beauftragung der Betreiber und Facility-Management-Dienstleister.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_hoffmann",
           "responsible": [
             "p_neumann"
@@ -252,78 +470,146 @@
           "expert": "p_richter",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-06-03",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Vergabe",
             "Facility Management"
-          ]
+          ],
+          "systems": [
+            "CAFM",
+            "SAP PM",
+            "Ticket-System"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "4.2b",
           "name": "Inbetriebnahmevorbereitung",
-          "active": true,
           "bpmn": "assets/bpmn/4.2b_Betrieb_Inbetriebnahmevorbereitung_E3.bpmn",
           "description": "Organisatorische und technische Vorbereitung der Inbetriebnahme.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_hoffmann",
           "responsible": [
             "p_neumann"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "draft",
           "version": "0.9",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-12-10",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Inbetriebnahme"
-          ]
+          ],
+          "systems": [
+            "CAFM",
+            "SAP PM",
+            "Ticket-System"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "4.3b",
           "name": "Inbetriebnahme",
-          "active": true,
           "bpmn": "assets/bpmn/4.3b_Betrieb_Inbetriebnahme_E3.bpmn",
           "description": "Übernahme in den Regelbetrieb und Einweisung der Nutzer.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_hoffmann",
           "responsible": [
             "p_neumann"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-07-19",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Inbetriebnahme"
-          ]
+          ],
+          "systems": [
+            "CAFM",
+            "SAP PM",
+            "Ticket-System"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "4.4b",
           "name": "Laufender Betrieb",
-          "active": true,
           "bpmn": "assets/bpmn/4.4b_Betrieb_LaufenderBetrieb_E3.bpmn",
           "description": "Regelbetrieb mit Instandhaltung, Bewirtschaftung und kontinuierlicher Verbesserung.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_hoffmann",
           "responsible": [
             "p_neumann",
             "p_fischer"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "2.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-11-27",
           "reviewCycleMonths": 24,
+          "classification": "",
           "tags": [
             "Facility Management",
             "Betrieb"
-          ]
+          ],
+          "systems": [
+            "CAFM",
+            "SAP PM",
+            "Ticket-System"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "4.5b",
           "name": "Besitzer-/Betreiberwechsel",
-          "active": true,
           "bpmn": "assets/bpmn/4.5b_Betrieb_BesitzerBetreiberwechsel_E3.bpmn",
           "description": "Übergang des Objekts an einen neuen Eigentümer oder Betreiber.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_hoffmann",
           "responsible": [
             "p_fischer"
@@ -331,11 +617,26 @@
           "expert": "p_richter",
           "status": "in-review",
           "version": "0.8",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-12-05",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Eigentümerwechsel"
-          ]
+          ],
+          "systems": [
+            "CAFM",
+            "SAP PM",
+            "Ticket-System"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -350,26 +651,46 @@
         {
           "id": "5.1b",
           "name": "Rückbauentwicklung",
-          "active": false,
           "bpmn": "",
           "description": "Konzeptionelle Vorbereitung des Rückbaus. (Diagramm noch nicht verfügbar.)",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_koch",
-          "responsible": [],
-          "expert": "",
+          "responsible": [
+            "p_becker"
+          ],
+          "expert": "p_richter",
           "status": "draft",
           "version": "",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
+          "classification": "",
           "tags": [
             "Rückbau"
-          ]
+          ],
+          "systems": [
+            "Entsorgungs-Register",
+            "SAP"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "5.2b",
           "name": "Rückbaugenehmigungsplanung",
-          "active": true,
           "bpmn": "assets/bpmn/5.2b_Rückbau_Rückbaugenehmigungsplanung_E3.bpmn",
           "description": "Erstellung der Genehmigungsunterlagen für den Rückbau.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_koch",
           "responsible": [
             "p_schmidt"
@@ -377,92 +698,170 @@
           "expert": "p_richter",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-08-21",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Rückbau",
             "Behörde"
-          ]
+          ],
+          "systems": [
+            "Entsorgungs-Register",
+            "SAP"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "5.3b",
           "name": "Rückbauvergabe",
-          "active": true,
           "bpmn": "assets/bpmn/5.3b_Rückbau_Rückbauvergabe_E3.bpmn",
           "description": "Vergabe der Rückbauleistungen an ausführende Unternehmen.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_koch",
           "responsible": [
             "p_richter"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-09-03",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Rückbau",
             "Vergabe"
-          ]
+          ],
+          "systems": [
+            "Entsorgungs-Register",
+            "SAP"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "5.4b",
           "name": "Rückbau-Arbeitsvorbereitung",
-          "active": true,
           "bpmn": "assets/bpmn/5.4b_Rückbau_RückbauArbeitsvorbereitung_E3.bpmn",
           "description": "Detaillierte Vorbereitung der Rückbauarbeiten.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_koch",
           "responsible": [
             "p_becker"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-09-20",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Rückbau",
             "Bauausführung"
-          ]
+          ],
+          "systems": [
+            "Entsorgungs-Register",
+            "SAP"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "5.5b",
           "name": "Rückbauumsetzung",
-          "active": true,
           "bpmn": "assets/bpmn/5.5b_Rückbau_Rückbauumsetzung_E3.bpmn",
           "description": "Durchführung des Rückbaus einschließlich Entsorgung.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_koch",
           "responsible": [
             "p_koch"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "approved",
           "version": "1.1",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-10-11",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Rückbau",
             "Entsorgung"
-          ]
+          ],
+          "systems": [
+            "Entsorgungs-Register",
+            "SAP"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "5.6b",
           "name": "Rückbauübernahme",
-          "active": true,
           "bpmn": "assets/bpmn/5.6b_Rückbau_Rückbauübernahme_E3.bpmn",
           "description": "Abnahme der Rückbauleistungen und Übergabe der Fläche.",
+          "purpose": "",
+          "trigger": "",
+          "outputs": [],
           "owner": "p_koch",
           "responsible": [
             "p_weber"
           ],
-          "expert": "",
+          "expert": "p_richter",
           "status": "draft",
           "version": "0.5",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "2024-12-12",
           "reviewCycleMonths": 12,
+          "classification": "",
           "tags": [
             "Rückbau",
             "Abnahme"
-          ]
+          ],
+          "systems": [
+            "Entsorgungs-Register",
+            "SAP"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     }

@@ -9,6 +9,11 @@
     { "id": "p_richter",    "name": "Julia Richter",     "org": "Recht & Vergabe",      "email": "julia.richter@example.org" },
     { "id": "p_wagner",     "name": "Oliver Wagner",     "org": "Portfolio-Strategie",  "email": "oliver.wagner@example.org" },
     { "id": "p_fischer",    "name": "Carla Fischer",     "org": "Liegenschaften",       "email": "carla.fischer@example.org" },
-    { "id": "p_neumann",    "name": "Michael Neumann",   "org": "Technisches FM",       "email": "michael.neumann@example.org" }
+    { "id": "p_neumann",    "name": "Michael Neumann",   "org": "Technisches FM",       "email": "michael.neumann@example.org" },
+    { "id": "p_berger",     "name": "Elena Berger",      "org": "Immobilienmanagement", "email": "elena.berger@example.org" },
+    { "id": "p_brunner",    "name": "Peter Brunner",     "org": "Programm- und Projektentwicklung", "email": "peter.brunner@example.org" },
+    { "id": "p_arnold",     "name": "Nina Arnold",       "org": "Liegenschaftsverwaltung", "email": "nina.arnold@example.org" },
+    { "id": "p_keller",     "name": "Markus Keller",     "org": "Lifecycle Data Management / BIM", "email": "markus.keller@example.org" },
+    { "id": "p_stucki",     "name": "Laura Stucki",      "org": "Portfolio-Management", "email": "laura.stucki@example.org" }
   ]
 }

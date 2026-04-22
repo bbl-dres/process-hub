@@ -11,47 +11,130 @@
         {
           "id": "TQ.21.00.00.01",
           "name": "Lösungsvorschläge Anmiete Kauf",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.01.bpmn",
           "description": "Mögliche Mietobjekte für eine Anmiete suchen. Mögliche Liegenschaften für einen Kauf suche",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Mögliche Mietobjekte für eine Anmiete suchen. Mögliche Liegenschaften für einen Kauf suche",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_brunner",
+          "responsible": [
+            "p_berger"
+          ],
+          "expert": "p_wagner",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Akquisition & Planung",
+          "tags": [
+            "Akquisition",
+            "Projektinitiierung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER",
+            "Excel"
+          ],
+          "standards": [
+            "TQ.21.00.00.01 C01 Lösungsvorschläge Anmiete Kauf"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.02",
           "name": "Machbarkeit Projektdefinition",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.02.bpmn",
           "description": "Dieser Prozess regelt den Ablauf bei A- und B-Geschäften vom Auftrag „Machbarkeit / Projek\nüber den Entscheid Eintreten auf das Projekt bis zum durch den Antragsteller bestätigten P\nZiel ist insbesondere die Prüfung der Machbarkeit inkl. Grobkostenermittlung entscheidorie\nTerminplan sowie die Erstellung der Projektdefinition.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Dieser Prozess regelt den Ablauf bei A- und B-Geschäften vom Auftrag „Machbarkeit / Projek\nüber den Entscheid Eintreten auf das Projekt bis zum durch den Antragsteller bestätigten P\nZiel ist insbesondere die Prüfung der Machbarkeit inkl. Grobkostenermittlung entscheidorie\nTerminplan sowie die Erstellung der Projektdefinition.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_brunner",
+          "responsible": [
+            "p_berger"
+          ],
+          "expert": "p_wagner",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Akquisition & Planung",
+          "tags": [
+            "Akquisition",
+            "Projektinitiierung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER",
+            "Excel"
+          ],
+          "standards": [
+            "Gesetze, Verordnungen und politische Vorgaben",
+            "Verordnung über das Immobilienmanagement und",
+            "die Logistik des Bundes (VILB)",
+            "Weisungen EFD",
+            "Weisung über wirtschaftliche Nutzung und den Betrieb",
+            "der Bauten im BBL-Immobilienportfolio",
+            "Strategische Konzepte Vorgaben (Portfoliostrategie, UK, BWEK)",
+            "Masterpläne und Nutzerkonzepte Benutzerorganisationen",
+            "Anträge von Benutzerorganisationen",
+            "Aufträge PFM"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.03",
           "name": "Auftragskoordination",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.03.bpmn",
           "description": "Dieser Prozess dient der korrekten Koordination und Überwachung von A- und B-Geschäften na\nerfolgter Auftragserteilung bis zum Debriefing des jeweiligen Geschäfts.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Dieser Prozess dient der korrekten Koordination und Überwachung von A- und B-Geschäften na\nerfolgter Auftragserteilung bis zum Debriefing des jeweiligen Geschäfts.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_brunner",
+          "responsible": [
+            "p_berger"
+          ],
+          "expert": "p_wagner",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Akquisition & Planung",
+          "tags": [
+            "Akquisition",
+            "Projektinitiierung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER",
+            "Excel"
+          ],
+          "standards": [
+            "Auftrag aus Prozess TQ.21.00.00.02 Machbarkeit / Projektdefinition (060-5/4/1/1)"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": [
+              "TQ.21.00.00.02"
+            ]
+          },
+          "documents": []
         }
       ]
     },
@@ -65,47 +148,126 @@
         {
           "id": "TQ.21.00.00.10",
           "name": "Vollzug Anmiete Pacht",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.10.bpmn",
           "description": "Abschluss eines Anmiet- oder Pachtvertrages",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Abschluss eines Anmiet- oder Pachtvertrages",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_brunner",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Vollzug & Übernahme",
+          "tags": [
+            "Vollzug",
+            "Vertrag"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER",
+            "NotarDossier"
+          ],
+          "standards": [
+            "TQ.21.00.00.10 C01 Vollzug Anmiete Pacht"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.15",
           "name": "Verurkundung Kauf Baurecht",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.15.bpmn",
           "description": "Grundlage\nAbschluss eines Kauf- oder Baurechtsvertrages unter der Mitwirkung eines Notars  Status\n                                                                                 Relevante",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Grundlage\nAbschluss eines Kauf- oder Baurechtsvertrages unter der Mitwirkung eines Notars  Status\n                                                                                 Relevante",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_brunner",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Vollzug & Übernahme",
+          "tags": [
+            "Vollzug",
+            "Vertrag"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER",
+            "NotarDossier"
+          ],
+          "standards": [
+            "Prozesssc",
+            "Gültige Checkliste TQ.21.00.00.15 C01 Verurkundung Kauf Baurecht                 Abkürzung",
+            "Beziehung",
+            "Prozessen",
+            "Änderungs",
+            "Relevante",
+            "Dokumente",
+            "Kontakt",
+            "Wölfli Ro",
+            "ronald.wo"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.20",
           "name": "Objektübernahme",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.20.bpmn",
           "description": "Nach einem Kauf oder einer Anmiete wird das Objekt durch das BBL vom Verkäufer oder Vermie\nübernommen.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Nach einem Kauf oder einer Anmiete wird das Objekt durch das BBL vom Verkäufer oder Vermie\nübernommen.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_brunner",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Vollzug & Übernahme",
+          "tags": [
+            "Vollzug",
+            "Vertrag"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER",
+            "NotarDossier"
+          ],
+          "standards": [],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -119,47 +281,123 @@
         {
           "id": "TQ.21.00.00.30",
           "name": "Bewirtschaftung Anmiet-, Pachtverträge, Eigene Baurechte",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.30.bpmn",
           "description": "Ersterfassung von Anmiet-, Pacht- uns Baurechtsverträgen im SAP. Laufende Anpassungen im S\nvornehmen wenn sich diese Verträge verändern.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Ersterfassung von Anmiet-, Pacht- uns Baurechtsverträgen im SAP. Laufende Anpassungen im S\nvornehmen wenn sich diese Verträge verändern.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_arnold",
+          "responsible": [
+            "p_fischer"
+          ],
+          "expert": "p_neumann",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Bewirtschaftung",
+          "tags": [
+            "Bewirtschaftung",
+            "FM"
+          ],
+          "systems": [
+            "SAP RE",
+            "CAFM",
+            "RUMBA",
+            "ESTAT"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.30 C01 Bewirtschaftung Anmiet-, Pachtverträge, Eigene Baur"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.35",
           "name": "Bewirtschaftung Eigentum, Stiftungen",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.35.bpmn",
           "description": "Bewirtschaften von Immobilien im Eigentum des Bundes und im Eigentum von Stiftungen des Bu",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Bewirtschaften von Immobilien im Eigentum des Bundes und im Eigentum von Stiftungen des Bu",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_arnold",
+          "responsible": [
+            "p_fischer"
+          ],
+          "expert": "p_neumann",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Bewirtschaftung",
+          "tags": [
+            "Bewirtschaftung",
+            "FM"
+          ],
+          "systems": [
+            "SAP RE",
+            "CAFM",
+            "RUMBA",
+            "ESTAT"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.35 C01 Bewirtschaftung Anmiet- Pachtverträge Eigene Baurec"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.45",
           "name": "Bewirtschaftung von Vermietungen, Verpachtungen, Baurechtsvergaben",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.45.bpmn",
           "description": "Verträge von Vermietungen, Verpachtungen und Abgaben im Baurecht bewirtschaften.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Verträge von Vermietungen, Verpachtungen und Abgaben im Baurecht bewirtschaften.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_arnold",
+          "responsible": [
+            "p_fischer"
+          ],
+          "expert": "p_neumann",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Bewirtschaftung",
+          "tags": [
+            "Bewirtschaftung",
+            "FM"
+          ],
+          "systems": [
+            "SAP RE",
+            "CAFM",
+            "RUMBA",
+            "ESTAT"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.45 C01 Bewirtschaftung von Vermietung Verpachtungen",
+            "Baurechtsvergaben"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -173,92 +411,239 @@
         {
           "id": "TQ.21.00.00.50",
           "name": "Objektübergabe an LB, Mieter",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.50.bpmn",
           "description": "Übergabe des Objektes an interne Mieter (Leistungsbezüger) oder externe Mieter (Private)",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Übergabe des Objektes an interne Mieter (Leistungsbezüger) oder externe Mieter (Private)",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_arnold",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Rückgabe & Auflösung",
+          "tags": [
+            "Rückgabe",
+            "Auflösung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.50 C01 Objektübergabe an LB Mieter"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.60",
           "name": "Lösungsvorschläge Rückgabe",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.60.bpmn",
           "description": "Z\nLösungsvorschläge erarbeiten für die Rückgabe einer Anmiete oder für den Verkauf         G\n                                                                                         S",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Z\nLösungsvorschläge erarbeiten für die Rückgabe einer Anmiete oder für den Verkauf         G\n                                                                                         S",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_arnold",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Rückgabe & Auflösung",
+          "tags": [
+            "Rückgabe",
+            "Auflösung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.60 C01 Lösungsvorschläge Rückgabe Anmietobjekt, Verkauf  P"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.70",
           "name": "Auflösung Anmiete, Pacht",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.70.bpmn",
           "description": "Kündigungen von Anmiete oder Pacht aussprechen. Kündigungen von Anmiete oder Pacht\nentgegennehmen.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Kündigungen von Anmiete oder Pacht aussprechen. Kündigungen von Anmiete oder Pacht\nentgegennehmen.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_arnold",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Rückgabe & Auflösung",
+          "tags": [
+            "Rückgabe",
+            "Auflösung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.70 C01 Auflösung Anmiete Pacht",
+            "Releva",
+            "Dokume",
+            "Kontak",
+            "Wölfli",
+            "ronald"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.75",
           "name": "Verurkundung Verkauf, Baurechtrückgabe",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.75.bpmn",
           "description": "Vertrag für den Verkauf oder die Rückgabe eines Baurechtes beim Notar beurkunden",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Vertrag für den Verkauf oder die Rückgabe eines Baurechtes beim Notar beurkunden",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_arnold",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Rückgabe & Auflösung",
+          "tags": [
+            "Rückgabe",
+            "Auflösung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.75 C01 Verurkundung Verkauf Baurechtrückgabe"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.80",
           "name": "Objektrücknahme von LB, Mieter",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.80.bpmn",
           "description": "Rücknahme von Räumlichkeiten von internen Mietern (Leistungsbezügern) oder von privaten Mi",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Rücknahme von Räumlichkeiten von internen Mietern (Leistungsbezügern) oder von privaten Mi",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_arnold",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Rückgabe & Auflösung",
+          "tags": [
+            "Rückgabe",
+            "Auflösung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER"
+          ],
+          "standards": [
+            "Gültige Checkliste: TQ.21.00.00.80 C01 Objektrücknahme von LB, Mieter"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.90",
           "name": "Objektrückgabe",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.90.bpmn",
           "description": "Rückgabe der Räumlichkeiten nach der Kündigung einer Anmiete oder dem Verkauf",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Rückgabe der Räumlichkeiten nach der Kündigung einer Anmiete oder dem Verkauf",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_berger",
+          "responsible": [
+            "p_richter"
+          ],
+          "expert": "p_arnold",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Rückgabe & Auflösung",
+          "tags": [
+            "Rückgabe",
+            "Auflösung"
+          ],
+          "systems": [
+            "SAP RE",
+            "GEVER"
+          ],
+          "standards": [
+            "Dokumente",
+            "Gültige Checkliste: TQ.21.00.00.90 C01 Objektrückgabe",
+            "Kontakt",
+            "Wölfli Rona",
+            "ronald.woel"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     },
@@ -272,47 +657,132 @@
         {
           "id": "TQ.21.00.00.96",
           "name": "Immostammdaten Energiedatenverwaltung",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.96.bpmn",
           "description": "Ziel dieses Prozesses Immostammdaten Energiedatenverwaltung und Immobilienstammdaten SAP z\nerfassen und diese Daten verschiedenen Bereichen zur Verfügung zu stellen.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Ziel dieses Prozesses Immostammdaten Energiedatenverwaltung und Immobilienstammdaten SAP z\nerfassen und diese Daten verschiedenen Bereichen zur Verfügung zu stellen.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_keller",
+          "responsible": [
+            "p_keller"
+          ],
+          "expert": "p_neumann",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Stammdaten & Support",
+          "tags": [
+            "Stammdaten",
+            "Support"
+          ],
+          "systems": [
+            "SAP RE",
+            "RUMBA",
+            "ESTAT",
+            "CAFM",
+            "BIM"
+          ],
+          "standards": [
+            "Konzept Energiebezugsflächen + Anhang Flächendefinitionen SIA416",
+            "TQ.21.00.00.96 A04 Erfassen Immobilienstammdaten",
+            "TQ.21.00.00.96 A05 Handbuch Erfassen Immobilienstammdaten im SAP",
+            "TQ.21.00.00.96 A06 Entscheidungsbaum WE GE GR Nummer",
+            "TQ.21.00.00.96 A07 Wirtschaftseinheit Beispiele",
+            "TQ.21.00.00.96 C01 Datenfluss Immostammdaten"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.97",
           "name": "Aktenmanagement",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.97.bpmn",
           "description": "Übernahme der Projekt- und Bewirtschaftungsakten aus Bauprojekten (nur Papier), Bewirtscha\nLangzeitablage.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Übernahme der Projekt- und Bewirtschaftungsakten aus Bauprojekten (nur Papier), Bewirtscha\nLangzeitablage.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_keller",
+          "responsible": [
+            "p_keller"
+          ],
+          "expert": "p_neumann",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Stammdaten & Support",
+          "tags": [
+            "Stammdaten",
+            "Support"
+          ],
+          "systems": [
+            "SAP RE",
+            "RUMBA",
+            "ESTAT",
+            "CAFM",
+            "BIM"
+          ],
+          "standards": [
+            "Organisationsvorschriften BBL",
+            "Weisungen über die Projekt- und Bewirtschaftungsakten"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         },
         {
           "id": "TQ.21.00.00.99",
           "name": "Planverwaltung / BIM",
-          "active": true,
           "bpmn": "assets/bpmn-bbl/TQ.21.00.00.99.bpmn",
           "description": "Übernahme / Upload der Pläne und BIM-Modelle ins das Planverwaltungstool (digitales Planar\nBauprojekten, digitale Plangrundlagen aus Anmiete und Kauf.\nBewirtschaftung und Schulung des Planverwaltungstool.",
-          "owner": "",
-          "responsible": [],
-          "expert": "",
+          "purpose": "Übernahme / Upload der Pläne und BIM-Modelle ins das Planverwaltungstool (digitales Planar\nBauprojekten, digitale Plangrundlagen aus Anmiete und Kauf.\nBewirtschaftung und Schulung des Planverwaltungstool.",
+          "trigger": "",
+          "outputs": [],
+          "owner": "p_keller",
+          "responsible": [
+            "p_keller"
+          ],
+          "expert": "p_neumann",
           "status": "approved",
           "version": "1.0",
+          "validFrom": "",
+          "validUntil": "",
           "updatedAt": "",
           "reviewCycleMonths": null,
-          "tags": []
+          "classification": "Stammdaten & Support",
+          "tags": [
+            "Stammdaten",
+            "Support"
+          ],
+          "systems": [
+            "SAP RE",
+            "RUMBA",
+            "ESTAT",
+            "CAFM",
+            "BIM"
+          ],
+          "standards": [
+            "Weisungen CAD-Daten",
+            "Weisungen CAFM"
+          ],
+          "linkedProcesses": {
+            "predecessor": [],
+            "successor": [],
+            "related": []
+          },
+          "documents": []
         }
       ]
     }
