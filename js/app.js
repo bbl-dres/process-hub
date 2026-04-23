@@ -783,7 +783,23 @@ function wireGlobalHandlers() {
     }
 
     const navBtn = e.target.closest('[data-nav]');
-    if (navBtn) { navigate(navBtn.dataset.nav); return; }
+    if (navBtn) {
+      // Clicking a branch row (collection or container node) also auto-expands
+      // it — users expect the row-click to reveal children without needing
+      // to find the chevron. No-op if already expanded.
+      const expandKey = navBtn.dataset.expandKey;
+      if (expandKey && !state.expandedNodes.has(expandKey)) {
+        state.expandedNodes.add(expandKey);
+        persistExpandedNodes();
+      }
+      const expandColl = navBtn.dataset.expandColl;
+      if (expandColl && !state.expandedCollections.has(expandColl)) {
+        state.expandedCollections.add(expandColl);
+        persistExpanded();
+      }
+      navigate(navBtn.dataset.nav);
+      return;
+    }
 
     if (e.target.closest('#filter-toggle')) {
       const panel = document.getElementById('filter-panel');
@@ -1310,7 +1326,8 @@ function renderSidebar() {
     ].filter(Boolean).join(' ');
 
     html += `
-      <div class="${collClasses}" data-nav="${collectionHrefFor(c.id)}"
+      <div class="${collClasses}" data-depth="0"
+           data-nav="${collectionHrefFor(c.id)}" data-expand-coll="${escapeAttr(c.id)}"
            role="link" title="${escapeAttr((c.code ? c.code + ' ' : '') + c.name)}">
         <button type="button" class="nav-chevron sidebar-collapsed-hide" data-toggle-collection="${escapeAttr(c.id)}"
                 aria-expanded="${expanded}" aria-label="${expanded ? 'Einklappen' : 'Ausklappen'}">
@@ -1370,6 +1387,7 @@ function renderSidebarNodes(c, nodes, parentPath, currentPathKey) {
   for (const n of sorted) {
     const pathIds = [...parentPath, n.id];
     const key = [c.id, ...pathIds].join('|');
+    const depth = pathIds.length;            // 1 = Level 1, 2 = Level 2, …
     const hasChildren = isContainerNode(n);
     const expanded = state.expandedNodes.has(key);
     const active = currentPathKey === key;
@@ -1391,9 +1409,12 @@ function renderSidebarNodes(c, nodes, parentPath, currentPathKey) {
       onPath && !active ? 'on-path' : '',
       hasChildren ? 'nav-item-branch' : 'nav-item-leaf'
     ].filter(Boolean).join(' ');
+    // data-expand-key = which node to auto-open when a branch row is clicked
+    // (the user expects row-click to both navigate AND expand).
+    const expandHook = hasChildren ? ` data-expand-key="${escapeAttr(key)}"` : '';
     out += `
-      <div class="${classes}"
-           data-nav="${escapeAttr(href)}"
+      <div class="${classes}" data-depth="${depth}"
+           data-nav="${escapeAttr(href)}"${expandHook}
            role="link" title="${escapeAttr(n.id + ' ' + n.name)}">
         ${chevron}
         <code class="nav-child-id">${escapeHtml(n.id)}</code>

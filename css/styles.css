@@ -471,7 +471,10 @@ body.sidebar-resizing .header-logo { transition: none !important; }
   background: var(--color-bg-accent-strong);
   border-radius: 1px;
 }
-.nav-item > span:not(.nav-count) {
+/* Name span grows + truncates. Excludes the count badge AND the chevron
+   spacer — previously the spacer matched this rule and got flex:1, which
+   shoved the id/name rightwards on leaf rows. */
+.nav-item > span:not(.nav-count):not(.nav-chevron-spacer) {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -492,12 +495,18 @@ body.sidebar-resizing .header-logo { transition: none !important; }
 .nav-item-child,
 .nav-item.nav-item-collection {
   margin: 0;
-  padding: 5px var(--space-2) 5px 14px;    /* very small, consistent left */
+  padding: 5px var(--space-2) 5px 14px;    /* base left pad (depth adds on top) */
   border-radius: 0;
   font-size: var(--text-body);
   color: var(--color-text-primary);
-  /* Ensures every row leaves room for the 3 px accent bar at left:0. */
+  /* Leaves a consistent accent-bar gutter at left:0. */
 }
+/* Small per-depth step so the hierarchy reads at a glance without the tree
+   cascading to the right. 6 px per level keeps even deep subtrees compact. */
+.nav-item-child[data-depth="1"] { padding-left: calc(14px + 6px); }
+.nav-item-child[data-depth="2"] { padding-left: calc(14px + 12px); }
+.nav-item-child[data-depth="3"] { padding-left: calc(14px + 18px); }
+.nav-item-child[data-depth="4"] { padding-left: calc(14px + 24px); }
 .nav-item.nav-item-collection {
   /* Collection row also participates in the flush-left tree styling, but
      keeps a slightly bolder weight to read as the group header. */
