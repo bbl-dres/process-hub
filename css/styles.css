@@ -135,7 +135,7 @@ a:hover { color: var(--color-text-link-hover); text-decoration: underline; }
 }
 .search-bar-input:focus {
   border-color: var(--color-border-accent);
-  box-shadow: 0 0 0 3px rgba(var(--color-bg-accent-strong-rgb), 0.10);
+  box-shadow: var(--focus-ring);
   background: var(--color-bg-surface);
 }
 .search-bar-shortcut {
@@ -325,7 +325,10 @@ body.sidebar-collapsed .sidebar-toggle i {
   background-size: 100% 24px, 100% 24px, 100% 8px, 100% 8px;
   background-attachment: local, local, scroll, scroll;
   overflow-y: auto;
-  padding: var(--space-3) var(--space-3);
+  /* No bottom padding — the sticky .sidebar-footer sits flush against the
+     app-footer's top edge, eliminating the visible gap that used to show
+     when the sidebar wasn't scrolled to its bottom. */
+  padding: var(--space-3) var(--space-3) 0;
   border-right: 1px solid var(--color-border-subtle);
   z-index: 50;
   /* Flex column so .sidebar-footer can use margin-top:auto to anchor at
@@ -593,16 +596,11 @@ body.sidebar-resizing .header-logo { transition: none !important; }
   color: var(--color-text-primary);
 }
 
-/* Collection code chip in the sidebar + home table ("BB", "BUW"). Matches
-   the process-id chip styling so every level reads "CODE Name" consistently. */
-.coll-code {
-  font-family: var(--font-mono);
-  font-size: var(--text-mono-xs);
-  color: var(--color-text-placeholder);
-  font-variant-numeric: tabular-nums;
-  background: transparent;
-  padding: 0;
-  margin-right: var(--space-1);
+/* Home table: collection name cell. Slightly heavier weight to read as the
+   primary column label. */
+.coll-row-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
 }
 
 /* Monospace id prefix used by .title-block-name across every level. */
@@ -622,11 +620,6 @@ body.sidebar-resizing .header-logo { transition: none !important; }
   background: transparent;
   padding: 0;
 }
-/* Collection rows show a folder-tree icon only in collapsed (icon-only)
-   mode, so the rail has a meaningful icon instead of an orphaned chevron. */
-.nav-item-icon-compact { display: none; }
-body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
-
 /* Count badge — consistent across the whole tree (collection row + every
    branch node). Muted by default; tracks foreground color on active rows. */
 .nav-count {
@@ -659,7 +652,7 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
 }
 .nav-divider {
   height: 1px;
-  background: var(--color-border-subtle);
+  background: var(--color-border-default);
   margin: var(--space-3) var(--space-3);
 }
 .nav-recent-item {
@@ -983,7 +976,7 @@ body.sidebar-collapsed .nav-item-icon-compact { display: inline-flex; }
   background: transparent; border: none; border-radius: 50%;
   color: var(--color-text-link); cursor: pointer;
 }
-.filter-pill-remove:hover { background: rgba(var(--color-bg-accent-strong-rgb), 0.12); }
+.filter-pill-remove:hover { background: var(--color-accent-bg-3); }
 .filter-pill-remove:focus-visible { outline: 2px solid var(--color-border-accent); outline-offset: 2px; }
 .filter-reset {
   background: transparent; border: none;
@@ -1139,7 +1132,7 @@ button.badge-filterable {
   border-bottom: 1px solid var(--color-border-subtle);
   transition: background 80ms ease;
 }
-.data-table tbody tr:hover { background: rgba(var(--color-bg-accent-strong-rgb), 0.03); }
+.data-table tbody tr:hover { background: var(--color-accent-bg-1); }
 .data-table tbody tr:last-child { border-bottom: none; }
 .data-table tbody td {
   padding: 10px var(--space-3);
@@ -1543,7 +1536,7 @@ button.badge-filterable {
 }
 .uml-card:hover {
   border-color: var(--color-border-accent);
-  box-shadow: 0 2px 6px rgba(var(--color-bg-accent-strong-rgb), 0.08);
+  box-shadow: var(--shadow-hover);
 }
 .uml-card-header {
   display: flex; align-items: center; gap: var(--space-2);
@@ -1661,7 +1654,7 @@ button.badge-filterable {
 }
 .rel-center-outer {
   border-radius: 50%;
-  background: rgba(var(--color-bg-accent-strong-rgb), 0.08);
+  background: var(--color-accent-bg-2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1839,7 +1832,7 @@ a.rel-item:hover .rel-item-label { color: var(--color-text-primary); }
 }
 .rel-panel-search:focus {
   border-color: var(--color-border-accent);
-  box-shadow: 0 0 0 3px rgba(var(--color-bg-accent-strong-rgb), 0.12);
+  box-shadow: var(--focus-ring);
 }
 .rel-panel-title {
   font-size: var(--text-label);
@@ -1946,7 +1939,7 @@ a.rel-item:hover .rel-item-label { color: var(--color-text-primary); }
 }
 .home-domain-row:last-child { border-bottom: none; }
 .home-domain-row:hover {
-  background: rgba(var(--color-bg-accent-strong-rgb), 0.03);
+  background: var(--color-accent-bg-1);
   color: var(--color-text-link);
 }
 .home-domain-count {
@@ -2162,7 +2155,7 @@ article.edit-mode .props-table .metavalue[contenteditable="true"] {
   transition: background 80ms ease;
 }
 .search-result-item:hover {
-  background: rgba(var(--color-bg-accent-strong-rgb), 0.04);
+  background: var(--color-accent-bg-1);
 }
 .search-result-item:hover .search-result-name { color: var(--color-text-link); }
 .search-result-icon { color: var(--color-text-secondary); margin-top: 2px; flex-shrink: 0; }
@@ -2174,7 +2167,7 @@ article.edit-mode .props-table .metavalue[contenteditable="true"] {
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
   outline: 2px solid var(--color-bg-accent-strong);
   outline-offset: 1px;
-  box-shadow: 0 0 0 3px rgba(var(--color-bg-accent-strong-rgb), 0.40);
+  box-shadow: var(--focus-ring-strong);
 }
 
 /* ============================================================
@@ -2211,7 +2204,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .inline-filter input:focus {
   border-color: var(--color-border-accent);
-  box-shadow: 0 0 0 3px rgba(var(--color-bg-accent-strong-rgb), 0.12);
+  box-shadow: var(--focus-ring);
 }
 .inline-filter .search-icon {
   position: absolute; left: 8px; top: 50%;
@@ -2246,7 +2239,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   margin-bottom: var(--space-1);
   transition: background 100ms ease;
 }
-.concept-pill:hover { background: rgba(var(--color-bg-accent-strong-rgb), 0.15); text-decoration: none; }
+.concept-pill:hover { background: var(--color-accent-bg-4); text-decoration: none; }
 
 /* verified check */
 .verified-check { color: var(--color-status-certified); }
@@ -2861,11 +2854,6 @@ body.sidebar-collapsed .nav-phase-badge { margin: 0 auto; }
 /* ============================================================
    Process Hub — Home / Collection / Process detail views
    ============================================================ */
-.title-block-subtitle {
-  font-size: var(--text-small);
-  color: var(--color-text-secondary);
-  margin-top: 2px;
-}
 .home-lead {
   max-width: var(--prose-max-width);
   color: var(--color-text-secondary);

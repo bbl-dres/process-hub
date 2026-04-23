@@ -11,6 +11,14 @@
   --color-bg-accent-strong-rgb: 31, 78, 138; /* use with rgba(var(--color-bg-accent-strong-rgb), α) */
   --color-bg-overlay: #262626;
 
+  /* Colors — Accent tints (layered over surfaces). The four steps here
+     replaced ~7 ad-hoc alpha values scattered across the codebase. Use
+     the smallest step that reads. */
+  --color-accent-bg-1: rgba(31, 78, 138, 0.04);   /* ghost — row hover on quiet surfaces */
+  --color-accent-bg-2: rgba(31, 78, 138, 0.08);   /* soft — persistent decorative fills */
+  --color-accent-bg-3: rgba(31, 78, 138, 0.12);   /* medium — interactive hover fills */
+  --color-accent-bg-4: rgba(31, 78, 138, 0.15);   /* strong — pressed / active fills */
+
   /* Colors — Border */
   --color-border-subtle: #EFEFED;
   --color-border-default: #D8D8D5;
@@ -96,6 +104,12 @@
   --shadow-popover:     0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-tooltip:     0 2px 8px rgba(0, 0, 0, 0.15);
   --shadow-md:          0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.10);
+
+  /* Focus rings — two tiers. Default is the gentle "interactive affordance"
+     ring; -strong is for keyboard focus where we want clear separation
+     from hover (search result items and similar). */
+  --focus-ring:        0 0 0 3px rgba(31, 78, 138, 0.12);
+  --focus-ring-strong: 0 0 0 3px rgba(31, 78, 138, 0.40);
 
   /* Motion */
   --transition-card: border-color 150ms ease;

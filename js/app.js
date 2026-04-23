@@ -161,9 +161,15 @@ function restoreLocalState() {
   if (localStorage.getItem(SIDEBAR_KEY) === '1') {
     document.body.classList.add('sidebar-collapsed');
   }
-  const savedWidth = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
-  if (savedWidth >= SIDEBAR_MIN_WIDTH && savedWidth <= SIDEBAR_MAX_WIDTH) {
-    document.body.style.setProperty('--sidebar-width', savedWidth + 'px');
+  // Only apply a saved custom width when NOT collapsed. Inline style wins
+  // over the class-based `body.sidebar-collapsed { --sidebar-width: 64px }`
+  // rule in specificity, so we must leave the property unset to let the
+  // collapse rule take effect.
+  if (!document.body.classList.contains('sidebar-collapsed')) {
+    const savedWidth = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
+    if (savedWidth >= SIDEBAR_MIN_WIDTH && savedWidth <= SIDEBAR_MAX_WIDTH) {
+      document.body.style.setProperty('--sidebar-width', savedWidth + 'px');
+    }
   }
   const savedInspW = parseInt(localStorage.getItem(INSPECTOR_WIDTH_KEY) || '', 10);
   if (savedInspW >= INSPECTOR_MIN_WIDTH && savedInspW <= INSPECTOR_MAX_WIDTH) {
@@ -678,9 +684,19 @@ function wireGlobalHandlers() {
 
   document.addEventListener('click', e => {
     if (e.target.closest('#sidebar-toggle')) {
-      document.body.classList.toggle('sidebar-collapsed');
-      localStorage.setItem(SIDEBAR_KEY,
-        document.body.classList.contains('sidebar-collapsed') ? '1' : '0');
+      const nowCollapsed = !document.body.classList.contains('sidebar-collapsed');
+      document.body.classList.toggle('sidebar-collapsed', nowCollapsed);
+      localStorage.setItem(SIDEBAR_KEY, nowCollapsed ? '1' : '0');
+      // Collapsing: drop the inline width so the 64-px class-driven rule wins.
+      // Expanding: restore the user's saved width (if any) as inline style.
+      if (nowCollapsed) {
+        document.body.style.removeProperty('--sidebar-width');
+      } else {
+        const savedWidth = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
+        if (savedWidth >= SIDEBAR_MIN_WIDTH && savedWidth <= SIDEBAR_MAX_WIDTH) {
+          document.body.style.setProperty('--sidebar-width', savedWidth + 'px');
+        }
+      }
       renderSidebar(); lucide.createIcons();
       return;
     }
@@ -1333,7 +1349,6 @@ function renderSidebar() {
                 aria-expanded="${expanded}" aria-label="${expanded ? 'Einklappen' : 'Ausklappen'}">
           <i data-lucide="chevron-${expanded ? 'down' : 'right'}" style="width:12px;height:12px;"></i>
         </button>
-        <i data-lucide="folder-tree" class="nav-item-icon-compact" style="width:16px;height:16px;flex-shrink:0;"></i>
         ${collLabel}
         <span class="nav-count">${count}</span>
       </div>`;

@@ -52,16 +52,16 @@ function renderHome() {
         <div class="data-table-wrap">
           <table class="data-table">
             <colgroup>
+              <col style="width: var(--col-id);">
               <col style="width: var(--col-primary);">
-              <col style="width: var(--col-count);">
               <col style="width: var(--col-count);">
               <col style="width: var(--col-count);">
               <col style="width: var(--col-date);">
             </colgroup>
             <thead>
               <tr>
+                <th scope="col">Nr.</th>
                 <th scope="col">Name</th>
-                <th scope="col">Ebene 1</th>
                 <th scope="col">Prozesse</th>
                 <th scope="col">Mit Diagramm</th>
                 <th scope="col">Aktualisiert</th>
@@ -136,21 +136,14 @@ function renderRecentActivityTable() {
 function renderCollectionRow(c) {
   const count = totalProcesses(c.landscape);
   const bpmn = processesWithBpmn(c.landscape);
-  const l1Count = countLevel1(c.landscape);
   const href = `#/c/${encodeURIComponent(c.id)}`;
-  const codePrefix = c.code
-    ? `<code class="coll-code">${escapeHtml(c.code)}</code> `
-    : '';
   return `
     <tr class="clickable-row" data-href="${escapeAttr(href)}">
-      <td>
-        <div style="font-weight:500;">${codePrefix}${escapeHtml(c.name)}</div>
-        ${c.subtitle ? `<div class="text-sub">${escapeHtml(c.subtitle)}</div>` : ''}
-      </td>
-      <td class="tabular-nums">${l1Count}</td>
+      <td class="tabular-nums">${c.code ? escapeHtml(c.code) : '<span class="text-placeholder">—</span>'}</td>
+      <td class="coll-row-name">${escapeHtml(c.name)}</td>
       <td class="tabular-nums">${count}</td>
       <td class="tabular-nums">${bpmn}</td>
-      <td class="text-sub">${escapeHtml(c.updatedAt || '—')}</td>
+      <td>${escapeHtml(c.updatedAt || '—')}</td>
     </tr>
   `;
 }
@@ -211,7 +204,6 @@ function renderContainer(c, node, trail, view) {
           <h1 class="title-block-name">
             ${titleCode ? `<code class="title-code">${escapeHtml(titleCode)}</code> ` : ''}${escapeHtml(titleName)}
           </h1>
-          ${c.subtitle && trail.length === 0 ? `<div class="title-block-subtitle">${escapeHtml(c.subtitle)}</div>` : ''}
         </div>
         ${renderTitleBlockActions({ context: 'container', payload: f.filtered })}
       </div>
@@ -858,7 +850,6 @@ function renderCollectionMetadataPane(c) {
       <table class="props-table">
         <tbody>
           <tr><th scope="row">Sammlung</th><td>${c.code ? `<code>${escapeHtml(c.code)}</code> ` : ''}${escapeHtml(c.name)}</td></tr>
-          ${c.subtitle ? `<tr><th scope="row">Untertitel</th><td>${escapeHtml(c.subtitle)}</td></tr>` : ''}
           <tr><th scope="row">Quelle</th><td>${ownerHtml}</td></tr>
           <tr><th scope="row">Aktualisiert</th><td>${escapeHtml(c.updatedAt || '—')}</td></tr>
         </tbody>
@@ -967,7 +958,6 @@ function renderWorkflowsView() {
                 <tr>
                   <td>
                     <a href="#/c/${encodeURIComponent(c.id)}">${escapeHtml(c.name)}</a>
-                    ${c.subtitle ? `<div>${escapeHtml(c.subtitle)}</div>` : ''}
                   </td>
                   <td class="tabular-nums">${total}</td>
                   <td class="tabular-nums">${withBpmn}</td>
@@ -1006,7 +996,7 @@ function renderWorkflowsView() {
 // ─── Search ─────────────────────────────────────────────────────────
 //
 // Searches across all loaded collections. Two entity types:
-//   - Sammlungen: match on name / subtitle / description
+//   - Sammlungen: match on name / code / description
 //   - Prozesse:   match on id / name / description / purpose / tags
 // Returns sorted results capped at `limit` per group.
 function searchHub(q, limit) {
@@ -1016,7 +1006,7 @@ function searchHub(q, limit) {
   const matches = (hay) => (hay || '').toLowerCase().includes(needle);
 
   const collections = state.collections
-    .filter(c => matches(c.name) || matches(c.code) || matches(c.subtitle) || matches(c.description))
+    .filter(c => matches(c.name) || matches(c.code) || matches(c.description))
     .slice(0, limit);
 
   const processes = [];
@@ -1081,7 +1071,7 @@ function renderSearchDropdown(q) {
               <div class="search-dropdown-item-icon"><i data-lucide="folder-tree" style="width:16px;height:16px;"></i></div>
               <div>
                 <div class="search-dropdown-item-name">${escapeHtml(c.name)}</div>
-                <div class="search-dropdown-item-meta">${escapeHtml(c.subtitle || 'Sammlung')}</div>
+                <div class="search-dropdown-item-meta">Sammlung</div>
               </div>
             </div>`).join('')}
         </div>`;
@@ -1152,7 +1142,7 @@ function renderSearchResults(q) {
           <div class="search-result-icon"><i data-lucide="folder-tree" style="width:16px;height:16px;"></i></div>
           <div>
             <div class="search-result-name">${escapeHtml(c.name)}</div>
-            <div class="search-result-type">${escapeHtml(c.subtitle || 'Sammlung')}</div>
+            <div class="search-result-type">Sammlung</div>
           </div>
         </div>`;
       }
@@ -1270,7 +1260,7 @@ function getInspectorScope() {
       c,
       header: {
         title: (c.code ? c.code + ' ' : '') + c.name,
-        sub: escapeHtml(c.subtitle || 'Sammlung')
+        sub: 'Sammlung'
       }
     };
   }
