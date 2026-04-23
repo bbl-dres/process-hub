@@ -1,38 +1,63 @@
-// exports.js - Excel / PDF / BPMN-ZIP downloads. Depends on state
-// (for filtered data), parseBpmnSteps from bpmn.js, and renderStatusBadge
-// from views.js.
+// exports.js — Excel / PDF / BPMN-ZIP downloads for the current route.
+// Row-shape dealt with here is the new { node, path } form. "Container"
+// exports walk the subtree under the current route; "process" exports
+// cover just the one BPMN-bearing node.
 
 function dispatchExport(kind) {
   const r = state.route;
-  if (r.name === 'collection') {
-    const c = state.collections.find(x => x.id === r.collId);
-    if (!c) return;
-    const { filtered } = buildFilterContext(c, state.filters[c.id]);
-    if (kind === 'excel') return exportCollectionExcel(c, filtered);
-    if (kind === 'pdf')   return exportCollectionPdf(c, filtered);
-    if (kind === 'bpmn')  return downloadCollectionBpmnZip(c, filtered);
-  } else if (r.name === 'process') {
-    const c = state.collections.find(x => x.id === r.collId);
-    if (!c) return;
-    const found = findGroupInCollection(c, r.processId);
-    if (!found) return;
-    if (kind === 'excel') return exportProcessExcel(c, found.area, found.group);
-    if (kind === 'pdf')   return exportProcessPdf(c, found.area, found.group);
-    if (kind === 'bpmn')  return downloadProcessBpmn(found.group);
+  if (r.name !== 'node') return;
+  const resolved = resolveNodeRoute(r);
+  if (!resolved) return;
+  const { c, node, trail } = resolved;
+
+  if (isProcessNode(node)) {
+    // Leaf / process-level export
+    if (kind === 'excel') return exportProcessExcel(c, node, trail);
+    if (kind === 'pdf')   return exportProcessPdf(c, node, trail);
+    if (kind === 'bpmn')  return downloadProcessBpmn(node);
+    return;
   }
+
+  // Container: walk the subtree under `node` to collect processes.
+  const rows = collectRowsUnder(c, node, trail);
+  if (kind === 'excel') return exportContainerExcel(c, node, rows);
+  if (kind === 'pdf')   return exportContainerPdf(c, node, rows);
+  if (kind === 'bpmn')  return downloadContainerBpmnZip(c, node, rows);
+}
+
+// Walk descendants of `rootNode` under trail, returning [{ node, path }] for
+// every "process"-like node (Level-2+ leaf or node with bpmn).
+function collectRowsUnder(c, rootNode, trail) {
+  const basePath = trail.map(n => n.id);
+  const rows = [];
+  const visit = (n, path) => {
+    if (path.length >= basePath.length + 1 && (!isContainerNode(n) || isProcessNode(n))) {
+      rows.push({ node: n, path });
+    }
+    for (const ch of n.children || []) visit(ch, [...path, ch.id]);
+  };
+  for (const ch of rootNode.children || []) visit(ch, [...basePath, ch.id]);
+  return rows;
+}
+
+// Return the Level-1 ancestor for a given row (or the row's node if it's L1).
+function level1Of(path, c) {
+  if (!path.length) return null;
+  const hit = findNodeByPath(c, path.slice(0, 1));
+  return hit?.node || null;
 }
 
 // ─── Excel exports ──────────────────────────────────────────────────
-function exportProcessExcel(c, area, group) {
+function exportProcessExcel(c, node, trail) {
   return withBusy('Excel wird erstellt…', async () => {
     const wb = XLSX.utils.book_new();
-    const wsMeta = XLSX.utils.aoa_to_sheet(processMetadataRows(c, area, group));
+    const wsMeta = XLSX.utils.aoa_to_sheet(processMetadataRows(c, node, trail));
     wsMeta['!cols'] = [{ wch: 24 }, { wch: 60 }];
     XLSX.utils.book_append_sheet(wb, wsMeta, 'Metadaten');
 
-    if (group.bpmn) {
+    if (node.bpmn) {
       try {
-        const steps = await fetchAndParseSteps(group.bpmn);
+        const steps = await fetchAndParseSteps(node.bpmn);
         const rows = steps.map((s, i) => ({
           'Nr.': i + 1, 'Name': s.name || '', 'Typ': s.typeLabel, 'Rolle': s.lane || ''
         }));
@@ -43,47 +68,47 @@ function exportProcessExcel(c, area, group) {
         console.warn('Step parse failed:', err);
       }
     }
-    XLSX.writeFile(wb, `${sanitizeFilename(group.id)}.xlsx`);
+    XLSX.writeFile(wb, `${sanitizeFilename(node.id)}.xlsx`);
   });
 }
 
-function exportCollectionExcel(c, filtered) {
+function exportContainerExcel(c, rootNode, rows) {
   return withBusy('Excel wird erstellt…', async () => {
-    const all = [];
-    filtered.forEach(a => a.groups.forEach(g => all.push({ a, g })));
-
-    const procRows = all.map(({ a, g }) => ({
-      'Prozess-ID':   g.id,
-      'Name':         g.name,
-      'Bereich':      a.name,
-      'Status':       STATUS_LABELS[g.status]?.label || g.status || '',
-      'Version':      g.version || '',
-      'Aktualisiert': g.updatedAt || '',
-      'Owner':        resolvePerson(g.owner)?.name || '',
-      'Responsible':  (g.responsible || []).map(id => resolvePerson(id)?.name).filter(Boolean).join(', '),
-      'Expert':       resolvePerson(g.expert)?.name || '',
-      'Tags':         (g.tags || []).join(', '),
-      'Beschreibung': g.description || '',
-      'BPMN-Datei':   g.bpmn || ''
-    }));
+    const procRows = rows.map(({ node, path }) => {
+      const l1 = level1Of(path, c);
+      return {
+        'Prozess-ID':   node.id,
+        'Name':         node.name,
+        'Ebene 1':      l1 ? `${l1.id} ${l1.name}` : '',
+        'Status':       STATUS_LABELS[node.status]?.label || node.status || '',
+        'Version':      node.version || '',
+        'Aktualisiert': node.updatedAt || '',
+        'Owner':        resolvePerson(node.owner)?.name || '',
+        'Responsible':  (node.responsible || []).map(id => resolvePerson(id)?.name).filter(Boolean).join(', '),
+        'Expert':       resolvePerson(node.expert)?.name || '',
+        'Tags':         (node.tags || []).join(', '),
+        'Beschreibung': node.description || '',
+        'BPMN-Datei':   node.bpmn || ''
+      };
+    });
 
     const wb = XLSX.utils.book_new();
     const wsProc = XLSX.utils.json_to_sheet(procRows);
     wsProc['!cols'] = [
-      { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 14 }, { wch: 10 },
+      { wch: 20 }, { wch: 40 }, { wch: 30 }, { wch: 14 }, { wch: 10 },
       { wch: 14 }, { wch: 22 }, { wch: 30 }, { wch: 22 }, { wch: 30 },
       { wch: 60 }, { wch: 40 }
     ];
     XLSX.utils.book_append_sheet(wb, wsProc, 'Prozesse');
 
-    const stepsNested = await Promise.all(all
-      .filter(({ g }) => g.bpmn)
-      .map(async ({ g }) => {
+    const stepsNested = await Promise.all(rows
+      .filter(r => r.node.bpmn)
+      .map(async ({ node }) => {
         try {
-          const steps = await fetchAndParseSteps(g.bpmn);
+          const steps = await fetchAndParseSteps(node.bpmn);
           return steps.map((s, i) => ({
-            'Prozess-ID':   g.id,
-            'Prozess-Name': g.name,
+            'Prozess-ID':   node.id,
+            'Prozess-Name': node.name,
             'Nr.':          i + 1,
             'Schritt-Name': s.name || '',
             'Typ':          s.typeLabel,
@@ -100,88 +125,93 @@ function exportCollectionExcel(c, filtered) {
       XLSX.utils.book_append_sheet(wb, wsSteps, 'Schritte');
     }
 
-    XLSX.writeFile(wb, `${sanitizeFilename(c.id)}.xlsx`);
+    const scopeId = rootNode.id === c.id ? c.id : `${c.id}_${rootNode.id}`;
+    XLSX.writeFile(wb, `${sanitizeFilename(scopeId)}.xlsx`);
   });
 }
 
-function processMetadataRows(c, area, group) {
+function processMetadataRows(c, node, trail) {
+  const l1 = trail.length >= 1 ? trail[0] : null;
   return [
     ['Feld', 'Wert'],
-    ['Prozess-ID',   group.id],
-    ['Name',         group.name],
+    ['Prozess-ID',   node.id],
+    ['Name',         node.name],
     ['Sammlung',     c.name],
-    ['Bereich',      area.name],
-    ['Status',       STATUS_LABELS[group.status]?.label || group.status || ''],
-    ['Version',      group.version || ''],
-    ['Aktualisiert', group.updatedAt || ''],
-    ['Owner',        resolvePerson(group.owner)?.name || ''],
-    ['Responsible',  (group.responsible || []).map(id => resolvePerson(id)?.name).filter(Boolean).join(', ')],
-    ['Expert',       resolvePerson(group.expert)?.name || ''],
-    ['Tags',         (group.tags || []).join(', ')],
-    ['Beschreibung', group.description || ''],
-    ['BPMN-Datei',   group.bpmn || '']
+    ['Ebene 1',      l1 ? `${l1.id} ${l1.name}` : ''],
+    ['Status',       STATUS_LABELS[node.status]?.label || node.status || ''],
+    ['Version',      node.version || ''],
+    ['Aktualisiert', node.updatedAt || ''],
+    ['Owner',        resolvePerson(node.owner)?.name || ''],
+    ['Responsible',  (node.responsible || []).map(id => resolvePerson(id)?.name).filter(Boolean).join(', ')],
+    ['Expert',       resolvePerson(node.expert)?.name || ''],
+    ['Tags',         (node.tags || []).join(', ')],
+    ['Beschreibung', node.description || ''],
+    ['BPMN-Datei',   node.bpmn || '']
   ];
 }
 
 // ─── PDF exports (simple v1 layout) ─────────────────────────────────
-function exportProcessPdf(c, area, group) {
+function exportProcessPdf(c, node, trail) {
   return withBusy('PDF wird erstellt…', async () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
     let steps = [];
-    if (group.bpmn) {
-      try { steps = await fetchAndParseSteps(group.bpmn); } catch { /* ignore */ }
+    if (node.bpmn) {
+      try { steps = await fetchAndParseSteps(node.bpmn); } catch { /* ignore */ }
     }
-    renderProcessPdfPage(doc, c, area, group, steps, { idx: 1, total: 1 });
-    doc.save(`${sanitizeFilename(group.id)}.pdf`);
+    renderProcessPdfPage(doc, c, node, trail, steps, { idx: 1, total: 1 });
+    doc.save(`${sanitizeFilename(node.id)}.pdf`);
   });
 }
 
-function exportCollectionPdf(c, filtered) {
+function exportContainerPdf(c, rootNode, rows) {
   return withBusy('PDF wird erstellt…', async () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const procs = [];
-    filtered.forEach(a => a.groups.forEach(g => procs.push({ a, g })));
-    if (procs.length === 0) {
+    if (rows.length === 0) {
       doc.setFontSize(14).text('Keine Prozesse in der aktuellen Auswahl.', 20, 30);
       doc.save(`${sanitizeFilename(c.id)}.pdf`);
       return;
     }
-    procs.forEach((item, i) => {
+    rows.forEach((r, i) => {
       if (i > 0) doc.addPage();
-      renderProcessPdfPage(doc, c, item.a, item.g, [], { idx: i + 1, total: procs.length });
+      const hit = findNodeByPath(c, r.path);
+      const trail = hit?.trail || [];
+      renderProcessPdfPage(doc, c, r.node, trail, [], { idx: i + 1, total: rows.length });
     });
-    doc.save(`${sanitizeFilename(c.id)}.pdf`);
+    const scopeId = rootNode.id === c.id ? c.id : `${c.id}_${rootNode.id}`;
+    doc.save(`${sanitizeFilename(scopeId)}.pdf`);
   });
 }
 
-function renderProcessPdfPage(doc, c, area, group, steps, ctx) {
+function renderProcessPdfPage(doc, c, node, trail, steps, ctx) {
   const margin = 20;
   const pageW = doc.internal.pageSize.getWidth();
+  const l1 = trail.length >= 1 ? trail[0] : null;
 
   // Title
   doc.setFontSize(16).setFont('helvetica', 'bold').setTextColor(20);
-  doc.text(doc.splitTextToSize(group.name, pageW - 2 * margin), margin, margin + 2);
+  doc.text(doc.splitTextToSize(node.name, pageW - 2 * margin), margin, margin + 2);
   doc.setFontSize(10).setFont('helvetica', 'normal').setTextColor(100);
-  doc.text(`${group.id}  ·  ${c.name}  ·  ${area.name}`, margin, margin + 10);
+  const subline = [node.id, c.name, l1 ? `${l1.id} ${l1.name}` : null].filter(Boolean).join('  ·  ');
+  doc.text(subline, margin, margin + 10);
 
   // Metadata table
-  const ownerName = resolvePerson(group.owner)?.name || '—';
-  const respNames = (group.responsible || []).map(id => resolvePerson(id)?.name).filter(Boolean).join(', ') || '—';
-  const expertName = resolvePerson(group.expert)?.name || '—';
+  const ownerName = resolvePerson(node.owner)?.name || '—';
+  const respNames = (node.responsible || []).map(id => resolvePerson(id)?.name).filter(Boolean).join(', ') || '—';
+  const expertName = resolvePerson(node.expert)?.name || '—';
 
   doc.autoTable({
     startY: margin + 15,
     head: [['Feld', 'Wert']],
     body: [
-      ['Status',       STATUS_LABELS[group.status]?.label || group.status || '—'],
-      ['Version',      group.version || '—'],
-      ['Aktualisiert', group.updatedAt || '—'],
+      ['Status',       STATUS_LABELS[node.status]?.label || node.status || '—'],
+      ['Version',      node.version || '—'],
+      ['Aktualisiert', node.updatedAt || '—'],
       ['Owner',        ownerName],
       ['Responsible',  respNames],
       ['Expert',       expertName],
-      ['Tags',         (group.tags || []).join(', ') || '—']
+      ['Tags',         (node.tags || []).join(', ') || '—']
     ],
     theme: 'plain',
     styles: { fontSize: 10, cellPadding: 2 },
@@ -192,11 +222,11 @@ function renderProcessPdfPage(doc, c, area, group, steps, ctx) {
 
   let y = (doc.lastAutoTable?.finalY || margin + 15) + 8;
 
-  if (group.description) {
+  if (node.description) {
     doc.setFontSize(12).setFont('helvetica', 'bold').setTextColor(20);
     doc.text('Zweck / Bemerkungen', margin, y);
     doc.setFontSize(10).setFont('helvetica', 'normal').setTextColor(40);
-    const lines = doc.splitTextToSize(group.description, pageW - 2 * margin);
+    const lines = doc.splitTextToSize(node.description, pageW - 2 * margin);
     doc.text(lines, margin, y + 6);
     y = y + 6 + lines.length * 5 + 6;
   }
@@ -235,32 +265,33 @@ function drawPdfFooter(doc, c, ctx) {
 }
 
 // ─── BPMN downloads ─────────────────────────────────────────────────
-async function downloadProcessBpmn(group) {
-  if (!group.bpmn) return;
+async function downloadProcessBpmn(node) {
+  if (!node.bpmn) return;
   try {
-    const res = await fetch(encodeURI(group.bpmn));
+    const res = await fetch(encodeURI(node.bpmn));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const xml = await res.text();
-    downloadBlob(new Blob([xml], { type: 'application/xml' }), `${sanitizeFilename(group.id)}.bpmn`);
+    downloadBlob(new Blob([xml], { type: 'application/xml' }), `${sanitizeFilename(node.id)}.bpmn`);
   } catch (err) {
     alert(`Download fehlgeschlagen: ${err.message}`);
   }
 }
 
-function downloadCollectionBpmnZip(c, filtered) {
+function downloadContainerBpmnZip(c, rootNode, rows) {
   return withBusy('ZIP wird erstellt…', async () => {
     const zip = new window.JSZip();
     const tasks = [];
-    filtered.forEach(a => a.groups.forEach(g => {
-      if (!g.bpmn) return;
-      tasks.push(fetch(encodeURI(g.bpmn))
+    rows.forEach(({ node }) => {
+      if (!node.bpmn) return;
+      tasks.push(fetch(encodeURI(node.bpmn))
         .then(r => r.ok ? r.text() : Promise.reject(new Error(`HTTP ${r.status}`)))
-        .then(xml => zip.file(`${sanitizeFilename(g.id)}.bpmn`, xml))
-        .catch(err => console.warn(`Skip ${g.id}:`, err.message)));
-    }));
+        .then(xml => zip.file(`${sanitizeFilename(node.id)}.bpmn`, xml))
+        .catch(err => console.warn(`Skip ${node.id}:`, err.message)));
+    });
     await Promise.all(tasks);
     const blob = await zip.generateAsync({ type: 'blob' });
-    downloadBlob(blob, `${sanitizeFilename(c.id)}-bpmn.zip`);
+    const scopeId = rootNode.id === c.id ? c.id : `${c.id}_${rootNode.id}`;
+    downloadBlob(blob, `${sanitizeFilename(scopeId)}-bpmn.zip`);
   });
 }
 
@@ -295,5 +326,3 @@ function withBusy(text, fn) {
     alert(`Export fehlgeschlagen: ${err.message}`);
   }).finally(() => overlay.remove());
 }
-
-// ─── Process / BPMN viewer ──────────────────────────────────────────

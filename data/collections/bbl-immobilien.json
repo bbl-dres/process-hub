@@ -1,13 +1,11 @@
 {
   "id": "bbl-immobilien",
-  "areas": [
+  "children": [
     {
-      "id": "akquisition",
-      "number": "1",
-      "name": "Akquisition & Planung",
-      "accent": "#1F4E8A",
-      "description": "Lösungsvorschläge, Machbarkeit, Auftragskoordination",
-      "groups": [
+      "id": "TQ.21.00",
+      "name": "Immobilienmanagement (K0)",
+      "description": "Prozesssammlung rund um Akquisition, Vollzug, Bewirtschaftung und Rückgabe von Liegenschaften des Bundes.",
+      "children": [
         {
           "id": "TQ.21.00.00.01",
           "name": "Lösungsvorschläge Anmiete Kauf",
@@ -135,16 +133,7 @@
             ]
           },
           "documents": []
-        }
-      ]
-    },
-    {
-      "id": "vollzug",
-      "number": "2",
-      "name": "Vollzug & Übernahme",
-      "accent": "#2E7D32",
-      "description": "Vollzug Anmiete/Pacht, Verurkundung Kauf, Objektübernahme",
-      "groups": [
+        },
         {
           "id": "TQ.21.00.00.10",
           "name": "Vollzug Anmiete Pacht",
@@ -268,16 +257,7 @@
             "related": []
           },
           "documents": []
-        }
-      ]
-    },
-    {
-      "id": "bewirtschaftung",
-      "number": "3",
-      "name": "Bewirtschaftung",
-      "accent": "#B45309",
-      "description": "Bewirtschaftung von Anmiet-, Pacht-, Baurechtsverträgen und Eigentum",
-      "groups": [
+        },
         {
           "id": "TQ.21.00.00.30",
           "name": "Bewirtschaftung Anmiet-, Pachtverträge, Eigene Baurechte",
@@ -398,16 +378,7 @@
             "related": []
           },
           "documents": []
-        }
-      ]
-    },
-    {
-      "id": "rueckgabe",
-      "number": "4",
-      "name": "Rückgabe & Auflösung",
-      "accent": "#7C3AED",
-      "description": "Objektübergabe, Lösungsvorschläge Rückgabe, Auflösung, Verurkundung Verkauf",
-      "groups": [
+        },
         {
           "id": "TQ.21.00.00.50",
           "name": "Objektübergabe an LB, Mieter",
@@ -644,16 +615,7 @@
             "related": []
           },
           "documents": []
-        }
-      ]
-    },
-    {
-      "id": "stammdaten",
-      "number": "5",
-      "name": "Stammdaten & Support",
-      "accent": "#5F5F5A",
-      "description": "Immostammdaten/Energiedaten, Aktenmanagement, Planverwaltung / BIM",
-      "groups": [
+        },
         {
           "id": "TQ.21.00.00.96",
           "name": "Immostammdaten Energiedatenverwaltung",

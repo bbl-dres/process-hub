@@ -7,10 +7,9 @@ function renderHome() {
 
   const kpiCards = [
     { icon: 'folder-tree',  count: kpis.collections, label: 'Sammlungen', sub: 'Prozess-Sammlungen' },
-    { icon: 'list-tree',    count: kpis.processes,   label: 'Prozesse',   sub: 'Gesamtzahl Teilprozesse' },
+    { icon: 'list-tree',    count: kpis.processes,   label: 'Prozesse',   sub: 'Level-2 und tiefer' },
     { icon: 'file-check',   count: kpis.withBpmn,    label: 'Mit Diagramm', sub: 'BPMN verfügbar' },
-    { icon: 'file-x',       count: kpis.withoutBpmn, label: 'Ohne Diagramm', sub: 'Kein BPMN hinterlegt' },
-    { icon: 'layers',       count: kpis.areas,       label: 'Bereiche',   sub: 'Level-2-Gruppierungen' },
+    { icon: 'file-x',       count: kpis.withoutBpmn, label: 'Ohne Diagramm', sub: 'Kein BPMN hinterlegt' }
   ];
 
   const skipped = state.skippedCollections || [];
@@ -62,7 +61,7 @@ function renderHome() {
             <thead>
               <tr>
                 <th scope="col">Name</th>
-                <th scope="col">Bereiche</th>
+                <th scope="col">Ebene 1</th>
                 <th scope="col">Prozesse</th>
                 <th scope="col">Mit Diagramm</th>
                 <th scope="col">Aktualisiert</th>
@@ -86,16 +85,16 @@ function renderHome() {
 function renderRecentActivityTable() {
   const all = [];
   state.collections.forEach(c => {
-    c.landscape.areas.forEach(a => {
-      a.groups.forEach(g => {
-        if (g.updatedAt) all.push({ c, a, g });
-      });
+    walkTree(c.landscape, (node, path) => {
+      if (path.length >= 2 && node.updatedAt) {
+        all.push({ c, node, path });
+      }
     });
   });
   if (all.length === 0) {
     return `<p class="text-secondary">Keine Aktivitäten erfasst.</p>`;
   }
-  all.sort((x, y) => (y.g.updatedAt || '').localeCompare(x.g.updatedAt || ''));
+  all.sort((x, y) => (y.node.updatedAt || '').localeCompare(x.node.updatedAt || ''));
   const top = all.slice(0, 5);
   return `
     <div class="data-table-wrap">
@@ -117,15 +116,15 @@ function renderRecentActivityTable() {
           </tr>
         </thead>
         <tbody>
-          ${top.map(({ c, a, g }) => {
-            const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(g.id)}`;
+          ${top.map(({ c, node, path }) => {
+            const href = hashForNode(c.id, path);
             return `
               <tr class="clickable-row" data-href="${escapeAttr(href)}">
-                <td class="tabular-nums">${escapeHtml(g.id)}</td>
-                <td>${escapeHtml(g.name)}</td>
+                <td class="tabular-nums">${escapeHtml(node.id)}</td>
+                <td>${escapeHtml(node.name)}</td>
                 <td>${escapeHtml(c.name)}</td>
-                <td>${renderStatusBadge(g.status)}</td>
-                <td>${escapeHtml(g.updatedAt)}</td>
+                <td>${renderStatusBadge(node.status)}</td>
+                <td>${escapeHtml(node.updatedAt)}</td>
               </tr>`;
           }).join('')}
         </tbody>
@@ -137,14 +136,18 @@ function renderRecentActivityTable() {
 function renderCollectionRow(c) {
   const count = totalProcesses(c.landscape);
   const bpmn = processesWithBpmn(c.landscape);
+  const l1Count = countLevel1(c.landscape);
   const href = `#/c/${encodeURIComponent(c.id)}`;
+  const codePrefix = c.code
+    ? `<code class="coll-code">${escapeHtml(c.code)}</code> `
+    : '';
   return `
     <tr class="clickable-row" data-href="${escapeAttr(href)}">
       <td>
-        <div style="font-weight:500;">${escapeHtml(c.name)}</div>
+        <div style="font-weight:500;">${codePrefix}${escapeHtml(c.name)}</div>
         ${c.subtitle ? `<div class="text-sub">${escapeHtml(c.subtitle)}</div>` : ''}
       </td>
-      <td class="tabular-nums">${c.landscape.areas.length}</td>
+      <td class="tabular-nums">${l1Count}</td>
       <td class="tabular-nums">${count}</td>
       <td class="tabular-nums">${bpmn}</td>
       <td class="text-sub">${escapeHtml(c.updatedAt || '—')}</td>
@@ -153,115 +156,110 @@ function renderCollectionRow(c) {
 }
 
 function computeKpis() {
-  let processes = 0, withBpmn = 0, withoutBpmn = 0, areas = 0;
+  let processes = 0, withBpmn = 0, withoutBpmn = 0;
   state.collections.forEach(c => {
-    areas += c.landscape.areas.length;
-    c.landscape.areas.forEach(a => a.groups.forEach(g => {
-      processes++;
-      if (g.bpmn) withBpmn++; else withoutBpmn++;
-    }));
+    walkTree(c.landscape, (node, path) => {
+      if (path.length >= 2) {
+        processes++;
+        if (isProcessNode(node)) withBpmn++; else withoutBpmn++;
+      }
+    });
   });
-  return { collections: state.collections.length, processes, withBpmn, withoutBpmn, areas };
+  return { collections: state.collections.length, processes, withBpmn, withoutBpmn };
 }
 
-function renderCollection(collId, view) {
-  const c = state.collections.find(x => x.id === collId);
-  if (!c) return `<div class="content-wrapper"><p>Sammlung nicht gefunden.</p></div>`;
-  const filters = state.filters[collId];
-  const f = buildFilterContext(c, filters);
+// renderContainer: replaces renderCollection. Drives the landing view for
+// ANY container node — collection root, Level 1, or a Level 2 that has
+// children. Same tab-bar (Tabelle / Diagramm); same filters; tiles/table
+// show all descendant processes (nodes at depth ≥ 2 under the current).
+function renderContainer(c, node, trail, view) {
+  const collectionPath = trail.map(n => n.id);
+  const filters = state.filters[c.id];
+  const f = buildFilterContext(c, node, trail, filters);
+  const breadcrumbs = [{ label: 'Home', hash: '#/' }];
+  breadcrumbs.push({ label: c.name, hash: `#/c/${encodeURIComponent(c.id)}` });
+  for (let i = 0; i < trail.length; i++) {
+    const link = i < trail.length - 1
+      ? hashForNode(c.id, collectionPath.slice(0, i + 1))
+      : null;
+    breadcrumbs.push({
+      label: `${trail[i].id} ${trail[i].name}`,
+      hash: link || undefined
+    });
+  }
+
+  const titleCode = trail.length ? trail[trail.length - 1].id : (c.code || '');
+  const titleName = trail.length ? trail[trail.length - 1].name : c.name;
+  const baseHash = hashForNode(c.id, collectionPath);
+
+  addRecent({
+    title: trail.length
+      ? `${c.name} · ${titleCode} ${titleName}`
+      : c.name,
+    hash: baseHash
+  });
 
   return `
     <div class="content-wrapper">
-      ${renderBreadcrumb([
-        { label: 'Home', hash: '#/' },
-        { label: c.name }
-      ])}
+      ${renderBreadcrumb(breadcrumbs)}
 
       <div class="title-block">
         <div class="title-block-icon">
-          <i data-lucide="folder-tree" style="width:20px;height:20px;"></i>
+          <i data-lucide="${trail.length ? 'folder' : 'folder-tree'}" style="width:20px;height:20px;"></i>
         </div>
         <div class="title-block-content">
-          <h1 class="title-block-name">${escapeHtml(c.name)}</h1>
+          <h1 class="title-block-name">
+            ${titleCode ? `<code class="title-code">${escapeHtml(titleCode)}</code> ` : ''}${escapeHtml(titleName)}
+          </h1>
+          ${c.subtitle && trail.length === 0 ? `<div class="title-block-subtitle">${escapeHtml(c.subtitle)}</div>` : ''}
         </div>
+        ${renderTitleBlockActions({ context: 'container', payload: f.filtered })}
       </div>
 
       <div class="tab-bar" role="tablist">
         <div class="tab-bar-scroll">
-          <button class="tab ${view === 'table' ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}${encodeCollectionQuery(c.id)}" role="tab" aria-selected="${view === 'table'}">Tabelle</button>
-          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}/diagram${encodeCollectionQuery(c.id)}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
-          <button class="tab ${view === 'metadata' ? 'active' : ''}" data-nav="#/c/${encodeURIComponent(c.id)}/metadata${encodeCollectionQuery(c.id)}" role="tab" aria-selected="${view === 'metadata'}">Metadaten</button>
+          <button class="tab ${view === 'table' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath)}" role="tab" aria-selected="${view === 'table'}">Tabelle</button>
+          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath, { view: 'diagram' })}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
         </div>
-        ${view !== 'metadata' ? f.toggleHtml : ''}
-        ${view !== 'metadata' ? renderGroupingDropdown(c.id) : ''}
-        ${renderExportDropdown('collection', f.filtered)}
-        ${view !== 'metadata' ? f.panelHtml : ''}
+        ${f.toggleHtml}
+        ${renderGroupingDropdown(c.id)}
+        ${f.panelHtml}
       </div>
 
-      ${view !== 'metadata' ? f.pillsHtml : ''}
+      ${f.pillsHtml}
 
-      ${view === 'diagram' ? renderDiagramView(c, f.filtered)
-        : view === 'metadata' ? renderCollectionMetadataView(c)
-        : renderTableView(c, f.filtered)}
+      ${view === 'diagram' ? renderDiagramView(c, f.rows) : renderTableView(c, f.rows)}
     </div>
   `;
 }
 
-function renderCollectionMetadataView(c) {
-  const ownerHtml = c.owner
-    ? (c.ownerUrl
-        ? `<a href="${escapeAttr(c.ownerUrl)}" target="_blank" rel="noopener">${escapeHtml(c.owner)}</a>`
-        : escapeHtml(c.owner))
-    : '<span class="text-placeholder">—</span>';
+// buildFilterContext now operates on a subtree rooted at `node`. It collects
+// descendant "process" rows ({node, path}), applies owner/status filters,
+// and assembles the toggle + pill + panel chrome.
+function buildFilterContext(c, rootNode, trail, filters) {
+  const basePath = trail.map(n => n.id);
+  // Descendants that represent "processes" (Level-2+ nodes). Plus the
+  // node itself is excluded; only its descendants are shown.
+  const allRows = [];
+  const visit = (n, path) => {
+    if (!isContainerNode(n) || isProcessNode(n)) {
+      // leaf row for the table (or process-with-children, which we also list)
+      if (path.length >= basePath.length + 1) {
+        allRows.push({ node: n, path });
+      }
+    }
+    for (const ch of n.children || []) visit(ch, [...path, ch.id]);
+  };
+  for (const ch of rootNode.children || []) visit(ch, [...basePath, ch.id]);
 
-  return `
-    <section class="content-section">
-      <div class="section-label">Beschreibung</div>
-      ${c.description
-        ? `<p style="margin:0; max-width: var(--prose-max-width); line-height:1.6;">${escapeHtml(c.description)}</p>`
-        : `<p class="text-placeholder" style="margin:0;">Keine Beschreibung hinterlegt.</p>`}
-    </section>
+  const rows = allRows.filter(({ node }) => {
+    if (filters.owners.size   > 0 && !filters.owners.has(node.owner))     return false;
+    if (filters.statuses.size > 0 && !filters.statuses.has(node.status))  return false;
+    return true;
+  });
 
-    <section class="content-section">
-      <div class="section-label">Herausgeber</div>
-      <table class="props-table">
-        <tbody>
-          <tr>
-            <th scope="row">Sammlung</th>
-            <td>${escapeHtml(c.name)}</td>
-          </tr>
-          ${c.subtitle ? `<tr><th scope="row">Untertitel</th><td>${escapeHtml(c.subtitle)}</td></tr>` : ''}
-          <tr>
-            <th scope="row">Quelle</th>
-            <td>${ownerHtml}</td>
-          </tr>
-          <tr>
-            <th scope="row">Aktualisiert</th>
-            <td>${escapeHtml(c.updatedAt || '—')}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-  `;
-}
-
-function buildFilterContext(c, filters) {
-  // Apply filters: group passes if it matches ALL active dimensions.
-  // Empty set for a dimension means "don't filter on this dimension."
-  const filtered = c.landscape.areas.map(a => ({
-    ...a,
-    groups: a.groups.filter(g => {
-      if (filters.phases.size   > 0 && !filters.phases.has(a.id))      return false;
-      if (filters.owners.size   > 0 && !filters.owners.has(g.owner))   return false;
-      if (filters.statuses.size > 0 && !filters.statuses.has(g.status)) return false;
-      return true;
-    })
-  })).filter(a => a.groups.length > 0);
-
-  const activeCount = filters.phases.size + filters.owners.size + filters.statuses.size;
+  const activeCount = filters.owners.size + filters.statuses.size;
   const panelOpen = state.filterPanelOpen;
-
   const toggleHtml = `
     <button type="button" class="grouping-btn filter-toggle" id="filter-toggle" aria-expanded="${panelOpen}" aria-controls="filter-panel">
       <i data-lucide="filter" style="width:14px;height:14px;"></i>
@@ -271,15 +269,12 @@ function buildFilterContext(c, filters) {
     </button>
   `;
 
-  // Collect the owners that actually appear on processes in this collection.
+  // Owner chip population — aggregated across the current subtree only.
   const ownerIds = new Set();
-  c.landscape.areas.forEach(a => a.groups.forEach(g => { if (g.owner) ownerIds.add(g.owner); }));
+  allRows.forEach(({ node }) => { if (node.owner) ownerIds.add(node.owner); });
   const owners = [...ownerIds]
     .map(id => ({ id, person: resolvePerson(id) }))
     .sort((x, y) => (x.person?.name || x.id).localeCompare(y.person?.name || y.id, 'de'));
-
-  // Lifecycle statuses — show every defined enum (even if not present in
-  // this collection) so filter options are predictable across collections.
   const statusKeys = Object.keys(STATUS_LABELS);
 
   const removePill = (dim, val, dimLabel, valLabel) => `
@@ -290,10 +285,6 @@ function buildFilterContext(c, filters) {
     </span>`;
 
   let pills = '';
-  filters.phases.forEach(phaseId => {
-    const a = c.landscape.areas.find(x => x.id === phaseId);
-    if (a) pills += removePill('phase', phaseId, 'Bereich', a.name);
-  });
   filters.owners.forEach(ownerId => {
     const p = resolvePerson(ownerId);
     pills += removePill('owner', ownerId, 'Owner', p?.name || ownerId);
@@ -316,14 +307,6 @@ function buildFilterContext(c, filters) {
   const panelHtml = `
     <div class="filter-panel" id="filter-panel" ${panelOpen ? '' : 'hidden'}>
       <div class="filter-group">
-        <div class="filter-group-label">Bereich</div>
-        <div class="filter-group-options">
-          ${c.landscape.areas.map(a =>
-            chip('phase', a.id, a.name, filters.phases.has(a.id))
-          ).join('')}
-        </div>
-      </div>
-      <div class="filter-group">
         <div class="filter-group-label">Owner</div>
         <div class="filter-group-options">
           ${owners.length
@@ -344,34 +327,15 @@ function buildFilterContext(c, filters) {
     </div>
   `;
 
-  return { filtered, toggleHtml, pillsHtml, panelHtml };
+  return { rows, toggleHtml, pillsHtml, panelHtml };
 }
 
-function renderDiagramView(c, areas) {
-  if (areas.length === 0) {
+function renderDiagramView(c, rows) {
+  if (rows.length === 0) {
     return `<div class="empty-state">Keine Prozesse passen zu den aktuellen Filtern.</div>`;
   }
-
-  const grouping = state.grouping[c.id] || 'area';
-
-  // When grouped by Bereich we keep the original areas (preserves per-area
-  // accent colors on the cards). For other groupings we flatten + re-group
-  // through the shared `groupRows` helper — exact same keying as Tabelle.
-  if (grouping === 'area') {
-    return `
-      <section class="landscape-diagram">
-        <div class="landscape-canvas">
-          ${areas.map(a => renderAreaCard(c, a)).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  // Flatten (preserving area reference so tiles keep their accent).
-  const rows = [];
-  areas.forEach(a => a.groups.forEach(g => rows.push({ a, g })));
-  const groups = groupRows(rows, grouping, c);
-
+  const grouping = state.grouping[c.id] || 'none';
+  const groups = groupRows(rows, grouping);
   return `
     <section class="landscape-diagram">
       <div class="landscape-canvas">
@@ -381,7 +345,7 @@ function renderDiagramView(c, areas) {
               <h3 class="area-card-title">${escapeHtml(gr.label)} <span class="text-placeholder" style="font-weight:400;">(${gr.rows.length})</span></h3>
             </header>
             <div class="tile-grid">
-              ${gr.rows.map(({ a, g }) => renderTile(c, g, a.accent)).join('')}
+              ${gr.rows.map(r => renderTile(c, r.node, r.path)).join('')}
             </div>
           </section>
         `).join('')}
@@ -390,53 +354,29 @@ function renderDiagramView(c, areas) {
   `;
 }
 
-function renderAreaCard(c, area) {
+function renderTile(c, node, path) {
+  const href = hashForNode(c.id, path);
   return `
-    <section class="area-card" style="--area-accent:${area.accent || 'var(--color-border-strong)'}">
-      <header class="area-card-header">
-        <h3 class="area-card-title">${escapeHtml(area.name)} <span class="text-placeholder" style="font-weight:400;">(${area.groups.length})</span></h3>
-      </header>
-      <div class="tile-grid">
-        ${area.groups.map(g => renderTile(c, g)).join('')}
-      </div>
-    </section>
-  `;
-}
-
-function renderTile(c, group, accent) {
-  const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(group.id)}`;
-  // The default rendering (Bereich grouping) inherits --area-accent from
-  // the parent .area-card. When the caller regroups across areas (owner /
-  // status), pass the tile's source-area accent explicitly so colour
-  // coding survives the regrouping.
-  const accentStyle = accent ? ` style="--area-accent:${accent}"` : '';
-  return `
-    <a href="${href}" class="tile"${accentStyle} aria-label="${escapeAttr(group.name)}">
-      <div class="tile-number">${escapeHtml(group.id)}</div>
-      <div class="tile-name">${escapeHtml(group.name)}</div>
+    <a href="${href}" class="tile" aria-label="${escapeAttr(node.name)}">
+      <div class="tile-number">${escapeHtml(node.id)}</div>
+      <div class="tile-name">${escapeHtml(node.name)}</div>
     </a>
   `;
 }
 
-function renderTableView(c, areas) {
-  const rows = [];
-  areas.forEach(a => a.groups.forEach(g => rows.push({ a, g })));
+function renderTableView(c, rows) {
   if (rows.length === 0) {
     return `<div class="empty-state">Keine Prozesse passen zu den aktuellen Filtern.</div>`;
   }
-
-  const grouping = state.grouping[c.id] || 'area';
-  const groups = groupRows(rows, grouping, c);
-
+  const grouping = state.grouping[c.id] || 'none';
+  const groups = groupRows(rows, grouping);
   return `
     <div class="list-panel">
       ${groups.map(gr => `
-        ${gr.label !== null ? `
-          <div class="group-header">
-            <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
-            <span class="group-header-title">${escapeHtml(gr.label)} (${gr.rows.length})</span>
-          </div>
-        ` : ''}
+        <div class="group-header">
+          <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
+          <span class="group-header-title">${escapeHtml(gr.label)} (${gr.rows.length})</span>
+        </div>
         <div class="group-content">
           ${renderProcessTable(c, gr.rows)}
         </div>
@@ -460,35 +400,37 @@ function renderProcessTable(c, rows) {
           <tr>
             <th scope="col">Nr.</th>
             <th scope="col">Prozess</th>
-            <th scope="col">Bereich</th>
+            <th scope="col">Gruppe</th>
             <th scope="col">Owner</th>
             <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody>
-          ${rows.map(({ a, g }) => renderProcessRow(c, a, g)).join('')}
+          ${rows.map(r => renderProcessRow(c, r.node, r.path)).join('')}
         </tbody>
       </table>
     </div>
   `;
 }
 
-function renderProcessRow(c, a, g) {
-  const href = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(g.id)}`;
-  const owner = g.owner ? resolvePerson(g.owner) : null;
-  const filterActive = state.filters[c.id]?.phases.has(a.id);
+function renderProcessRow(c, node, path) {
+  const href = hashForNode(c.id, path);
+  const owner = node.owner ? resolvePerson(node.owner) : null;
+  // "Group" column = immediate parent in the tree (the Level-1 node for
+  // Level-2 rows; the containing Level-2 for Level-3). Empty for L1 itself.
+  let groupLabel = '—';
+  if (path.length >= 2) {
+    const parentPath = path.slice(0, -1);
+    const hit = findNodeByPath(c, parentPath);
+    if (hit) groupLabel = `${hit.node.id} ${hit.node.name}`;
+  }
   return `
     <tr class="clickable-row" data-href="${escapeAttr(href)}">
-      <td class="tabular-nums">${escapeHtml(g.id)}</td>
-      <td>${escapeHtml(g.name)}</td>
-      <td>
-        <button type="button" class="badge badge-domain badge-filterable"
-                data-filter-phase="${escapeAttr(a.id)}"
-                ${filterActive ? 'aria-pressed="true"' : ''}
-                title="Nach Bereich filtern">${escapeHtml(a.name)}</button>
-      </td>
+      <td class="tabular-nums">${escapeHtml(node.id)}</td>
+      <td>${escapeHtml(node.name)}</td>
+      <td><span class="text-sub">${escapeHtml(groupLabel)}</span></td>
       <td>${owner ? escapeHtml(owner.name) : '<span class="text-placeholder">—</span>'}</td>
-      <td>${renderStatusBadge(g.status)}</td>
+      <td>${renderStatusBadge(node.status)}</td>
     </tr>`;
 }
 
@@ -500,8 +442,8 @@ function renderStatusBadge(status) {
 }
 
 function renderGroupingDropdown(collId) {
-  const active = state.grouping[collId] || 'area';
-  const activeLabel = GROUPING_OPTIONS.find(o => o.id === active)?.label || 'Bereich';
+  const active = state.grouping[collId] || 'none';
+  const activeLabel = GROUPING_OPTIONS.find(o => o.id === active)?.label || 'Ohne Gruppierung';
   return `
     <div class="grouping-dropdown">
       <button type="button" class="grouping-btn" id="grouping-btn">
@@ -517,32 +459,32 @@ function renderGroupingDropdown(collId) {
   `;
 }
 
-function groupRows(rows, grouping, c) {
+// Row shape is always { node, path }. Grouping keys:
+//   parent → group by immediate parent id in the tree
+//   owner  → group by owner person id
+//   status → group by lifecycle status
+//   none   → single "Prozesse" bucket
+function groupRows(rows, grouping) {
   if (grouping === 'none') {
-    // Still emit a single group so the header-with-count renders — matches
-    // the data-catalog pattern of always showing "<label> (N)" above the
-    // table, even when there's no real grouping.
     return [{ label: 'Prozesse', rows }];
   }
-
   const keyFn = {
-    area:   ({ a }) => ({ key: a.id, label: a.name }),
-    owner:  ({ g }) => {
-      if (!g.owner) return { key: '__none', label: 'Ohne Owner' };
-      const p = resolvePerson(g.owner);
-      return { key: g.owner, label: p ? p.name : g.owner };
+    parent: ({ path }) => {
+      // Immediate parent id. For Level-2 rows that's the Level-1 ancestor.
+      const parentId = path.length >= 2 ? path[path.length - 2] : '__root';
+      return { key: parentId, label: parentId || 'Wurzel' };
     },
-    status: ({ g }) => {
-      if (!g.status) return { key: '__none', label: 'Ohne Status' };
-      const s = STATUS_LABELS[g.status];
-      return { key: g.status, label: s ? s.label : g.status };
+    owner:  ({ node }) => {
+      if (!node.owner) return { key: '__none', label: 'Ohne Owner' };
+      const p = resolvePerson(node.owner);
+      return { key: node.owner, label: p ? p.name : node.owner };
     },
-    tag:    ({ g }) => {
-      const t = g.tags?.[0];
-      if (!t) return { key: '__none', label: 'Ohne Tag' };
-      return { key: t, label: t };
+    status: ({ node }) => {
+      if (!node.status) return { key: '__none', label: 'Ohne Status' };
+      const s = STATUS_LABELS[node.status];
+      return { key: node.status, label: s ? s.label : node.status };
     }
-  }[grouping] || (({ a }) => ({ key: a.id, label: a.name }));
+  }[grouping] || (() => ({ key: '__all', label: 'Prozesse' }));
 
   const map = new Map();
   rows.forEach(r => {
@@ -552,8 +494,11 @@ function groupRows(rows, grouping, c) {
   });
 
   const out = [...map.values()];
-  // Keep 'area' grouping in the data's natural order; others: alpha, with "Ohne …" last.
-  if (grouping !== 'area') {
+  // Natural id sort for 'parent' grouping (so TQ.21.00 < TQ.21.01, 1 < 2 < 10);
+  // alpha sort for others, pushing "Ohne …" to the bottom.
+  if (grouping === 'parent') {
+    out.sort((x, y) => x.label.localeCompare(y.label, undefined, { numeric: true }));
+  } else {
     out.sort((x, y) => {
       const xNone = /^Ohne /.test(x.label);
       const yNone = /^Ohne /.test(y.label);
@@ -564,91 +509,160 @@ function groupRows(rows, grouping, c) {
   return out;
 }
 
-function renderExportDropdown(context, payload) {
-  const hasBpmn = context === 'process'
-    ? !!payload?.group?.bpmn
-    : (payload || []).some(a => a.groups.some(g => g.bpmn));
-  const bpmnLabel = context === 'process' ? 'BPMN herunterladen' : 'BPMN als ZIP herunterladen';
-  const disabledClass = hasBpmn ? '' : 'disabled';
+// menuPayload is passed to renderExportMenu to render the kebab dropdown.
+// Shape: { context: 'process'|'collection', payload: …same arg as renderExportDropdown }
+// When absent (e.g., home, search), the kebab is omitted.
+function renderTitleBlockActions(menuPayload) {
+  const ins = state.inspector || {};
+  const on = (section) => ins.open && ins.section === section ? ' is-active' : '';
+  const btn = (section, icon, label) => `
+    <button type="button" class="title-block-action-btn${on(section)}"
+            data-inspector-toggle="${section}"
+            aria-label="${escapeAttr(label)}" title="${escapeAttr(label)}"
+            aria-pressed="${ins.open && ins.section === section}">
+      <i data-lucide="${icon}" style="width:16px;height:16px;"></i>
+    </button>`;
+
+  const kebabHtml = menuPayload
+    ? `<div class="title-block-more-wrap">
+         <button type="button" class="title-block-action-btn${state.exportMenuOpen ? ' is-active' : ''}"
+                 data-action="more"
+                 aria-label="Weitere Aktionen" title="Weitere Aktionen"
+                 aria-haspopup="menu" aria-expanded="${state.exportMenuOpen}"
+                 aria-controls="titleblock-more-menu">
+           <i data-lucide="more-vertical" style="width:16px;height:16px;"></i>
+         </button>
+         ${renderTitleBlockMoreMenu(menuPayload.context, menuPayload.payload)}
+       </div>`
+    : '';
 
   return `
-    <div class="grouping-dropdown">
-      <button type="button" class="grouping-btn" id="export-btn" aria-expanded="${state.exportMenuOpen}" aria-controls="export-menu">
-        <i data-lucide="download" style="width:14px;height:14px;"></i>
-        Export
-        <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+    <div class="title-block-actions" role="toolbar" aria-label="Ansicht">
+      ${btn('info',     'info',          'Informationen')}
+      ${btn('comments', 'message-square','Kommentare')}
+      <button type="button" class="title-block-action-btn" data-action="edit"
+              aria-label="Bearbeiten" title="Bearbeiten">
+        <i data-lucide="pencil" style="width:16px;height:16px;"></i>
       </button>
-      <div class="grouping-menu ${state.exportMenuOpen ? 'open' : ''}" id="export-menu">
-        <div class="grouping-option" data-export="excel">Als Excel (.xlsx)</div>
-        <div class="grouping-option" data-export="pdf">Als PDF</div>
-        <div class="grouping-option ${disabledClass}" data-export="bpmn">${escapeHtml(bpmnLabel)}</div>
-      </div>
+      <div class="title-block-actions-sep" aria-hidden="true"></div>
+      <button type="button" class="title-block-action-btn" data-action="print"
+              aria-label="Drucken" title="Drucken">
+        <i data-lucide="printer" style="width:16px;height:16px;"></i>
+      </button>
+      <button type="button" class="title-block-action-btn" data-action="share"
+              aria-label="Link teilen" title="Link teilen">
+        <i data-lucide="share-2" style="width:16px;height:16px;"></i>
+      </button>
+      ${kebabHtml}
     </div>
   `;
 }
 
-function renderProcess(collId, processId, detailTab) {
-  const c = state.collections.find(x => x.id === collId);
-  if (!c) {
-    document.getElementById('main-content').innerHTML =
-      `<div class="content-wrapper"><p>Sammlung nicht gefunden.</p></div>`;
-    return;
-  }
-  const found = findGroupInCollection(c, processId);
-  if (!found) {
-    document.getElementById('main-content').innerHTML =
-      `<div class="content-wrapper"><p>Prozess nicht gefunden.</p></div>`;
-    return;
-  }
-  const { area, group } = found;
-  const tab = ['diagram', 'metadata', 'steps'].includes(detailTab) ? detailTab : 'diagram';
-  const processBase = `#/c/${encodeURIComponent(c.id)}/process/${encodeURIComponent(group.id)}`;
+// Export options dropdown, rendered inside the title-block kebab wrapper.
+// Same option classes as before so the shared click handler in app.js
+// (.grouping-option[data-export]) still routes correctly.
+function renderTitleBlockMoreMenu(context, payload) {
+  // Every container context shows "export everything in this subtree" —
+  // tree walk ensures we find BPMN leaves at any depth.
+  const hasBpmn = context === 'process'
+    ? !!payload?.group?.bpmn
+    : (payload || []).some(r => isProcessNode(r.node));
+  const bpmnLabel = context === 'process' ? 'BPMN herunterladen' : 'BPMN als ZIP herunterladen';
+  const disabledClass = hasBpmn ? '' : 'disabled';
+  return `
+    <div class="grouping-menu title-block-more-menu ${state.exportMenuOpen ? 'open' : ''}"
+         id="titleblock-more-menu" role="menu">
+      <div class="grouping-menu-section-label">Export</div>
+      <div class="grouping-option" data-export="excel" role="menuitem">Als Excel (.xlsx)</div>
+      <div class="grouping-option" data-export="pdf" role="menuitem">Als PDF</div>
+      <div class="grouping-option ${disabledClass}" data-export="bpmn" role="menuitem">${escapeHtml(bpmnLabel)}</div>
+    </div>
+  `;
+}
 
-  addRecent({ title: `${c.name} · ${group.id} ${group.name}`, hash: processBase });
+
+// New signature: renderProcess(c, node, trail, view).
+// `node` is the process-bearing node (has .bpmn). `trail` is the chain of
+// ancestor nodes from Level 1 down to this node. `view` is 'diagram' or 'steps'.
+function renderProcess(c, node, trail, view) {
+  const collectionPath = trail.map(n => n.id);
+  const base = hashForNode(c.id, collectionPath);
+  const elQuery = state.route.selectedElementId
+    ? `?el=${encodeURIComponent(state.route.selectedElementId)}`
+    : '';
+  // tab-nav targets carry the selection forward (see syncSelectedElementUrl
+  // for live updates on selection change). 'diagram' is the default view
+  // for process nodes so we omit it from the Diagramm href.
+  const diagramHref = hashForNode(c.id, collectionPath, {
+    el: state.route.selectedElementId
+  });
+  const stepsHref = hashForNode(c.id, collectionPath, {
+    view: 'steps',
+    el: state.route.selectedElementId
+  });
+
+  const breadcrumbs = [{ label: 'Home', hash: '#/' }];
+  breadcrumbs.push({ label: c.name, hash: `#/c/${encodeURIComponent(c.id)}` });
+  for (let i = 0; i < trail.length; i++) {
+    const link = i < trail.length - 1
+      ? hashForNode(c.id, collectionPath.slice(0, i + 1))
+      : null;
+    breadcrumbs.push({
+      label: `${trail[i].id} ${trail[i].name}`,
+      hash: link || undefined
+    });
+  }
+
+  addRecent({
+    title: `${c.name} · ${node.id} ${node.name}`,
+    hash: base
+  });
+
+  // The export menu payload needs the ancestry for PDF/Excel headers.
+  const exportPayload = {
+    c,
+    area: trail.length >= 1 ? trail[0] : null,   // back-compat: "area" = Level 1
+    group: node,
+    trail
+  };
 
   document.getElementById('main-content').innerHTML = `
     <div class="content-wrapper process-view">
-      ${renderBreadcrumb([
-        { label: 'Home', hash: '#/' },
-        { label: c.name, hash: `#/c/${encodeURIComponent(c.id)}` },
-        { label: `${group.id} ${group.name}` }
-      ])}
+      ${renderBreadcrumb(breadcrumbs)}
 
       <div class="title-block">
         <div class="title-block-icon">
           <i data-lucide="file-text" style="width:20px;height:20px;"></i>
         </div>
         <div class="title-block-content">
-          <h1 class="title-block-name">${escapeHtml(group.name)}</h1>
+          <h1 class="title-block-name">
+            <code class="title-code">${escapeHtml(node.id)}</code> ${escapeHtml(node.name)}
+          </h1>
         </div>
+        ${renderTitleBlockActions({ context: 'process', payload: exportPayload })}
       </div>
 
       <div class="tab-bar" role="tablist">
         <div class="tab-bar-scroll">
-          <button class="tab ${tab === 'diagram' ? 'active' : ''}" data-nav="${processBase}" role="tab" aria-selected="${tab === 'diagram'}">Diagramm</button>
-          <button class="tab ${tab === 'steps' ? 'active' : ''}" data-nav="${processBase}/steps" role="tab" aria-selected="${tab === 'steps'}">Schritte</button>
-          <button class="tab ${tab === 'metadata' ? 'active' : ''}" data-nav="${processBase}/metadata" role="tab" aria-selected="${tab === 'metadata'}">Metadaten</button>
+          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-process-tab="diagram" data-nav="${escapeAttr(diagramHref)}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
+          <button class="tab ${view === 'steps' ? 'active' : ''}" data-process-tab="steps" data-nav="${escapeAttr(stepsHref)}" role="tab" aria-selected="${view === 'steps'}">Schritte</button>
         </div>
-        ${renderExportDropdown('process', { c, area, group })}
       </div>
 
       <div id="process-tab-content">
-        ${tab === 'diagram'  ? renderProcessDiagramPane(group) :
-          tab === 'metadata' ? renderProcessMetadataPane(c, area, group) :
-                                renderProcessStepsPane()}
+        ${view === 'steps' ? renderProcessStepsPane() : renderProcessDiagramPane(node)}
       </div>
     </div>
   `;
 
-  if (tab === 'diagram') {
-    if (!group.bpmn) {
-      // Empty viewer — leave the canvas blank; the toolbar overlay stays.
+  if (view === 'steps') {
+    loadProcessSteps(node);
+  } else {
+    if (!node.bpmn) {
       document.getElementById('bpmn-canvas').innerHTML = '';
       return;
     }
-    loadBpmn(group.bpmn);
-  } else if (tab === 'steps') {
-    loadProcessSteps(group);
+    loadBpmn(node.bpmn);
   }
 }
 
@@ -683,20 +697,23 @@ function renderProcessDiagramPane(group) {
   `;
 }
 
-function renderProcessMetadataPane(c, area, group) {
+// Process metadata pane. `node` = the process-bearing tree node;
+// `trail` is the ancestor chain. Structure mirrors the pre-tree version;
+// "Bereich" row now surfaces whatever Level-1 node contains the process.
+function renderProcessMetadataPane(c, node, trail) {
   const dash = '<span class="text-placeholder">—</span>';
   const emptyPara = msg => `<p class="text-placeholder" style="margin:0;">${escapeHtml(msg)}</p>`;
 
-  const responsibleList = (group.responsible || []).map(renderPersonInline).join('<br>') || dash;
-  const tagsHtml = (group.tags || []).length
-    ? (group.tags || []).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join(' ')
+  const responsibleList = (node.responsible || []).map(renderPersonInline).join('<br>') || dash;
+  const tagsHtml = (node.tags || []).length
+    ? (node.tags || []).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join(' ')
     : dash;
 
-  const outputs   = group.outputs   || [];
-  const systems   = group.systems   || [];
-  const standards = group.standards || [];
-  const documents = group.documents || [];
-  const linkedProcs = group.linkedProcesses || { predecessor: [], successor: [], related: [] };
+  const outputs   = node.outputs   || [];
+  const systems   = node.systems   || [];
+  const standards = node.standards || [];
+  const documents = node.documents || [];
+  const linkedProcs = node.linkedProcesses || { predecessor: [], successor: [], related: [] };
   const linkedTotal = (linkedProcs.predecessor?.length || 0)
                     + (linkedProcs.successor?.length   || 0)
                     + (linkedProcs.related?.length     || 0);
@@ -713,22 +730,26 @@ function renderProcessMetadataPane(c, area, group) {
     </table>
   `;
 
+  // Ancestor context: show the path of ancestors with their id+name.
+  const level1 = trail.length >= 1 ? trail[0] : null;
+  const parent = trail.length >= 2 ? trail[trail.length - 2] : level1;
+
   return `
     <section class="content-section">
       <div class="section-label">Prozessverantwortliche</div>
       ${propsTable([
-        { label: 'Owner',                 value: renderPersonInline(group.owner) },
+        { label: 'Owner',                 value: renderPersonInline(node.owner) },
         { label: 'Responsible',           value: responsibleList },
-        { label: 'Subject-Matter Expert', value: renderPersonInline(group.expert) }
+        { label: 'Subject-Matter Expert', value: renderPersonInline(node.expert) }
       ])}
     </section>
 
     <section class="content-section">
       <div class="section-label">Zweck & Kontext</div>
       ${propsTable([
-        { label: 'Beschreibung', value: group.description ? escapeHtml(group.description) : dash },
-        { label: 'Zweck',        value: group.purpose     ? escapeHtml(group.purpose)     : dash },
-        { label: 'Trigger',      value: group.trigger     ? escapeHtml(group.trigger)     : dash },
+        { label: 'Beschreibung', value: node.description ? escapeHtml(node.description) : dash },
+        { label: 'Zweck',        value: node.purpose     ? escapeHtml(node.purpose)     : dash },
+        { label: 'Trigger',      value: node.trigger     ? escapeHtml(node.trigger)     : dash },
         { label: 'Ergebnisse',   value: outputs.length
             ? `<ul class="bullet-list" style="margin:0;">${outputs.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>`
             : dash }
@@ -739,15 +760,16 @@ function renderProcessMetadataPane(c, area, group) {
       <div class="section-label">Einordnung & Status</div>
       ${propsTable([
         { label: 'Sammlung',       value: escapeHtml(c.name) },
-        { label: 'Bereich',        value: escapeHtml(area.name) },
-        { label: 'Klassifikation', value: group.classification ? escapeHtml(group.classification) : dash },
+        { label: 'Ebene 1',        value: level1 ? escapeHtml(level1.id + ' ' + level1.name) : dash },
+        ...(parent && parent !== level1 ? [{ label: 'Über-Prozess', value: escapeHtml(parent.id + ' ' + parent.name) }] : []),
+        { label: 'Klassifikation', value: node.classification ? escapeHtml(node.classification) : dash },
         { label: 'Tags',           value: tagsHtml },
-        { label: 'Status',         value: renderStatusBadge(group.status) },
-        { label: 'Version',        value: group.version    ? escapeHtml(group.version)    : dash },
-        { label: 'Gültig ab',      value: group.validFrom  ? escapeHtml(group.validFrom)  : dash },
-        { label: 'Gültig bis',     value: group.validUntil ? escapeHtml(group.validUntil) : dash },
-        { label: 'Aktualisiert',   value: group.updatedAt  ? escapeHtml(group.updatedAt)  : dash },
-        { label: 'Review-Zyklus',  value: group.reviewCycleMonths ? `${group.reviewCycleMonths} Monate` : dash }
+        { label: 'Status',         value: renderStatusBadge(node.status) },
+        { label: 'Version',        value: node.version    ? escapeHtml(node.version)    : dash },
+        { label: 'Gültig ab',      value: node.validFrom  ? escapeHtml(node.validFrom)  : dash },
+        { label: 'Gültig bis',     value: node.validUntil ? escapeHtml(node.validUntil) : dash },
+        { label: 'Aktualisiert',   value: node.updatedAt  ? escapeHtml(node.updatedAt)  : dash },
+        { label: 'Review-Zyklus',  value: node.reviewCycleMonths ? `${node.reviewCycleMonths} Monate` : dash }
       ])}
     </section>
 
@@ -791,13 +813,68 @@ function renderProcessMetadataPane(c, area, group) {
   `;
 }
 
+// Container metadata: what we show for a Level-1 (or any container) node in
+// the inspector — description + direct-child count + ancestors. Short, since
+// these nodes carry less metadata than leaf processes.
+function renderContainerMetadataPane(c, node, trail) {
+  const dash = '<span class="text-placeholder">—</span>';
+  const level1 = trail.length >= 1 ? trail[0] : null;
+  const childCount = (node.children || []).length;
+  return `
+    <section class="content-section">
+      <div class="section-label">Beschreibung</div>
+      ${node.description
+        ? `<p style="margin:0; line-height:1.6;">${escapeHtml(node.description)}</p>`
+        : `<p class="text-placeholder" style="margin:0;">Keine Beschreibung hinterlegt.</p>`}
+    </section>
+    <section class="content-section">
+      <div class="section-label">Einordnung</div>
+      <table class="props-table">
+        <tbody>
+          <tr><th scope="row">Sammlung</th><td>${escapeHtml(c.name)}</td></tr>
+          ${level1 && level1 !== node ? `<tr><th scope="row">Ebene 1</th><td>${escapeHtml(level1.id + ' ' + level1.name)}</td></tr>` : ''}
+          <tr><th scope="row">Unterknoten</th><td>${childCount}</td></tr>
+        </tbody>
+      </table>
+    </section>
+  `;
+}
+
+function renderCollectionMetadataPane(c) {
+  const ownerHtml = c.owner
+    ? (c.ownerUrl
+        ? `<a href="${escapeAttr(c.ownerUrl)}" target="_blank" rel="noopener">${escapeHtml(c.owner)}</a>`
+        : escapeHtml(c.owner))
+    : '<span class="text-placeholder">—</span>';
+  return `
+    <section class="content-section">
+      <div class="section-label">Beschreibung</div>
+      ${c.description
+        ? `<p style="margin:0; line-height:1.6;">${escapeHtml(c.description)}</p>`
+        : `<p class="text-placeholder" style="margin:0;">Keine Beschreibung hinterlegt.</p>`}
+    </section>
+    <section class="content-section">
+      <div class="section-label">Herausgeber</div>
+      <table class="props-table">
+        <tbody>
+          <tr><th scope="row">Sammlung</th><td>${c.code ? `<code>${escapeHtml(c.code)}</code> ` : ''}${escapeHtml(c.name)}</td></tr>
+          ${c.subtitle ? `<tr><th scope="row">Untertitel</th><td>${escapeHtml(c.subtitle)}</td></tr>` : ''}
+          <tr><th scope="row">Quelle</th><td>${ownerHtml}</td></tr>
+          <tr><th scope="row">Aktualisiert</th><td>${escapeHtml(c.updatedAt || '—')}</td></tr>
+        </tbody>
+      </table>
+    </section>
+  `;
+}
+
 function renderLinkedProcesses(c, ids) {
   if (!ids || ids.length === 0) return '<span class="text-placeholder">—</span>';
   return ids.map(pid => {
-    const hit = findGroupInCollection(c, pid);
-    if (hit) {
-      const href = processHrefFor(c.id, pid);
-      return `<a href="${escapeAttr(href)}">${escapeHtml(pid)} ${escapeHtml(hit.group.name)}</a>`;
+    const path = findPathToId(c, pid);
+    if (path) {
+      const href = hashForNode(c.id, path);
+      const hit = findNodeByPath(c, path);
+      return `<a href="${escapeAttr(href)}">${escapeHtml(pid)} ${escapeHtml(hit?.node?.name || '')}</a>`;
     }
     return escapeHtml(pid);
   }).join('<br>');
@@ -939,23 +1016,21 @@ function searchHub(q, limit) {
   const matches = (hay) => (hay || '').toLowerCase().includes(needle);
 
   const collections = state.collections
-    .filter(c => matches(c.name) || matches(c.subtitle) || matches(c.description))
+    .filter(c => matches(c.name) || matches(c.code) || matches(c.subtitle) || matches(c.description))
     .slice(0, limit);
 
   const processes = [];
-  outer:
   for (const c of state.collections) {
-    for (const a of c.landscape.areas) {
-      for (const g of a.groups) {
-        const hitTags = (g.tags || []).some(t => matches(t));
-        if (matches(g.id) || matches(g.name) || matches(g.description) || matches(g.purpose) || hitTags) {
-          processes.push({ c, a, g });
-          if (processes.length >= limit) break outer;
-        }
+    if (processes.length >= limit) break;
+    walkTree(c.landscape, (node, path) => {
+      if (processes.length >= limit) return;
+      if (path.length < 2) return;   // Level-1 containers excluded from "Prozesse" results
+      const hitTags = (node.tags || []).some(t => matches(t));
+      if (matches(node.id) || matches(node.name) || matches(node.description) || matches(node.purpose) || hitTags) {
+        processes.push({ c, node, path });
       }
-    }
+    });
   }
-
   return { collections, processes };
 }
 
@@ -1014,12 +1089,12 @@ function renderSearchDropdown(q) {
       if (processes.length) {
         html += `<div class="search-dropdown-group">
           <div class="search-dropdown-group-label">Prozesse</div>
-          ${processes.map(({ c, a, g }) => `
-            <div class="search-dropdown-item" data-href="${processHrefFor(c.id, g.id)}" role="option">
+          ${processes.map(({ c, node, path }) => `
+            <div class="search-dropdown-item" data-href="${hashForNode(c.id, path)}" role="option">
               <div class="search-dropdown-item-icon"><i data-lucide="file-text" style="width:16px;height:16px;"></i></div>
               <div>
-                <div class="search-dropdown-item-name">${escapeHtml(g.name)}</div>
-                <div class="search-dropdown-item-meta">${escapeHtml(g.id)} · ${escapeHtml(c.name)} · ${escapeHtml(a.name)}</div>
+                <div class="search-dropdown-item-name">${escapeHtml(node.name)}</div>
+                <div class="search-dropdown-item-meta">${escapeHtml(node.id)} · ${escapeHtml(c.name)}</div>
               </div>
             </div>`).join('')}
         </div>`;
@@ -1084,12 +1159,12 @@ function renderSearchResults(q) {
     }
     if (processes.length) {
       body += `<div class="search-group-label">Prozesse <span style="color:var(--color-text-placeholder);font-weight:500;margin-left:4px;">${processes.length}</span></div>`;
-      for (const { c, a, g } of processes) {
-        body += `<div class="search-result-item" data-href="${processHrefFor(c.id, g.id)}">
+      for (const { c, node, path } of processes) {
+        body += `<div class="search-result-item" data-href="${hashForNode(c.id, path)}">
           <div class="search-result-icon"><i data-lucide="file-text" style="width:16px;height:16px;"></i></div>
           <div>
-            <div class="search-result-name">${escapeHtml(g.name)}</div>
-            <div class="search-result-type">${escapeHtml(g.id)} · ${escapeHtml(c.name)} · ${escapeHtml(a.name)} ${renderStatusBadge(g.status)}</div>
+            <div class="search-result-name">${escapeHtml(node.name)}</div>
+            <div class="search-result-type">${escapeHtml(node.id)} · ${escapeHtml(c.name)} ${renderStatusBadge(node.status)}</div>
           </div>
         </div>`;
       }
@@ -1107,4 +1182,218 @@ function renderSearchResults(q) {
     </div>
     ${body}
   </div>`;
+}
+
+// ─── Inspector panel ────────────────────────────────────────────────
+// Right-side context-sensitive inspector. Sections are 'info' | 'comments'.
+// The Info section adapts to what's in focus:
+//   • process view, element selected → element attributes
+//   • process view, no element       → process metadata (was the Metadaten tab)
+//   • collection view                 → collection metadata
+function renderInspector() {
+  const ins = state.inspector || {};
+  if (!ins.open) return '';
+
+  const scope = getInspectorScope();
+  const header = scope.header;
+
+  const tab = (key, label) => `
+    <button type="button" class="inspector-tab ${ins.section === key ? 'active' : ''}"
+            data-inspector-section="${key}" role="tab"
+            aria-selected="${ins.section === key}">
+      ${escapeHtml(label)}
+    </button>`;
+
+  const body = ins.section === 'comments'
+    ? renderInspectorCommentsSection(scope)
+    : renderInspectorInfoSection(scope);
+
+  return `
+    <div class="inspector-header">
+      <div class="inspector-header-text">
+        <div class="inspector-header-title" title="${escapeAttr(header.title)}">${escapeHtml(header.title)}</div>
+        <div class="inspector-header-sub">${header.sub || '&nbsp;'}</div>
+      </div>
+      <button type="button" class="inspector-close" id="inspector-close"
+              aria-label="Inspektor schließen" title="Schließen">
+        <i data-lucide="x" style="width:16px;height:16px;"></i>
+      </button>
+    </div>
+    <div class="inspector-tabs" role="tablist">
+      ${tab('info', 'Info')}
+      ${tab('comments', `Kommentare${commentCountLabel(scope)}`)}
+    </div>
+    <div class="inspector-body">
+      ${body}
+    </div>
+  `;
+}
+
+// Pick the focused entity for the inspector based on the current node route
+// + selected BPMN element. Returns a scope object consumed by the renderers.
+function getInspectorScope() {
+  const r = state.route;
+  if (r.name !== 'node') {
+    return { kind: 'empty', header: { title: 'Inspektor', sub: '' } };
+  }
+  const resolved = resolveNodeRoute(r);
+  if (!resolved) return { kind: 'empty', header: { title: 'Inspektor', sub: '' } };
+  const { c, node, trail } = resolved;
+  const el = state.inspector.element;
+
+  // Element selected on a process diagram → element-attributes scope.
+  if (el && isProcessNode(node)) {
+    return {
+      kind: 'element',
+      element: el, c, node, trail,
+      header: {
+        title: el.name || el.typeLabel || el.id || 'Element',
+        sub: `${escapeHtml(el.typeLabel || '')}${el.id ? ' · ' + escapeHtml(el.id) : ''}`
+      }
+    };
+  }
+  if (isProcessNode(node)) {
+    const parent = trail.length >= 2 ? trail[trail.length - 2] : null;
+    return {
+      kind: 'process',
+      c, node, trail,
+      header: {
+        title: node.name,
+        sub: `${escapeHtml(node.id)}${parent ? ' · ' + escapeHtml(parent.name) : ''}`
+      }
+    };
+  }
+  // Collection root (trail empty) → collection metadata.
+  if (trail.length === 0) {
+    return {
+      kind: 'collection',
+      c,
+      header: {
+        title: (c.code ? c.code + ' ' : '') + c.name,
+        sub: escapeHtml(c.subtitle || 'Sammlung')
+      }
+    };
+  }
+  // Container node (Level-1 or Level-2-with-children).
+  return {
+    kind: 'container',
+    c, node, trail,
+    header: {
+      title: `${node.id} ${node.name}`,
+      sub: trail.length >= 2
+        ? escapeHtml(trail[trail.length - 2].name)
+        : (c.code ? c.code + ' ' + c.name : c.name)
+    }
+  };
+}
+
+function commentCountLabel(scope) {
+  const n = getCommentsForCurrent(scope?.element).length;
+  return n > 0 ? ` (${n})` : '';
+}
+
+function renderInspectorInfoSection(scope) {
+  if (scope.kind === 'element') {
+    return renderInspectorElementAttributes(scope.element);
+  }
+  if (scope.kind === 'process') {
+    return `<div class="inspector-metadata">
+      ${renderProcessMetadataPane(scope.c, scope.node, scope.trail)}
+    </div>`;
+  }
+  if (scope.kind === 'container') {
+    return `<div class="inspector-metadata">
+      ${renderContainerMetadataPane(scope.c, scope.node, scope.trail)}
+    </div>`;
+  }
+  if (scope.kind === 'collection') {
+    return `<div class="inspector-metadata">
+      ${renderCollectionMetadataPane(scope.c)}
+    </div>`;
+  }
+  return `<div class="inspector-empty">
+    <p>Keine Informationen verfügbar.</p>
+  </div>`;
+}
+
+function renderInspectorElementAttributes(el) {
+  const dash = '<span class="text-placeholder">—</span>';
+  const row = (label, value) => `
+    <div class="inspector-kv">
+      <div class="inspector-kv-k">${escapeHtml(label)}</div>
+      <div class="inspector-kv-v">${value === null || value === undefined || value === '' ? dash : (typeof value === 'string' ? escapeHtml(value) : value)}</div>
+    </div>`;
+  return `
+    <section class="inspector-section">
+      <h3 class="inspector-section-title">Element-Attribute</h3>
+      <div class="inspector-kv-list">
+        ${row('Name', el.name)}
+        ${row('Typ', el.typeLabel || el.type)}
+        ${row('ID', el.id)}
+        ${row('Lane / Pool', el.lane)}
+        ${row('Eingehende', el.incoming != null ? String(el.incoming) : '')}
+        ${row('Ausgehende', el.outgoing != null ? String(el.outgoing) : '')}
+        ${row('Dokumentation', el.documentation)}
+      </div>
+    </section>
+  `;
+}
+
+function renderInspectorCommentsSection(scope) {
+  const el = scope?.element;
+  const comments = getCommentsForCurrent(el);
+  const list = comments.length === 0
+    ? `<div class="inspector-empty-muted">Noch keine Kommentare.</div>`
+    : comments.map(c => `
+        <article class="inspector-comment" data-comment-id="${escapeAttr(c.id)}">
+          <div class="inspector-comment-head">
+            <span class="inspector-comment-author">${escapeHtml(c.author || 'DR')}</span>
+            <span class="inspector-comment-time">${escapeHtml(relativeTime(c.createdAt))}</span>
+            <button type="button" class="inspector-comment-del" data-comment-del="${escapeAttr(c.id)}"
+                    aria-label="Kommentar löschen" title="Löschen">
+              <i data-lucide="trash-2" style="width:13px;height:13px;"></i>
+            </button>
+          </div>
+          <div class="inspector-comment-body">${escapeHtml(c.text)}</div>
+        </article>
+      `).join('');
+
+  const scopeLabel =
+    scope?.kind === 'element'    ? `Kommentare zu Element <code>${escapeHtml(el.id)}</code>`
+    : scope?.kind === 'process'  ? `Kommentare zum Prozess`
+    : scope?.kind === 'collection' ? `Kommentare zur Sammlung`
+    :                               `Kommentare`;
+
+  return `
+    <section class="inspector-section">
+      <h3 class="inspector-section-title">${scopeLabel}</h3>
+      <div class="inspector-comments">
+        ${list}
+      </div>
+      <form class="inspector-comment-form" id="inspector-comment-form">
+        <textarea class="inspector-comment-input" id="inspector-comment-input"
+                  placeholder="Kommentar schreiben…" rows="2"
+                  aria-label="Neuer Kommentar"></textarea>
+        <div class="inspector-comment-form-row">
+          <span class="text-sub">Prototyp — lokal gespeichert (localStorage).</span>
+          <button type="submit" class="btn-primary inspector-comment-submit">Senden</button>
+        </div>
+      </form>
+    </section>
+  `;
+}
+
+function relativeTime(iso) {
+  if (!iso) return '';
+  const then = new Date(iso).getTime();
+  if (isNaN(then)) return '';
+  const diffSec = Math.round((Date.now() - then) / 1000);
+  if (diffSec < 60) return 'gerade eben';
+  const diffMin = Math.round(diffSec / 60);
+  if (diffMin < 60) return `vor ${diffMin} Min.`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `vor ${diffH} Std.`;
+  const diffD = Math.round(diffH / 24);
+  if (diffD < 14) return `vor ${diffD} Tagen`;
+  return new Date(iso).toLocaleDateString('de-DE');
 }

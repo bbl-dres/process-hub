@@ -19,7 +19,12 @@
       "Bash(node -c js/app.js)",
       "Bash(node -c js/views.js)",
       "Bash(node -c js/exports.js)",
-      "Bash(node -c js/bpmn.js)"
+      "Bash(node -c js/bpmn.js)",
+      "Bash(node --check js/app.js)",
+      "Bash(node --check js/views.js)",
+      "Bash(node --check js/bpmn.js)",
+      "Bash(python3 -c ' *)",
+      "Bash(node --check js/exports.js)"
     ]
   }
 }

@@ -1,14 +1,11 @@
 {
   "id": "buw",
-  "areas": [
+  "children": [
     {
-      "id": "entwicklung",
-      "number": "1",
+      "id": "1",
       "name": "Entwicklung",
-      "nameEn": "Development",
-      "accent": "#1F4E8A",
       "description": "Projektinitiierung, Machbarkeitsstudie und Entwicklung des Bauvorhabens vor der Planungsphase.",
-      "groups": [
+      "children": [
         {
           "id": "1.1b",
           "name": "Entwicklung",
@@ -48,13 +45,10 @@
       ]
     },
     {
-      "id": "planung",
-      "number": "2",
+      "id": "2",
       "name": "Planung",
-      "nameEn": "Planning",
-      "accent": "#2E7D32",
       "description": "Schrittweise Planungsphasen von der Grundlagenermittlung bis zur Ausführungsplanung.",
-      "groups": [
+      "children": [
         {
           "id": "2.1b",
           "name": "Grundlagenermittlung und Vergabe der Fachplanung",
@@ -267,13 +261,10 @@
       ]
     },
     {
-      "id": "ausfuehrung",
-      "number": "3",
+      "id": "3",
       "name": "Ausführung",
-      "nameEn": "Execution",
-      "accent": "#B45309",
       "description": "Vergabe, Arbeitsvorbereitung und Bauausführung bis zur Abnahme.",
-      "groups": [
+      "children": [
         {
           "id": "3.1b",
           "name": "Vergabe der Bauausführung",
@@ -448,13 +439,10 @@
       ]
     },
     {
-      "id": "betrieb",
-      "number": "4",
+      "id": "4",
       "name": "Betrieb",
-      "nameEn": "Operation",
-      "accent": "#7C3AED",
       "description": "Inbetriebnahme, laufender Betrieb und Nutzerwechsel über den Lebenszyklus.",
-      "groups": [
+      "children": [
         {
           "id": "4.1b",
           "name": "Vergabe des Betriebs",
@@ -641,13 +629,10 @@
       ]
     },
     {
-      "id": "rueckbau",
-      "number": "5",
+      "id": "5",
       "name": "Rückbau",
-      "nameEn": "Deconstruction",
-      "accent": "#B02A1F",
       "description": "Planung, Vergabe und Durchführung des Rückbaus am Ende des Lebenszyklus.",
-      "groups": [
+      "children": [
         {
           "id": "5.1b",
           "name": "Rückbauentwicklung",
