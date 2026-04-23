@@ -106,7 +106,7 @@ async function init() {
         owners:   new Set(),   // person IDs (from people.json)
         statuses: new Set()    // lifecycle: approved | in-review | draft | deprecated
       };
-      state.grouping[c.id] = 'none';
+      state.grouping[c.id] = 'parent';
     });
   } catch (err) {
     showFatalError(err);
@@ -242,14 +242,15 @@ function collectionHrefFor(collId) {
 function encodeNodeQuery(collId) {
   const f = state.filters[collId];
   if (!f) return '';
-  const grouping = state.grouping[collId] || 'none';
+  const grouping = state.grouping[collId] || 'parent';
   const parts = [];
   const push = (key, set) => {
     if (set && set.size) parts.push(`${key}=${[...set].map(encodeURIComponent).join(',')}`);
   };
   push('owners',   f.owners);
   push('statuses', f.statuses);
-  if (grouping && grouping !== 'none') parts.push(`grouping=${encodeURIComponent(grouping)}`);
+  // 'parent' is the default — omit from URL so shared links stay short.
+  if (grouping && grouping !== 'parent') parts.push(`grouping=${encodeURIComponent(grouping)}`);
   return parts.length ? '?' + parts.join('&') : '';
 }
 
@@ -264,7 +265,7 @@ function applyNodeRouteQueryToState(route) {
   f.owners   = toSet(q.owners);
   f.statuses = toSet(q.statuses);
   state.grouping[route.collId] =
-    /^(owner|status|none)$/.test(q.grouping || '') ? q.grouping : 'none';
+    /^(parent|owner|status|none)$/.test(q.grouping || '') ? q.grouping : 'parent';
 }
 
 // Push the current filter/grouping state into the URL (replace, not push).
@@ -546,9 +547,10 @@ function resolveNodeRoute(route) {
   return { c, node: hit.node, trail: hit.trail };
 }
 
-// Given a node + the raw ?view value, pick a sensible view. Containers
-// default to 'table'; process nodes default to 'diagram'. 'steps' is only
-// valid for process nodes.
+// Given a node + the raw ?view value, pick a sensible view. Diagramm is
+// the default for BOTH containers and process nodes so tab 1 is always
+// the same across depths (cross-level muscle memory). 'steps' is only
+// valid on process nodes; 'table' is only valid on container nodes.
 function effectiveView(node, rawView) {
   const isProc = isProcessNode(node);
   if (isProc) {
@@ -556,7 +558,7 @@ function effectiveView(node, rawView) {
     return 'diagram';
   }
   if (rawView === 'diagram' || rawView === 'table') return rawView;
-  return 'table';
+  return 'diagram';
 }
 
 // Turn a legacy URL (/process/{id} or /c/{id}/diagram etc.) into the new

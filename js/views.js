@@ -210,8 +210,8 @@ function renderContainer(c, node, trail, view) {
 
       <div class="tab-bar" role="tablist">
         <div class="tab-bar-scroll">
-          <button class="tab ${view === 'table' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath)}" role="tab" aria-selected="${view === 'table'}">Tabelle</button>
-          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath, { view: 'diagram' })}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
+          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath)}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
+          <button class="tab ${view === 'table' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath, { view: 'table' })}" role="tab" aria-selected="${view === 'table'}">Tabelle</button>
         </div>
         ${f.toggleHtml}
         ${renderGroupingDropdown(c.id)}
@@ -326,8 +326,8 @@ function renderDiagramView(c, rows) {
   if (rows.length === 0) {
     return `<div class="empty-state">Keine Prozesse passen zu den aktuellen Filtern.</div>`;
   }
-  const grouping = state.grouping[c.id] || 'none';
-  const groups = groupRows(rows, grouping);
+  const grouping = state.grouping[c.id] || 'parent';
+  const groups = groupRows(rows, grouping, c);
   return `
     <section class="landscape-diagram">
       <div class="landscape-canvas">
@@ -360,8 +360,8 @@ function renderTableView(c, rows) {
   if (rows.length === 0) {
     return `<div class="empty-state">Keine Prozesse passen zu den aktuellen Filtern.</div>`;
   }
-  const grouping = state.grouping[c.id] || 'none';
-  const groups = groupRows(rows, grouping);
+  const grouping = state.grouping[c.id] || 'parent';
+  const groups = groupRows(rows, grouping, c);
   return `
     <div class="list-panel">
       ${groups.map(gr => `
@@ -434,8 +434,8 @@ function renderStatusBadge(status) {
 }
 
 function renderGroupingDropdown(collId) {
-  const active = state.grouping[collId] || 'none';
-  const activeLabel = GROUPING_OPTIONS.find(o => o.id === active)?.label || 'Ohne Gruppierung';
+  const active = state.grouping[collId] || 'parent';
+  const activeLabel = GROUPING_OPTIONS.find(o => o.id === active)?.label || 'Gruppe';
   return `
     <div class="grouping-dropdown">
       <button type="button" class="grouping-btn" id="grouping-btn">
@@ -452,19 +452,24 @@ function renderGroupingDropdown(collId) {
 }
 
 // Row shape is always { node, path }. Grouping keys:
-//   parent → group by immediate parent id in the tree
+//   parent → group by immediate parent node in the tree (label = "{id} {name}")
 //   owner  → group by owner person id
 //   status → group by lifecycle status
 //   none   → single "Prozesse" bucket
-function groupRows(rows, grouping) {
+// `c` is the collection — needed by the 'parent' grouping so we can resolve
+// the parent id to its display name.
+function groupRows(rows, grouping, c) {
   if (grouping === 'none') {
     return [{ label: 'Prozesse', rows }];
   }
   const keyFn = {
     parent: ({ path }) => {
-      // Immediate parent id. For Level-2 rows that's the Level-1 ancestor.
-      const parentId = path.length >= 2 ? path[path.length - 2] : '__root';
-      return { key: parentId, label: parentId || 'Wurzel' };
+      if (path.length < 2) return { key: '__root', label: 'Wurzel' };
+      const parentPath = path.slice(0, -1);
+      const parentId = parentPath[parentPath.length - 1];
+      const hit = c ? findNodeByPath(c, parentPath) : null;
+      const name = hit?.node?.name;
+      return { key: parentId, label: name ? `${parentId} ${name}` : parentId };
     },
     owner:  ({ node }) => {
       if (!node.owner) return { key: '__none', label: 'Ohne Owner' };
