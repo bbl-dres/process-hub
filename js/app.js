@@ -4,17 +4,17 @@
 // findNodeByPath, findPathToId, hashForNode, addRecent, renderBreadcrumb.
 
 // Process Hub Reader — main app
-// Loads all collections at boot. Renders Home (KPIs + table), Collection
-// landing (diagram/table toggle), and Process view (BPMN).
+// Loads all collections at boot. Renders Home (KPIs + table), container
+// landings (Diagramm / Tabelle), and process views (BPMN diagram / steps).
 
 // ─── State ──────────────────────────────────────────────────────────
 const state = {
-  collections: [],        // [{ ...index, landscape: { id, areas: [...] } }]
+  collections: [],        // [{ ...index, landscape: { id, children: [...] } }]
   people: {},             // { personId: { id, name, org, email } }
   route: { name: 'home' },
   filters: {},            // filters[collId] = { owners: Set, statuses: Set }
   filterPanelOpen: false,
-  grouping: {},           // grouping[collId] = 'area' | 'owner' | 'status' | 'none'
+  grouping: {},           // grouping[collId] = 'parent' | 'owner' | 'status' | 'none'
   groupingMenuOpen: false,
   exportMenuOpen: false,  // shared between collection and process export dropdowns
   expandedCollections: new Set(),  // sidebar tree: which collections are expanded
@@ -23,7 +23,8 @@ const state = {
   skippedCollections: [],  // populated in init() when a collection fails to load/validate
   recents: [],
   bpmnViewer: null,
-  bpmnLastXml: null,          // last-imported BPMN XML, for lane-map reconstruction on re-select
+  bpmnLastXml: null,          // last-imported BPMN XML (kept for debugging + future selection-restore needs)
+  bpmnLaneMap: null,          // nodeId → laneName Map built once per import; read by both selection paths
   bpmnMarkedId: null,         // id of the shape currently painted with .ph-selected-shape (NavigatedViewer has no selection service)
   processSteps: [],           // latest parseBpmnSteps() output, for Schritte-row click lookup
   // Right-side element inspector (Info / Kommentare). Defaults to open so
@@ -41,6 +42,13 @@ const GROUPING_OPTIONS = [
   { id: 'status', label: 'Status' },
   { id: 'none',   label: 'Ohne Gruppierung' }
 ];
+
+// Tree-depth convention: Level 1 = direct children of a collection root
+// (containers like "TQ.21.00"); Level 2+ = processes and deeper. KPIs,
+// search, exports, and filters all treat nodes at this depth or deeper as
+// "processes". Centralised so deeper hierarchies (L3, L4, …) need at most
+// one edit instead of hunting through every file.
+const MIN_PROCESS_DEPTH = 2;
 
 const STATUS_LABELS = {
   approved:   { label: 'Freigegeben',   badge: 'badge-certified' },
@@ -350,27 +358,22 @@ function findPathToId(c, id) {
 function isContainerNode(node) { return !!(node?.children && node.children.length); }
 function isProcessNode(node)   { return !!(node?.bpmn); }
 
-// Flatten every descendant process (node with bpmn) under a subtree.
-// Returns [{ node, path }] where path is the id trail from root.
-function collectProcesses(landscape) {
-  const out = [];
-  walkTree(landscape, (node, path) => { if (isProcessNode(node)) out.push({ node, path }); });
-  return out;
-}
-
-// Flatten every Level-2+ node (=everything that isn't a Level-1 container) —
-// this is what the app has historically meant by "process" for KPI counts
-// and the flat table view.
-function collectLeaves(landscape) {
-  const out = [];
-  walkTree(landscape, (node, path) => {
-    // A node is a "leaf" for the table view if it's at Level 2+ AND either
-    // has bpmn OR has no further children. Level-1 containers are excluded.
-    if (path.length >= 2 && (!isContainerNode(node) || isProcessNode(node))) {
-      out.push({ node, path });
+// Collect the "process" descendants of `rootNode` — nodes with bpmn, plus
+// any non-container leaf below the root. Returns [{ node, path }] where
+// path is the full id trail from the collection root. `trail` is the
+// ancestor chain of rootNode so paths are absolute from the collection.
+// Single source of truth: formerly duplicated in exports.js and views.js.
+function collectRowsUnder(rootNode, trail = []) {
+  const basePath = (trail || []).map(n => n.id);
+  const rows = [];
+  const visit = (n, path) => {
+    if (path.length >= basePath.length + 1 && (!isContainerNode(n) || isProcessNode(n))) {
+      rows.push({ node: n, path });
     }
-  });
-  return out;
+    for (const ch of n.children || []) visit(ch, [...path, ch.id]);
+  };
+  for (const ch of rootNode.children || []) visit(ch, [...basePath, ch.id]);
+  return rows;
 }
 
 // Build the canonical hash URL for a node at `path` inside `c`.
@@ -403,6 +406,16 @@ function navigate(hash) {
   else window.location.hash = hash;
 }
 
+// Safe percent-decode — falls back to the raw string on malformed input
+// rather than throwing `URIError` and crashing the entire router. A user
+// pasting `?el=%FF` (invalid UTF-8 sequence) should land on a graceful
+// empty selection, not a frozen app.
+function safeDecodeURI(str) {
+  if (!str) return '';
+  try { return decodeURIComponent(str); }
+  catch { return String(str); }
+}
+
 function parseRoute() {
   const hash = window.location.hash || '#/';
   const qSplit = hash.indexOf('?');
@@ -414,7 +427,7 @@ function parseRoute() {
   for (const kv of queryStr.split('&').filter(Boolean)) {
     const eq = kv.indexOf('=');
     const k = eq >= 0 ? kv.slice(0, eq) : kv;
-    const v = eq >= 0 ? decodeURIComponent(kv.slice(eq + 1)) : '';
+    const v = eq >= 0 ? safeDecodeURI(kv.slice(eq + 1)) : '';
     query[k] = v;
   }
 
@@ -427,7 +440,7 @@ function parseRoute() {
   if (parts[0] === 'recents') return { name: 'recents' };
 
   if (parts[0] === 'c' && parts[1]) {
-    const collId = decodeURIComponent(parts[1]);
+    const collId = safeDecodeURI(parts[1]);
     // Legacy /process/{id}[/steps|/metadata] shape — preserve `legacyProcessId`
     // so handleRoute can look up the node in the tree and redirect.
     if (parts[2] === 'process' && parts[3]) {
@@ -436,7 +449,7 @@ function parseRoute() {
         name: 'node',
         legacy: 'process',
         collId,
-        legacyProcessId: decodeURIComponent(parts[3]),
+        legacyProcessId: safeDecodeURI(parts[3]),
         legacyTab: (rawTab === 'metadata' || rawTab === 'steps') ? rawTab : 'diagram',
         query
       };
@@ -454,7 +467,7 @@ function parseRoute() {
     // New shape: /c/{coll}/n/{id1}/{id2}/…  (path empty = collection root)
     let path = [];
     if (parts[2] === 'n') {
-      path = parts.slice(3).map(decodeURIComponent);
+      path = parts.slice(3).map(safeDecodeURI);
     }
     // view is always in the query string in the new shape. Legal values:
     // table / diagram / steps. Anything else treated as "unset" (let the
@@ -885,7 +898,7 @@ function wireGlobalHandlers() {
       const c = state.collections.find(x => x.id === collId);
       if (!c) return;
       const rootNode = { id: c.id, name: c.name, children: c.landscape.children };
-      const rows = collectRowsUnder(c, rootNode, []);
+      const rows = collectRowsUnder(rootNode, []);
       if (kind === 'excel')      exportContainerExcel(c, rootNode, rows);
       else if (kind === 'pdf')   exportContainerPdf(c, rootNode, rows);
       else if (kind === 'bpmn')  downloadContainerBpmnZip(c, rootNode, rows);
@@ -1091,12 +1104,20 @@ function inspectorIsRelevantRoute() {
 function refreshInspector() {
   const panel = document.getElementById('inspector-panel');
   if (!panel) return;
+  const wasOpen = !panel.hidden;
   const open = !!state.inspector.open && inspectorIsRelevantRoute();
   panel.hidden = !open;
   document.body.classList.toggle('inspector-open', open);
   if (open) {
     panel.innerHTML = renderInspector();
     if (window.lucide?.createIcons) window.lucide.createIcons();
+    // Move focus into the panel on the open transition — keyboard users
+    // otherwise have no signal that the panel appeared. Only on the
+    // open-transition (not on every refresh) to avoid yanking focus away
+    // while the user is typing a comment or using the tabs.
+    if (!wasOpen) {
+      document.getElementById('inspector-close')?.focus({ preventScroll: true });
+    }
   } else {
     panel.innerHTML = '';
   }
@@ -1282,6 +1303,18 @@ function showToast(text, ms = 2200) {
   setTimeout(() => { el.remove(); }, ms);
 }
 
+// ─── Notifications ──────────────────────────────────────────────────
+// Single entry point for user-facing diagnostics. `severity` controls the
+// console channel (info → log, warn → warn, error → error) so browser
+// filters still work; the user always sees a toast. Replaces scattered
+// `alert()` calls in exports + ad-hoc showToast in error paths.
+function notify(text, severity = 'info') {
+  if (severity === 'error') console.error(text);
+  else if (severity === 'warn') console.warn(text);
+  else console.log(text);
+  showToast(text, severity === 'error' ? 4000 : 2200);
+}
+
 // Renamed from rerenderCollection. Re-draws the current node view after a
 // filter / grouping / view change. Also pushes state into the URL via
 // syncNodeUrl so shared links reproduce the same filtered view.
@@ -1450,7 +1483,7 @@ function renderSidebarNodes(c, nodes, parentPath, currentPathKey) {
 // containers are excluded so a collection with one L1 + 18 L2s reports 18.
 function totalProcesses(landscape) {
   let n = 0;
-  walkTree(landscape, (_, path) => { if (path.length >= 2) n++; });
+  walkTree(landscape, (_, path) => { if (path.length >= MIN_PROCESS_DEPTH) n++; });
   return n;
 }
 function processesWithBpmn(landscape) {
@@ -1458,7 +1491,6 @@ function processesWithBpmn(landscape) {
   walkTree(landscape, (node) => { if (isProcessNode(node)) n++; });
   return n;
 }
-function countLevel1(landscape) { return (landscape.children || []).length; }
 
 // Descendant count for a node — used by the sidebar count badges. Semantics
 // match totalProcesses (every Level-2+ descendant, i.e. everything below

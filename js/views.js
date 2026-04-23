@@ -29,9 +29,7 @@ function renderHome() {
         <div class="title-block-icon">
           <i data-lucide="workflow" style="width:20px;height:20px;"></i>
         </div>
-        <div class="title-block-content">
-          <h1 class="title-block-name">Prozess-Hub</h1>
-        </div>
+        <h1 class="title-block-name">Prozess-Hub</h1>
       </div>
 
       ${skipBanner}
@@ -86,7 +84,7 @@ function renderRecentActivityTable() {
   const all = [];
   state.collections.forEach(c => {
     walkTree(c.landscape, (node, path) => {
-      if (path.length >= 2 && node.updatedAt) {
+      if (path.length >= MIN_PROCESS_DEPTH && node.updatedAt) {
         all.push({ c, node, path });
       }
     });
@@ -152,7 +150,7 @@ function computeKpis() {
   let processes = 0, withBpmn = 0, withoutBpmn = 0;
   state.collections.forEach(c => {
     walkTree(c.landscape, (node, path) => {
-      if (path.length >= 2) {
+      if (path.length >= MIN_PROCESS_DEPTH) {
         processes++;
         if (isProcessNode(node)) withBpmn++; else withoutBpmn++;
       }
@@ -200,18 +198,16 @@ function renderContainer(c, node, trail, view) {
         <div class="title-block-icon">
           <i data-lucide="${trail.length ? 'folder' : 'folder-tree'}" style="width:20px;height:20px;"></i>
         </div>
-        <div class="title-block-content">
-          <h1 class="title-block-name">
-            ${titleCode ? `<code class="title-code">${escapeHtml(titleCode)}</code> ` : ''}${escapeHtml(titleName)}
-          </h1>
-        </div>
+        <h1 class="title-block-name">
+          ${titleCode ? `<code class="title-code">${escapeHtml(titleCode)}</code> ` : ''}${escapeHtml(titleName)}
+        </h1>
         ${renderTitleBlockActions({ context: 'container', payload: f.filtered })}
       </div>
 
-      <div class="tab-bar" role="tablist">
+      <div class="tab-bar" role="tablist" aria-label="Ansichts-Umschaltung">
         <div class="tab-bar-scroll">
-          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath)}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
-          <button class="tab ${view === 'table' ? 'active' : ''}" data-nav="${hashForNode(c.id, collectionPath, { view: 'table' })}" role="tab" aria-selected="${view === 'table'}">Tabelle</button>
+          <button class="tab ${view === 'diagram' ? 'active' : ''}" id="tab-container-diagram" data-nav="${hashForNode(c.id, collectionPath)}" role="tab" aria-selected="${view === 'diagram'}" aria-controls="tabpanel-container">Diagramm</button>
+          <button class="tab ${view === 'table' ? 'active' : ''}" id="tab-container-table" data-nav="${hashForNode(c.id, collectionPath, { view: 'table' })}" role="tab" aria-selected="${view === 'table'}" aria-controls="tabpanel-container">Tabelle</button>
         </div>
         ${f.toggleHtml}
         ${renderGroupingDropdown(c.id)}
@@ -220,29 +216,20 @@ function renderContainer(c, node, trail, view) {
 
       ${f.pillsHtml}
 
-      ${view === 'diagram' ? renderDiagramView(c, f.rows) : renderTableView(c, f.rows)}
+      <div id="tabpanel-container" role="tabpanel"
+           aria-labelledby="${view === 'diagram' ? 'tab-container-diagram' : 'tab-container-table'}">
+        ${view === 'diagram' ? renderDiagramView(c, f.rows) : renderTableView(c, f.rows)}
+      </div>
     </div>
   `;
 }
 
-// buildFilterContext now operates on a subtree rooted at `node`. It collects
-// descendant "process" rows ({node, path}), applies owner/status filters,
-// and assembles the toggle + pill + panel chrome.
+// buildFilterContext operates on a subtree rooted at `node`: collects
+// descendant "process" rows via the shared collectRowsUnder helper (from
+// app.js), then applies owner/status filters, and assembles the toggle +
+// pill + panel chrome.
 function buildFilterContext(c, rootNode, trail, filters) {
-  const basePath = trail.map(n => n.id);
-  // Descendants that represent "processes" (Level-2+ nodes). Plus the
-  // node itself is excluded; only its descendants are shown.
-  const allRows = [];
-  const visit = (n, path) => {
-    if (!isContainerNode(n) || isProcessNode(n)) {
-      // leaf row for the table (or process-with-children, which we also list)
-      if (path.length >= basePath.length + 1) {
-        allRows.push({ node: n, path });
-      }
-    }
-    for (const ch of n.children || []) visit(ch, [...path, ch.id]);
-  };
-  for (const ch of rootNode.children || []) visit(ch, [...basePath, ch.id]);
+  const allRows = collectRowsUnder(rootNode, trail);
 
   const rows = allRows.filter(({ node }) => {
     if (filters.owners.size   > 0 && !filters.owners.has(node.owner))     return false;
@@ -411,7 +398,7 @@ function renderProcessRow(c, node, path) {
   // "Group" column = immediate parent in the tree (the Level-1 node for
   // Level-2 rows; the containing Level-2 for Level-3). Empty for L1 itself.
   let groupLabel = '—';
-  if (path.length >= 2) {
+  if (path.length >= MIN_PROCESS_DEPTH) {
     const parentPath = path.slice(0, -1);
     const hit = findNodeByPath(c, parentPath);
     if (hit) groupLabel = `${hit.node.id} ${hit.node.name}`;
@@ -464,7 +451,7 @@ function groupRows(rows, grouping, c) {
   }
   const keyFn = {
     parent: ({ path }) => {
-      if (path.length < 2) return { key: '__root', label: 'Wurzel' };
+      if (path.length < MIN_PROCESS_DEPTH) return { key: '__root', label: 'Wurzel' };
       const parentPath = path.slice(0, -1);
       const parentId = parentPath[parentPath.length - 1];
       const hit = c ? findNodeByPath(c, parentPath) : null;
@@ -631,22 +618,21 @@ function renderProcess(c, node, trail, view) {
         <div class="title-block-icon">
           <i data-lucide="file-text" style="width:20px;height:20px;"></i>
         </div>
-        <div class="title-block-content">
-          <h1 class="title-block-name">
-            <code class="title-code">${escapeHtml(node.id)}</code> ${escapeHtml(node.name)}
-          </h1>
-        </div>
+        <h1 class="title-block-name">
+          <code class="title-code">${escapeHtml(node.id)}</code> ${escapeHtml(node.name)}
+        </h1>
         ${renderTitleBlockActions({ context: 'process', payload: exportPayload })}
       </div>
 
-      <div class="tab-bar" role="tablist">
+      <div class="tab-bar" role="tablist" aria-label="Prozess-Ansicht">
         <div class="tab-bar-scroll">
-          <button class="tab ${view === 'diagram' ? 'active' : ''}" data-process-tab="diagram" data-nav="${escapeAttr(diagramHref)}" role="tab" aria-selected="${view === 'diagram'}">Diagramm</button>
-          <button class="tab ${view === 'steps' ? 'active' : ''}" data-process-tab="steps" data-nav="${escapeAttr(stepsHref)}" role="tab" aria-selected="${view === 'steps'}">Schritte</button>
+          <button class="tab ${view === 'diagram' ? 'active' : ''}" id="tab-process-diagram" data-process-tab="diagram" data-nav="${escapeAttr(diagramHref)}" role="tab" aria-selected="${view === 'diagram'}" aria-controls="process-tab-content">Diagramm</button>
+          <button class="tab ${view === 'steps' ? 'active' : ''}" id="tab-process-steps" data-process-tab="steps" data-nav="${escapeAttr(stepsHref)}" role="tab" aria-selected="${view === 'steps'}" aria-controls="process-tab-content">Schritte</button>
         </div>
       </div>
 
-      <div id="process-tab-content">
+      <div id="process-tab-content" role="tabpanel"
+           aria-labelledby="${view === 'steps' ? 'tab-process-steps' : 'tab-process-diagram'}">
         ${view === 'steps' ? renderProcessStepsPane() : renderProcessDiagramPane(node)}
       </div>
     </div>
@@ -773,7 +759,7 @@ function renderProcessMetadataPane(c, node, trail) {
     <section class="content-section">
       <div class="section-label">Unterstützende Systeme</div>
       ${systems.length
-        ? `<div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">${
+        ? `<div class="chip-wrap">${
             systems.map(s => `<span class="tag-chip">${escapeHtml(s)}</span>`).join('')
           }</div>`
         : emptyPara('Keine Systeme erfasst.')}
@@ -821,7 +807,7 @@ function renderContainerMetadataPane(c, node, trail) {
     <section class="content-section">
       <div class="section-label">Beschreibung</div>
       ${node.description
-        ? `<p style="margin:0; line-height:1.6;">${escapeHtml(node.description)}</p>`
+        ? `<p class="prose-tight">${escapeHtml(node.description)}</p>`
         : `<p class="text-placeholder" style="margin:0;">Keine Beschreibung hinterlegt.</p>`}
     </section>
     <section class="content-section">
@@ -847,7 +833,7 @@ function renderCollectionMetadataPane(c) {
     <section class="content-section">
       <div class="section-label">Beschreibung</div>
       ${c.description
-        ? `<p style="margin:0; line-height:1.6;">${escapeHtml(c.description)}</p>`
+        ? `<p class="prose-tight">${escapeHtml(c.description)}</p>`
         : `<p class="text-placeholder" style="margin:0;">Keine Beschreibung hinterlegt.</p>`}
     </section>
     <section class="content-section">
@@ -904,9 +890,7 @@ function renderChatView() {
       <div class="title-block-icon">
         <i data-lucide="sparkles" style="width:20px;height:20px;"></i>
       </div>
-      <div class="title-block-content">
-        <h1 class="title-block-name">KI-Assistent</h1>
-      </div>
+      <h1 class="title-block-name">KI-Assistent</h1>
     </div>
 
     <div class="chat-placeholder">
@@ -931,9 +915,7 @@ function renderWorkflowsView() {
       <div class="title-block-icon">
         <i data-lucide="workflow" style="width:20px;height:20px;"></i>
       </div>
-      <div class="title-block-content">
-        <h1 class="title-block-name">Workflows & API</h1>
-      </div>
+      <h1 class="title-block-name">Workflows & API</h1>
     </div>
 
     <section class="content-section">
@@ -967,7 +949,7 @@ function renderWorkflowsView() {
                   <td class="tabular-nums">${total}</td>
                   <td class="tabular-nums">${withBpmn}</td>
                   <td>
-                    <div style="display:flex; flex-wrap: wrap; gap: var(--space-2);">
+                    <div class="chip-wrap">
                       <button class="tool-btn" type="button" data-export-coll="${escapeAttr(c.id)}:excel">
                         <i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Als Excel
                       </button>
@@ -1019,7 +1001,7 @@ function searchHub(q, limit) {
     if (processes.length >= limit) break;
     walkTree(c.landscape, (node, path) => {
       if (processes.length >= limit) return;
-      if (path.length < 2) return;   // Level-1 containers excluded from "Prozesse" results
+      if (path.length < MIN_PROCESS_DEPTH) return;   // Level-1 containers excluded from "Prozesse" results
       const hitTags = (node.tags || []).some(t => matches(t));
       if (matches(node.id) || matches(node.name) || matches(node.description) || matches(node.purpose) || hitTags) {
         processes.push({ c, node, path });
@@ -1119,9 +1101,7 @@ function renderSearchResults(q) {
       ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Suche' }])}
       <div class="title-block">
         <div class="title-block-icon"><i data-lucide="search" style="width:20px;height:20px;"></i></div>
-        <div class="title-block-content">
-          <h1 class="title-block-name">Suche</h1>
-        </div>
+        <h1 class="title-block-name">Suche</h1>
       </div>
       <p class="text-secondary">Geben Sie oben einen Suchbegriff ein.</p>
     </div>`;
@@ -1171,9 +1151,7 @@ function renderSearchResults(q) {
     ${renderBreadcrumb([{ label: 'Home', hash: '#/' }, { label: 'Suche' }])}
     <div class="title-block">
       <div class="title-block-icon"><i data-lucide="search" style="width:20px;height:20px;"></i></div>
-      <div class="title-block-content">
-        <h1 class="title-block-name">${total} ${noun} für „${escapeHtml(trimmed)}"</h1>
-      </div>
+      <h1 class="title-block-name">${total} ${noun} für „${escapeHtml(trimmed)}"</h1>
     </div>
     ${body}
   </div>`;
@@ -1194,8 +1172,10 @@ function renderInspector() {
 
   const tab = (key, label) => `
     <button type="button" class="inspector-tab ${ins.section === key ? 'active' : ''}"
+            id="tab-inspector-${key}"
             data-inspector-section="${key}" role="tab"
-            aria-selected="${ins.section === key}">
+            aria-selected="${ins.section === key}"
+            aria-controls="tabpanel-inspector">
       ${escapeHtml(label)}
     </button>`;
 
@@ -1214,11 +1194,12 @@ function renderInspector() {
         <i data-lucide="x" style="width:16px;height:16px;"></i>
       </button>
     </div>
-    <div class="inspector-tabs" role="tablist">
+    <div class="inspector-tabs" role="tablist" aria-label="Inspektor-Ansicht">
       ${tab('info', 'Info')}
       ${tab('comments', `Kommentare${commentCountLabel(scope)}`)}
     </div>
-    <div class="inspector-body">
+    <div class="inspector-body" id="tabpanel-inspector" role="tabpanel"
+         aria-labelledby="tab-inspector-${ins.section}">
       ${body}
     </div>
   `;
@@ -1275,9 +1256,12 @@ function getInspectorScope() {
     c, node, trail,
     header: {
       title: `${node.id} ${node.name}`,
+      // Escape BOTH branches — the collection-level branch previously fed
+      // `c.code + ' ' + c.name` raw into innerHTML (XSS vector via tampered
+      // collection JSON). Always treat data-sourced strings as untrusted.
       sub: trail.length >= 2
         ? escapeHtml(trail[trail.length - 2].name)
-        : (c.code ? c.code + ' ' + c.name : c.name)
+        : escapeHtml(c.code ? c.code + ' ' + c.name : c.name)
     }
   };
 }

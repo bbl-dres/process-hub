@@ -705,34 +705,34 @@ body.sidebar-resizing .header-logo { transition: none !important; }
    Title Block
    ============================================================ */
 .title-block {
-  display: flex; align-items: flex-start;
+  display: flex; align-items: center;   /* was flex-start + margin-top:4px nudges on every child */
   gap: var(--space-3);
   margin-bottom: var(--space-6);
 }
 .title-block-icon {
   width: 36px; height: 36px;
-  flex-shrink: 0; margin-top: 0;
+  flex-shrink: 0;
   color: var(--color-bg-accent-strong);
   background: var(--color-bg-accent);
   border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center;
 }
-.title-block-content { flex: 1; }
 .title-block-name {
-  /* Was --text-display (28 px) — dominated dense views. Stepping down
-     to heading-l (18 px) in bold reads as a proper page-title without
-     crowding the tab-bar beneath it. */
+  /* `.title-block-content` used to wrap the name with `flex: 1`; that
+     wrapper did nothing else and is now gone. The name takes the flex
+     role directly. */
+  flex: 1;
+  min-width: 0;
   font-size: var(--text-heading-l); font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1.3; margin: 0;
   letter-spacing: -0.01em;
 }
-.title-block-badge { flex-shrink: 0; margin-top: 4px; }
+.title-block-badge { flex-shrink: 0; }
 .title-block-actions {
   flex-shrink: 0;
   display: flex; align-items: center;
   gap: var(--space-2);
-  margin-top: 4px;
 }
 
 /* ============================================================
@@ -2695,23 +2695,6 @@ body.sidebar-collapsed .nav-phase-badge { margin: 0 auto; }
   box-shadow: var(--shadow-card);
   overflow: hidden;
 }
-.landscape-diagram-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--color-border-subtle);
-  background: var(--color-bg-surface);
-}
-.landscape-diagram-title {
-  display: inline-flex; align-items: center; gap: var(--space-2);
-  font-size: var(--text-heading-m);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-.landscape-diagram-tools {
-  display: flex; gap: var(--space-2);
-}
 .tool-btn {
   display: inline-flex; align-items: center; gap: 6px;
   height: 28px;
@@ -2921,6 +2904,19 @@ body.sidebar-collapsed .nav-phase-badge { margin: 0 auto; }
   color: var(--color-text-link);
   border-radius: 999px;
   font-size: var(--text-small);
+  line-height: 1.6;
+}
+/* Wrapping row of chips (systems, workflow-view action buttons, etc.). Used
+   to live as duplicated inline `style="display:flex;flex-wrap:wrap;gap:…"`. */
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+/* Body paragraph inside a .content-section — no top/bottom margin, generous
+   line-height. Used for description blobs in the inspector metadata panes. */
+.prose-tight {
+  margin: 0;
   line-height: 1.6;
 }
 

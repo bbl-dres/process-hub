@@ -157,6 +157,10 @@ async function loadBpmn(path) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const xml = await res.text();
     state.bpmnLastXml = xml;
+    // Build the lane map once per import and cache on state. Selection
+    // handlers (interactive click + URL preselect) both reuse this instead
+    // of re-parsing the XML, so the two paths can't drift apart.
+    state.bpmnLaneMap = buildLaneMap(xml);
     state.bpmnMarkedId = null;  // old id belongs to the previous viewer's DOM, which is gone
     canvasEl.innerHTML = '';
     if (!window.BpmnJS) throw new Error('BPMN-Viewer nicht geladen');
@@ -166,7 +170,7 @@ async function loadBpmn(path) {
     if (warnings?.length) console.warn('BPMN import warnings:', warnings);
     state.bpmnViewer.get('canvas').zoom('fit-viewport', 'auto');
     wireBpmnToolbar();
-    wireBpmnSelection(xml);
+    wireBpmnSelection();
     applyRouteSelection();
   } catch (err) {
     canvasEl.innerHTML = `<div class="bpmn-empty">
@@ -212,9 +216,6 @@ function wireBpmnToolbar() {
   }
 }
 
-// Bind element.click on the bpmn-js eventBus so clicking a shape pushes
-// its structured info into the inspector. We also pre-build a lane map
-// from the raw XML so lane resolution doesn't depend on bpmn-js internals.
 // Pre-select the element named in state.route.selectedElementId (from ?el=…).
 // Looks it up via elementRegistry (always available), applies a visible
 // marker via canvas.addMarker (NavigatedViewer has no 'selection' service,
@@ -239,15 +240,19 @@ function applyRouteSelection() {
   try { state.bpmnViewer.get('selection').select(el); } catch { markBpmnElement(id); }
   try { canvas.scrollToElement(el); } catch { /* older bpmn-js lacks this */ }
   if (typeof setInspectorElement === 'function') {
-    const xml = state.bpmnLastXml || '';
-    const info = describeBpmnElement(el, buildLaneMap(xml));
+    // Lane map cached in state by loadBpmn — single source shared with
+    // the interactive-click path below.
+    const info = describeBpmnElement(el, state.bpmnLaneMap || new Map());
     setInspectorElement(info);
   }
 }
 
-function wireBpmnSelection(xml) {
+// Bind element.click on the bpmn-js eventBus so clicking a shape pushes
+// its structured info into the inspector. Reads the lane map from state
+// (populated in loadBpmn) rather than building its own — so the two entry
+// points to selection (click here, URL preselect above) can't drift.
+function wireBpmnSelection() {
   if (!state.bpmnViewer) return;
-  const laneMap = buildLaneMap(xml);
   const bus = state.bpmnViewer.get('eventBus');
   bus.on('element.click', (evt) => {
     const el = evt?.element;
@@ -258,7 +263,7 @@ function wireBpmnSelection(xml) {
       return;
     }
     markBpmnElement(el.id);
-    const info = describeBpmnElement(el, laneMap);
+    const info = describeBpmnElement(el, state.bpmnLaneMap || new Map());
     if (typeof setInspectorElement === 'function') setInspectorElement(info);
   });
 }

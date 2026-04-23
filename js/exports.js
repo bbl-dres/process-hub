@@ -18,26 +18,13 @@ function dispatchExport(kind) {
     return;
   }
 
-  // Container: walk the subtree under `node` to collect processes.
-  const rows = collectRowsUnder(c, node, trail);
+  // Container: walk the subtree under `node` to collect processes. Helper
+  // `collectRowsUnder` lives in app.js so views/exports/handlers share one
+  // canonical definition of "process descendants."
+  const rows = collectRowsUnder(node, trail);
   if (kind === 'excel') return exportContainerExcel(c, node, rows);
   if (kind === 'pdf')   return exportContainerPdf(c, node, rows);
   if (kind === 'bpmn')  return downloadContainerBpmnZip(c, node, rows);
-}
-
-// Walk descendants of `rootNode` under trail, returning [{ node, path }] for
-// every "process"-like node (Level-2+ leaf or node with bpmn).
-function collectRowsUnder(c, rootNode, trail) {
-  const basePath = trail.map(n => n.id);
-  const rows = [];
-  const visit = (n, path) => {
-    if (path.length >= basePath.length + 1 && (!isContainerNode(n) || isProcessNode(n))) {
-      rows.push({ node: n, path });
-    }
-    for (const ch of n.children || []) visit(ch, [...path, ch.id]);
-  };
-  for (const ch of rootNode.children || []) visit(ch, [...basePath, ch.id]);
-  return rows;
 }
 
 // Return the Level-1 ancestor for a given row (or the row's node if it's L1).
@@ -273,7 +260,7 @@ async function downloadProcessBpmn(node) {
     const xml = await res.text();
     downloadBlob(new Blob([xml], { type: 'application/xml' }), `${sanitizeFilename(node.id)}.bpmn`);
   } catch (err) {
-    alert(`Download fehlgeschlagen: ${err.message}`);
+    notify(`Download fehlgeschlagen: ${err.message}`, 'error');
   }
 }
 
@@ -322,7 +309,6 @@ function withBusy(text, fn) {
   overlay.innerHTML = `<div class="loading-spinner"></div><p>${escapeHtml(text)}</p>`;
   document.body.appendChild(overlay);
   return Promise.resolve().then(fn).catch(err => {
-    console.error('Export failed:', err);
-    alert(`Export fehlgeschlagen: ${err.message}`);
+    notify(`Export fehlgeschlagen: ${err.message}`, 'error');
   }).finally(() => overlay.remove());
 }
