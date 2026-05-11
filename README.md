@@ -10,15 +10,15 @@
 ![bpmn--js](https://img.shields.io/badge/bpmn--js-17-1a1a1a)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 
-> [!CAUTION]
-> **This is an unofficial mockup for demonstration purposes only.**
-> All data is fictional. Not all features are fully functional. This project serves as a visual and conceptual prototype — it is not intended for production use.
-
 A single-page, vanilla-JS reader for browsing BPMN process landscapes. Structured like a data catalog, read-only, and designed for non-modellers to navigate collections of documented business processes.
 
 No build step. No framework. Load over an HTTP server and go.
 
 - Live demo: https://bbl-dres.github.io/process-hub/ 
+
+> [!CAUTION]
+> **This is an unofficial mockup for demonstration purposes only.**
+> All data is fictional. Not all features are fully functional. This project serves as a visual and conceptual prototype — it is not intended for production use.
 
 <p align="center">
   <img src="assets/images/Preview1.jpg" alt="Process Hub — collection landscape view" width="45%" />
