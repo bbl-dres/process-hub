@@ -20,6 +20,8 @@ No build step. No framework. Load over an HTTP server and go.
 > **This is an unofficial mockup for demonstration purposes only.**
 > All data is fictional. Not all features are fully functional. This project serves as a visual and conceptual prototype — it is not intended for production use.
 
+## Preview
+
 <p align="center">
   <img src="assets/images/Preview1.jpg" alt="Process Hub — collection landscape view" width="45%" />
   &nbsp;
