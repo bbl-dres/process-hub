@@ -18,6 +18,8 @@ A single-page, vanilla-JS reader for browsing BPMN process landscapes. Structure
 
 No build step. No framework. Load over an HTTP server and go.
 
+- Live demo: https://bbl-dres.github.io/process-hub/ 
+
 <p align="center">
   <img src="assets/images/Preview1.jpg" alt="Process Hub — collection landscape view" width="45%" />
   &nbsp;
