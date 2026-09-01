@@ -14,12 +14,10 @@ A read-only browser for navigating BPMN process landscapes without requiring use
 
 **Live demo:** https://bbl-dres.github.io/process-hub/
 
-<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-  <tr>
-    <td width="50%" valign="top"><img src="assets/images/preview-1.jpg" alt="Process Hub dashboard" width="100%"/></td>
-    <td width="50%" valign="top"><img src="assets/images/preview-2.jpg" alt="Process Hub BPMN diagram view" width="100%"/></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="assets/images/preview-1.jpg" alt="Process Hub dashboard" width="49%"/>
+  <img src="assets/images/preview-2.jpg" alt="Process Hub BPMN diagram view" width="49%"/>
+</p>
 
 ## Features
 
