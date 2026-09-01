@@ -5,10 +5,10 @@
 [![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-2ea44f?logo=github&logoColor=white)](https://bbl-dres.github.io/process-hub/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A read-only browser for navigating BPMN process landscapes without requiring users to work in a modelling tool.
-
 > [!CAUTION]
 > This is an unofficial demonstration prototype. Its functions and reconstructed process content are not production-ready and must not be treated as an authoritative process repository.
+
+A read-only browser for navigating BPMN process landscapes without requiring users to work in a modelling tool.
 
 ## Demo
 
