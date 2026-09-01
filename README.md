@@ -1,6 +1,9 @@
 # Process Hub
 
-![Process Hub social preview](assets/Social1.jpg)
+![Process Hub social preview](assets/social-preview.jpg)
+
+[![Demo](https://img.shields.io/badge/demo-GitHub%20Pages-2ea44f?logo=github&logoColor=white)](https://bbl-dres.github.io/process-hub/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A read-only browser for navigating BPMN process landscapes without requiring users to work in a modelling tool.
 
@@ -10,6 +13,13 @@ A read-only browser for navigating BPMN process landscapes without requiring use
 ## Demo
 
 **Live demo:** https://bbl-dres.github.io/process-hub/
+
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+  <tr>
+    <td width="50%" valign="top"><img src="assets/images/preview-1.jpg" alt="Process Hub dashboard" width="100%"/></td>
+    <td width="50%" valign="top"><img src="assets/images/preview-2.jpg" alt="Process Hub BPMN diagram view" width="100%"/></td>
+  </tr>
+</table>
 
 ## Features
 
